@@ -1,0 +1,288 @@
+{
+  "red": {
+    "western": {
+      "general": ["passion", "love", "danger", "excitement", "energy", "power"],
+      "business": ["urgency", "sale", "clearance", "importance", "stop"],
+      "wedding": ["love", "romance", "rarely used as primary"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["luck", "prosperity", "happiness", "celebration", "joy"],
+      "business": ["success", "fortune", "auspicious"],
+      "wedding": ["traditional color", "joy", "luck", "prosperity"],
+      "mourning": ["not used", "considered inappropriate"]
+    },
+    "southAsian": {
+      "general": ["purity", "fertility", "love", "beauty", "power"],
+      "business": ["auspicious", "success"],
+      "wedding": ["traditional bridal color", "fertility", "prosperity"],
+      "mourning": ["not used", "represents life"]
+    },
+    "middleEastern": {
+      "general": ["danger", "evil", "sacrifice", "courage"],
+      "business": ["caution", "used sparingly"],
+      "wedding": ["varies by country", "sometimes traditional"],
+      "mourning": ["not typically used"]
+    }
+  },
+  "blue": {
+    "western": {
+      "general": ["trust", "calm", "stability", "professionalism", "security"],
+      "business": ["corporate", "trustworthy", "reliable", "professional"],
+      "wedding": ["something blue tradition", "fidelity"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["immortality", "healing", "relaxation", "trust"],
+      "business": ["trust", "reliability"],
+      "wedding": ["sometimes used", "not traditional"],
+      "mourning": ["sometimes associated with death in some regions"]
+    },
+    "southAsian": {
+      "general": ["divine", "Krishna association", "truth", "mercy"],
+      "business": ["trust", "stability"],
+      "wedding": ["not traditional", "sometimes used"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["heaven", "spirituality", "protection", "truth"],
+      "business": ["trust", "stability"],
+      "wedding": ["protection from evil eye"],
+      "mourning": ["sometimes used in Iran"]
+    }
+  },
+  "green": {
+    "western": {
+      "general": ["nature", "growth", "health", "environment", "money"],
+      "business": ["eco-friendly", "organic", "finance", "go"],
+      "wedding": ["nature themes", "spring", "renewal"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["nature", "fertility", "youth", "energy"],
+      "business": ["growth", "harmony"],
+      "wedding": ["not traditional", "sometimes used"],
+      "mourning": ["not typically used"]
+    },
+    "southAsian": {
+      "general": ["nature", "harvest", "happiness", "new beginnings"],
+      "business": ["prosperity", "growth"],
+      "wedding": ["auspicious", "fertility", "new beginnings"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["Islam", "paradise", "nature", "fertility", "luck"],
+      "business": ["positive", "growth", "religious significance"],
+      "wedding": ["sometimes used", "positive associations"],
+      "mourning": ["not typically used"]
+    }
+  },
+  "yellow": {
+    "western": {
+      "general": ["happiness", "optimism", "warning", "sunshine", "energy"],
+      "business": ["attention-grabbing", "caution", "affordable"],
+      "wedding": ["spring themes", "happiness"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["royalty", "power", "earth", "nourishment", "prosperity"],
+      "business": ["royalty", "sacred in China"],
+      "wedding": ["sometimes used", "prosperity"],
+      "mourning": ["sometimes represents death in some regions"]
+    },
+    "southAsian": {
+      "general": ["learning", "knowledge", "happiness", "peace"],
+      "business": ["positive", "auspicious"],
+      "wedding": ["auspicious", "sometimes used"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["happiness", "prosperity", "gold association"],
+      "business": ["positive", "success"],
+      "wedding": ["sometimes used", "positive"],
+      "mourning": ["sometimes associated with death in Egypt"]
+    }
+  },
+  "white": {
+    "western": {
+      "general": ["purity", "innocence", "cleanliness", "simplicity", "peace"],
+      "business": ["clean", "minimal", "modern", "medical"],
+      "wedding": ["traditional bridal color", "purity", "innocence"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["death", "mourning", "purity", "cleanliness"],
+      "business": ["clean", "modern"],
+      "wedding": ["avoided traditionally", "becoming more accepted"],
+      "mourning": ["traditional mourning color"]
+    },
+    "southAsian": {
+      "general": ["peace", "purity", "mourning", "spirituality"],
+      "business": ["clean", "minimal"],
+      "wedding": ["widows wear white", "avoided for brides"],
+      "mourning": ["traditional mourning color"]
+    },
+    "middleEastern": {
+      "general": ["purity", "cleanliness", "peace", "mourning in some areas"],
+      "business": ["clean", "professional"],
+      "wedding": ["becoming more common", "purity"],
+      "mourning": ["used in some regions"]
+    }
+  },
+  "black": {
+    "western": {
+      "general": ["elegance", "power", "mystery", "death", "sophistication"],
+      "business": ["luxury", "power", "formal", "professional"],
+      "wedding": ["formal wear", "elegance", "increasingly popular"],
+      "mourning": ["traditional mourning color"]
+    },
+    "eastAsian": {
+      "general": ["power", "knowledge", "stability", "evil in some contexts"],
+      "business": ["power", "sophistication"],
+      "wedding": ["not traditional", "becoming acceptable"],
+      "mourning": ["used alongside white in some regions"]
+    },
+    "southAsian": {
+      "general": ["evil", "negativity", "protection from evil eye"],
+      "business": ["power", "used carefully"],
+      "wedding": ["avoided", "considered inauspicious"],
+      "mourning": ["not traditional", "white preferred"]
+    },
+    "middleEastern": {
+      "general": ["power", "mystery", "mourning", "evil"],
+      "business": ["power", "sophistication"],
+      "wedding": ["not traditional"],
+      "mourning": ["traditional in many areas"]
+    }
+  },
+  "purple": {
+    "western": {
+      "general": ["royalty", "luxury", "creativity", "mystery", "spirituality"],
+      "business": ["premium", "creative", "luxury brands"],
+      "wedding": ["elegance", "royalty", "romantic"],
+      "mourning": ["sometimes used", "dignity"]
+    },
+    "eastAsian": {
+      "general": ["nobility", "spirituality", "wealth"],
+      "business": ["luxury", "premium"],
+      "wedding": ["sometimes used", "elegance"],
+      "mourning": ["sometimes associated with mourning in Thailand"]
+    },
+    "southAsian": {
+      "general": ["royalty", "wealth", "spirituality"],
+      "business": ["premium", "luxury"],
+      "wedding": ["sometimes used", "wealth"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["wealth", "royalty", "spirituality"],
+      "business": ["luxury", "premium"],
+      "wedding": ["sometimes used", "elegance"],
+      "mourning": ["not typically used"]
+    }
+  },
+  "orange": {
+    "western": {
+      "general": ["energy", "enthusiasm", "warmth", "autumn", "creativity"],
+      "business": ["friendly", "affordable", "call-to-action"],
+      "wedding": ["autumn themes", "warmth"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["happiness", "spirituality", "transformation"],
+      "business": ["positive", "energetic"],
+      "wedding": ["sometimes used", "happiness"],
+      "mourning": ["not typically used"]
+    },
+    "southAsian": {
+      "general": ["sacred", "spirituality", "purity", "Hinduism", "Buddhism"],
+      "business": ["spiritual contexts", "auspicious"],
+      "wedding": ["sacred", "sometimes used"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["warmth", "desert", "hospitality"],
+      "business": ["friendly", "warm"],
+      "wedding": ["sometimes used"],
+      "mourning": ["not typically used"]
+    }
+  },
+  "pink": {
+    "western": {
+      "general": ["femininity", "romance", "sweetness", "youth", "tenderness"],
+      "business": ["feminine products", "romance", "youthful"],
+      "wedding": ["romantic", "feminine", "popular"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["spring", "youth", "good health", "femininity"],
+      "business": ["youthful", "feminine"],
+      "wedding": ["sometimes used", "romantic"],
+      "mourning": ["not typically used"]
+    },
+    "southAsian": {
+      "general": ["femininity", "youth", "romance"],
+      "business": ["feminine products"],
+      "wedding": ["sometimes used", "romantic"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["femininity", "romance", "youth"],
+      "business": ["feminine products"],
+      "wedding": ["sometimes used"],
+      "mourning": ["not typically used"]
+    }
+  },
+  "brown": {
+    "western": {
+      "general": ["earth", "stability", "reliability", "nature", "warmth"],
+      "business": ["organic", "rustic", "reliable", "masculine"],
+      "wedding": ["rustic themes", "autumn"],
+      "mourning": ["sometimes used"]
+    },
+    "eastAsian": {
+      "general": ["earth", "stability", "mourning in some contexts"],
+      "business": ["stable", "reliable"],
+      "wedding": ["not traditional"],
+      "mourning": ["sometimes used"]
+    },
+    "southAsian": {
+      "general": ["earth", "mourning", "simplicity"],
+      "business": ["stable", "earthy"],
+      "wedding": ["not traditional"],
+      "mourning": ["sometimes worn"]
+    },
+    "middleEastern": {
+      "general": ["earth", "simplicity", "humility"],
+      "business": ["stable", "traditional"],
+      "wedding": ["not traditional"],
+      "mourning": ["sometimes used"]
+    }
+  },
+  "gold": {
+    "western": {
+      "general": ["wealth", "success", "luxury", "prestige", "achievement"],
+      "business": ["premium", "luxury", "high-end"],
+      "wedding": ["luxury", "celebration", "prosperity"],
+      "mourning": ["not typically used"]
+    },
+    "eastAsian": {
+      "general": ["wealth", "prosperity", "good fortune", "imperial"],
+      "business": ["success", "premium", "lucky"],
+      "wedding": ["prosperity", "luck", "traditional"],
+      "mourning": ["not typically used"]
+    },
+    "southAsian": {
+      "general": ["prosperity", "divinity", "purity", "auspicious"],
+      "business": ["success", "premium"],
+      "wedding": ["essential", "prosperity", "blessings"],
+      "mourning": ["not typically used"]
+    },
+    "middleEastern": {
+      "general": ["wealth", "prestige", "divine"],
+      "business": ["luxury", "success"],
+      "wedding": ["prosperity", "luxury"],
+      "mourning": ["not typically used"]
+    }
+  }
+}

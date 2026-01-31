@@ -1,0 +1,107 @@
+{
+  "D65": {
+    "name": "CIE Standard Illuminant D65",
+    "description": "Average daylight, correlated color temperature ~6504K",
+    "cct": 6504,
+    "chromaticity": {
+      "x": 0.31272,
+      "y": 0.32903
+    },
+    "tristimulus": {
+      "X": 0.95047,
+      "Y": 1.0,
+      "Z": 1.08883
+    },
+    "usage": ["sRGB", "Most web content", "Photography", "Television"]
+  },
+  "D50": {
+    "name": "CIE Standard Illuminant D50",
+    "description": "Horizon daylight, correlated color temperature ~5003K",
+    "cct": 5003,
+    "chromaticity": {
+      "x": 0.34567,
+      "y": 0.3585
+    },
+    "tristimulus": {
+      "X": 0.96422,
+      "Y": 1.0,
+      "Z": 0.82521
+    },
+    "usage": ["Print", "Prepress", "ICC profiles", "Adobe RGB"]
+  },
+  "A": {
+    "name": "CIE Standard Illuminant A",
+    "description": "Incandescent/tungsten light, correlated color temperature ~2856K",
+    "cct": 2856,
+    "chromaticity": {
+      "x": 0.44757,
+      "y": 0.40745
+    },
+    "tristimulus": {
+      "X": 1.0985,
+      "Y": 1.0,
+      "Z": 0.35585
+    },
+    "usage": ["Incandescent lighting simulation", "Historical reference"]
+  },
+  "E": {
+    "name": "CIE Standard Illuminant E",
+    "description": "Equal energy illuminant (theoretical)",
+    "cct": 5454,
+    "chromaticity": {
+      "x": 0.33333,
+      "y": 0.33333
+    },
+    "tristimulus": {
+      "X": 1.0,
+      "Y": 1.0,
+      "Z": 1.0
+    },
+    "usage": ["Theoretical reference", "Color science calculations"]
+  },
+  "F2": {
+    "name": "CIE Standard Illuminant F2",
+    "description": "Cool white fluorescent, correlated color temperature ~4230K",
+    "cct": 4230,
+    "chromaticity": {
+      "x": 0.37208,
+      "y": 0.37529
+    },
+    "tristimulus": {
+      "X": 0.99186,
+      "Y": 1.0,
+      "Z": 0.67393
+    },
+    "usage": ["Office lighting", "Commercial spaces"]
+  },
+  "F7": {
+    "name": "CIE Standard Illuminant F7",
+    "description": "Broadband daylight fluorescent, correlated color temperature ~6500K",
+    "cct": 6500,
+    "chromaticity": {
+      "x": 0.31292,
+      "y": 0.32933
+    },
+    "tristimulus": {
+      "X": 0.95041,
+      "Y": 1.0,
+      "Z": 1.08747
+    },
+    "usage": ["Color matching booths", "Quality control"]
+  },
+  "F11": {
+    "name": "CIE Standard Illuminant F11",
+    "description": "Narrow-band cool white fluorescent (TL84), correlated color temperature ~4000K",
+    "cct": 4000,
+    "chromaticity": {
+      "x": 0.38052,
+      "y": 0.37713
+    },
+    "tristimulus": {
+      "X": 1.00962,
+      "Y": 1.0,
+      "Z": 0.6435
+    },
+    "usage": ["European retail", "TL84 standard"]
+  }
+}
