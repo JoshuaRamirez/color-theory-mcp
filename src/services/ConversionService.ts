@@ -1,4 +1,5 @@
 import type { IColorSpaceRegistry } from '../domain/interfaces/IColorSpace.js';
+import { UnknownColorSpaceError } from '../domain/errors.js';
 import { Color } from '../domain/values/Color.js';
 import type { ColorSpaceType } from '../domain/values/ColorSpaceType.js';
 import { ColorSpaceRegistry } from '../color-spaces/ColorSpaceRegistry.js';
@@ -28,10 +29,10 @@ export class ConversionService {
     const targetColorSpace = this.registry.get(targetSpace);
 
     if (!sourceColorSpace) {
-      throw new Error(`Unknown source color space: ${color.space}`);
+      throw new UnknownColorSpaceError(color.space);
     }
     if (!targetColorSpace) {
-      throw new Error(`Unknown target color space: ${targetSpace}`);
+      throw new UnknownColorSpaceError(targetSpace);
     }
 
     // Convert to XYZ-D65 (connection space)
@@ -54,7 +55,7 @@ export class ConversionService {
   isInGamut(color: Color, targetSpace: ColorSpaceType): boolean {
     const colorSpace = this.registry.get(targetSpace);
     if (!colorSpace) {
-      throw new Error(`Unknown color space: ${targetSpace}`);
+      throw new UnknownColorSpaceError(targetSpace);
     }
 
     // Convert to target space first
@@ -69,7 +70,7 @@ export class ConversionService {
   clampToGamut(color: Color): Color {
     const colorSpace = this.registry.get(color.space);
     if (!colorSpace) {
-      throw new Error(`Unknown color space: ${color.space}`);
+      throw new UnknownColorSpaceError(color.space);
     }
 
     const clamped = colorSpace.clampToGamut(color.components);
@@ -95,7 +96,7 @@ export class ConversionService {
     const destination = targetSpace ?? color.space;
     const destSpace = this.registry.get(destination);
     if (!destSpace) {
-      throw new Error(`Unknown color space: ${destination}`);
+      throw new UnknownColorSpaceError(destination);
     }
 
     // Already in gamut? Return converted directly.

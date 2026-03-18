@@ -1,4 +1,5 @@
 import { type ColorSpaceType, COLOR_SPACE_COMPONENTS } from './ColorSpaceType.js';
+import { ColorParseError, ComponentCountError, ColorSpaceMismatchError } from '../errors.js';
 
 /**
  * Immutable color value object.
@@ -11,11 +12,7 @@ export class Color {
   readonly components: readonly number[];
   readonly alpha: number;
 
-  private constructor(
-    space: ColorSpaceType,
-    components: readonly number[],
-    alpha: number
-  ) {
+  private constructor(space: ColorSpaceType, components: readonly number[], alpha: number) {
     this.space = space;
     this.components = Object.freeze([...components]);
     this.alpha = Math.max(0, Math.min(1, alpha));
@@ -25,16 +22,10 @@ export class Color {
    * Creates a new Color instance.
    * @throws Error if component count doesn't match color space requirements
    */
-  static create(
-    space: ColorSpaceType,
-    components: readonly number[],
-    alpha: number = 1
-  ): Color {
+  static create(space: ColorSpaceType, components: readonly number[], alpha: number = 1): Color {
     const expectedCount = COLOR_SPACE_COMPONENTS[space].length;
     if (components.length !== expectedCount) {
-      throw new Error(
-        `Color space '${space}' requires ${expectedCount} components, got ${components.length}`
-      );
+      throw new ComponentCountError(space, expectedCount, components.length);
     }
     return new Color(space, components, alpha);
   }
@@ -45,7 +36,10 @@ export class Color {
    */
   static fromHex(hex: string): Color {
     const cleaned = hex.replace(/^#/, '');
-    let r: number, g: number, b: number, a: number = 1;
+    let r: number,
+      g: number,
+      b: number,
+      a: number = 1;
 
     if (cleaned.length === 3 || cleaned.length === 4) {
       r = parseInt(cleaned[0]! + cleaned[0]!, 16) / 255;
@@ -62,11 +56,11 @@ export class Color {
         a = parseInt(cleaned.slice(6, 8), 16) / 255;
       }
     } else {
-      throw new Error(`Invalid hex color: ${hex}`);
+      throw new ColorParseError(hex, 'Invalid hex color');
     }
 
     if ([r, g, b, a].some(isNaN)) {
-      throw new Error(`Invalid hex color: ${hex}`);
+      throw new ColorParseError(hex, 'Invalid hex color');
     }
 
     return new Color('srgb', [r, g, b], a);
@@ -87,7 +81,7 @@ export class Color {
     // Note: Actual conversion will be handled by ConversionService
     // For now, only works correctly for sRGB colors
     if (this.space !== 'srgb') {
-      throw new Error('Call toSpace("srgb") before toHex() for non-sRGB colors');
+      throw new ColorSpaceMismatchError('srgb', this.space);
     }
 
     const [r, g, b] = this.components as [number, number, number];
@@ -108,14 +102,10 @@ export class Color {
    */
   toRgbArray(): [number, number, number] {
     if (this.space !== 'srgb') {
-      throw new Error('Call toSpace("srgb") before toRgbArray() for non-sRGB colors');
+      throw new ColorSpaceMismatchError('srgb', this.space);
     }
     const [r, g, b] = this.components as [number, number, number];
-    return [
-      Math.round(r * 255),
-      Math.round(g * 255),
-      Math.round(b * 255),
-    ];
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
   }
 
   /**
@@ -131,7 +121,7 @@ export class Color {
     }
 
     // CSS Color 4 format
-    const comps = this.components.map(c => c.toFixed(4)).join(' ');
+    const comps = this.components.map((c) => c.toFixed(4)).join(' ');
     if (this.alpha < 1) {
       return `color(${this.space} ${comps} / ${this.alpha.toFixed(3)})`;
     }
@@ -159,9 +149,7 @@ export class Color {
     if (this.space !== other.space) return false;
     if (Math.abs(this.alpha - other.alpha) > tolerance) return false;
     if (this.components.length !== other.components.length) return false;
-    return this.components.every(
-      (c, i) => Math.abs(c - (other.components[i] ?? 0)) <= tolerance
-    );
+    return this.components.every((c, i) => Math.abs(c - (other.components[i] ?? 0)) <= tolerance);
   }
 
   /**
@@ -183,7 +171,7 @@ export class Color {
    * Returns a string representation for debugging.
    */
   toString(): string {
-    const comps = this.components.map(c => c.toFixed(4)).join(', ');
+    const comps = this.components.map((c) => c.toFixed(4)).join(', ');
     return `Color(${this.space}: [${comps}], alpha: ${this.alpha.toFixed(3)})`;
   }
 }

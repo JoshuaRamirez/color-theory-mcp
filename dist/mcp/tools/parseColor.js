@@ -1,4 +1,5 @@
 import { Color } from '../../domain/values/Color.js';
+import { ColorParseError, ColorSpaceMismatchError } from '../../domain/errors.js';
 import { NamedColorsRepository } from '../../data/NamedColorsRepository.js';
 const namedColors = new NamedColorsRepository();
 /**
@@ -38,7 +39,7 @@ export function parseColor(input) {
         const a = hslMatch[4] ? parseFloat(hslMatch[4]) : 1;
         return Color.create('hsl', [h, s, l], a);
     }
-    throw new Error(`Unable to parse color: ${input}`);
+    throw new ColorParseError(input);
 }
 /**
  * Formats a color for output.
@@ -47,7 +48,7 @@ export function formatColor(color) {
     // Ensure we're working with sRGB
     const srgb = color.space === 'srgb' ? color : null;
     if (!srgb) {
-        throw new Error('Color must be in sRGB space for formatting');
+        throw new ColorSpaceMismatchError('srgb', color.space);
     }
     const [r, g, b] = srgb.toRgbArray();
     // Also get HSL

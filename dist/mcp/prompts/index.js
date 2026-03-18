@@ -5,7 +5,8 @@ import { z } from 'zod';
 export function registerPrompts(server) {
     // Design System palette prompt
     server.prompt('design-system', 'Generate a complete design system color palette from a brand color', { brandColor: z.string().describe('Primary brand color (hex or CSS name)') }, async ({ brandColor }) => ({
-        messages: [{
+        messages: [
+            {
                 role: 'user',
                 content: {
                     type: 'text',
@@ -25,14 +26,16 @@ Present the results as a structured design system with:
 - Accessibility validation for all foreground/background combinations
 - Exportable design tokens`,
                 },
-            }],
+            },
+        ],
     }));
     // Accessibility Audit prompt
     server.prompt('accessibility-audit', 'Comprehensive accessibility audit of a color palette', {
         colors: z.string().describe('Comma-separated list of colors to audit'),
         background: z.string().optional().default('#ffffff').describe('Background color'),
     }, async ({ colors, background }) => ({
-        messages: [{
+        messages: [
+            {
                 role: 'user',
                 content: {
                     type: 'text',
@@ -52,13 +55,19 @@ Report:
 - Whether all colors are sufficiently distinguishable (Delta-E > 10)
 - Specific recommendations for any failing colors`,
                 },
-            }],
+            },
+        ],
     }));
     // Color Temperature prompt
     server.prompt('color-temperature', 'Explore color temperature and lighting conditions', {
-        scenario: z.string().optional().default('interior-design').describe('Scenario: interior-design, photography, web-design'),
+        scenario: z
+            .string()
+            .optional()
+            .default('interior-design')
+            .describe('Scenario: interior-design, photography, web-design'),
     }, async ({ scenario }) => ({
-        messages: [{
+        messages: [
+            {
                 role: 'user',
                 content: {
                     type: 'text',
@@ -79,14 +88,20 @@ Explain how color temperature affects:
 - ${scenario === 'photography' ? 'White balance and color grading' : ''}
 - ${scenario === 'web-design' ? 'Screen calibration and design for different displays' : ''}`,
                 },
-            }],
+            },
+        ],
     }));
     // Cultural Color Analysis prompt
     server.prompt('cultural-analysis', 'Analyze colors for cultural appropriateness across regions', {
         colors: z.string().describe('Comma-separated colors to analyze'),
-        purpose: z.string().optional().default('general').describe('Purpose: general, business, wedding, mourning'),
+        purpose: z
+            .string()
+            .optional()
+            .default('general')
+            .describe('Purpose: general, business, wedding, mourning'),
     }, async ({ colors, purpose }) => ({
-        messages: [{
+        messages: [
+            {
                 role: 'user',
                 content: {
                     type: 'text',
@@ -103,7 +118,8 @@ Create a cross-cultural comparison matrix showing:
 - Recommendations for global-safe color choices
 - Alternative colors where cultural conflicts exist`,
                 },
-            }],
+            },
+        ],
     }));
 }
 //# sourceMappingURL=index.js.map

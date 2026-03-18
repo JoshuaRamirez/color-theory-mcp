@@ -1,4 +1,5 @@
 import { Color } from '../../domain/values/Color.js';
+import { ColorParseError, ColorSpaceMismatchError } from '../../domain/errors.js';
 import { NamedColorsRepository } from '../../data/NamedColorsRepository.js';
 
 const namedColors = new NamedColorsRepository();
@@ -26,7 +27,9 @@ export function parseColor(input: string): Color {
   }
 
   // Try rgb/rgba
-  const rgbMatch = trimmed.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+  const rgbMatch = trimmed.match(
+    /^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/
+  );
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1]!, 10);
     const g = parseInt(rgbMatch[2]!, 10);
@@ -36,7 +39,9 @@ export function parseColor(input: string): Color {
   }
 
   // Try hsl/hsla
-  const hslMatch = trimmed.match(/^hsla?\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+)\s*)?\)$/);
+  const hslMatch = trimmed.match(
+    /^hsla?\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+)\s*)?\)$/
+  );
   if (hslMatch) {
     const h = parseFloat(hslMatch[1]!);
     const s = parseFloat(hslMatch[2]!) / 100;
@@ -45,7 +50,7 @@ export function parseColor(input: string): Color {
     return Color.create('hsl', [h, s, l], a);
   }
 
-  throw new Error(`Unable to parse color: ${input}`);
+  throw new ColorParseError(input);
 }
 
 /**
@@ -61,7 +66,7 @@ export function formatColor(color: Color): {
   const srgb = color.space === 'srgb' ? color : null;
 
   if (!srgb) {
-    throw new Error('Color must be in sRGB space for formatting');
+    throw new ColorSpaceMismatchError('srgb', color.space);
   }
 
   const [r, g, b] = srgb.toRgbArray();

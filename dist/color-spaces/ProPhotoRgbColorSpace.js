@@ -14,7 +14,7 @@ const PROPHOTO_CUTOFF = 1 / 512; // 0.001953125
 const PROPHOTO_TO_XYZ_D50 = Matrix3x3.create([
     [0.7977604, 0.1351917, 0.0313534],
     [0.2880711, 0.7118432, 0.0000857],
-    [0.0000000, 0.0000000, 0.8251046],
+    [0.0, 0.0, 0.8251046],
 ]);
 /**
  * XYZ-D50 to ProPhoto RGB transformation matrix.
@@ -22,7 +22,7 @@ const PROPHOTO_TO_XYZ_D50 = Matrix3x3.create([
 const XYZ_D50_TO_PROPHOTO = Matrix3x3.create([
     [1.3457989, -0.2555801, -0.0511557],
     [-0.5459137, 1.5081673, 0.0205351],
-    [0.0000000, 0.0000000, 1.2118128],
+    [0.0, 0.0, 1.2118128],
 ]);
 /**
  * Converts a single ProPhoto RGB gamma-encoded component to linear.
@@ -88,10 +88,10 @@ export class ProPhotoRgbColorSpace {
         return Color.create('prophoto-rgb', encoded, color.alpha);
     }
     isInGamut(components) {
-        return components.every(c => c >= 0 && c <= 1);
+        return components.every((c) => c >= 0 && c <= 1);
     }
     clampToGamut(components) {
-        return components.map(c => Math.max(0, Math.min(1, c)));
+        return components.map((c) => Math.max(0, Math.min(1, c)));
     }
 }
 //# sourceMappingURL=ProPhotoRgbColorSpace.js.map

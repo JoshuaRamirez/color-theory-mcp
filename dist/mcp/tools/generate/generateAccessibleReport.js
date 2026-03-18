@@ -14,7 +14,11 @@ export const generateAccessibleReportSchema = z.object({
     colors: z.array(z.string()).describe('Colors to audit'),
     backgroundColor: z.string().describe('Background color'),
     includeAPCA: z.boolean().optional().default(true).describe('Include APCA analysis'),
-    includeCVD: z.boolean().optional().default(true).describe('Include color vision deficiency simulation'),
+    includeCVD: z
+        .boolean()
+        .optional()
+        .default(true)
+        .describe('Include color vision deficiency simulation'),
 });
 /**
  * Generates a comprehensive accessibility audit for a palette of colors
@@ -88,9 +92,7 @@ export async function generateAccessibleReport(input) {
                 const simulated = simulator.simulate(color);
                 const simSrgb = conversionService.convert(simulated, 'srgb');
                 const simClamped = conversionService.clampToGamut(simSrgb);
-                const deltaE = deltaEStrategy
-                    ? deltaEStrategy.calculate(color, simClamped)
-                    : 0;
+                const deltaE = deltaEStrategy ? deltaEStrategy.calculate(color, simClamped) : 0;
                 cvdEntries[cvdType] = {
                     simulatedHex: simClamped.toHex(),
                     deltaEFromOriginal: Math.round(deltaE * 100) / 100,

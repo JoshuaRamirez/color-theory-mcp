@@ -10,7 +10,7 @@ const conversionService = new ConversionService();
 const APCA_COEFFICIENTS = {
     R: 0.2126729,
     G: 0.7151522,
-    B: 0.0721750,
+    B: 0.072175,
 };
 /**
  * Soft-clamp threshold and exponent for low-luminance pre-processing.
@@ -147,12 +147,16 @@ export class APCAService {
         if (yBg > yText) {
             // Normal polarity: dark text on light background
             polarity = 'normal';
-            sapc = (Math.pow(yBg, POWER_CURVES.NORMAL.BG) - Math.pow(yText, POWER_CURVES.NORMAL.TEXT)) * POWER_CURVES.SCALE;
+            sapc =
+                (Math.pow(yBg, POWER_CURVES.NORMAL.BG) - Math.pow(yText, POWER_CURVES.NORMAL.TEXT)) *
+                    POWER_CURVES.SCALE;
         }
         else {
             // Reverse polarity: light text on dark background
             polarity = 'reverse';
-            sapc = (Math.pow(yBg, POWER_CURVES.REVERSE.BG) - Math.pow(yText, POWER_CURVES.REVERSE.TEXT)) * POWER_CURVES.SCALE;
+            sapc =
+                (Math.pow(yBg, POWER_CURVES.REVERSE.BG) - Math.pow(yText, POWER_CURVES.REVERSE.TEXT)) *
+                    POWER_CURVES.SCALE;
         }
         // Step 4: Output clamp and offset
         let lc;

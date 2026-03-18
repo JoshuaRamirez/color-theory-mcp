@@ -2,10 +2,20 @@ import { z } from 'zod';
 import { parseColor } from '../parseColor.js';
 import { TemperatureService } from '../../../services/TemperatureService.js';
 const temperatureService = new TemperatureService();
-export const calculateTemperatureSchema = z.object({
-    color: z.string().optional().describe('A color to estimate the correlated color temperature of'),
-    kelvin: z.number().optional().describe('A Kelvin value to convert to its corresponding sRGB color'),
-}).refine((data) => data.color !== undefined || data.kelvin !== undefined, { message: 'At least one of "color" or "kelvin" must be provided' });
+export const calculateTemperatureSchema = z
+    .object({
+    color: z
+        .string()
+        .optional()
+        .describe('A color to estimate the correlated color temperature of'),
+    kelvin: z
+        .number()
+        .optional()
+        .describe('A Kelvin value to convert to its corresponding sRGB color'),
+})
+    .refine((data) => data.color !== undefined || data.kelvin !== undefined, {
+    message: 'At least one of "color" or "kelvin" must be provided',
+});
 /**
  * Converts between colors and correlated color temperatures (Kelvin).
  * Accepts a color to estimate its temperature, a Kelvin value to convert to a color,

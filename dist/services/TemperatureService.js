@@ -50,7 +50,7 @@ export class TemperatureService {
         if (temp <= 66) {
             r = 255;
             g = 99.4708025861 * Math.log(temp) - 161.1195681661;
-            b = (temp <= 19) ? 0 : 138.5177312231 * Math.log(temp - 10) - 305.0447927307;
+            b = temp <= 19 ? 0 : 138.5177312231 * Math.log(temp - 10) - 305.0447927307;
         }
         else {
             r = 329.698727446 * Math.pow(temp - 60, -0.1332047592);
@@ -109,7 +109,7 @@ export class TemperatureService {
         const x = X / sum;
         const y = Y / sum;
         // McCamy's formula for correlated color temperature
-        const n = (x - 0.3320) / (0.1858 - y);
+        const n = (x - 0.332) / (0.1858 - y);
         const cct = 449 * Math.pow(n, 3) + 3525 * Math.pow(n, 2) + 6823.3 * n + 5520.33;
         // Determine Planckian locus proximity in CIE 1960 uv space
         const isOnLocus = this.isNearPlanckianLocus(x, y, cct);
@@ -195,10 +195,10 @@ export class TemperatureService {
     planckianLocusUV(kelvin) {
         const T = kelvin;
         const T2 = T * T;
-        const u = (0.860117757 + 1.54118254e-4 * T + 1.28641212e-7 * T2)
-            / (1 + 8.42420235e-4 * T + 7.08145163e-7 * T2);
-        const v = (0.317398726 + 4.22806245e-5 * T + 4.20481691e-8 * T2)
-            / (1 - 2.89741816e-5 * T + 1.61456053e-7 * T2);
+        const u = (0.860117757 + 1.54118254e-4 * T + 1.28641212e-7 * T2) /
+            (1 + 8.42420235e-4 * T + 7.08145163e-7 * T2);
+        const v = (0.317398726 + 4.22806245e-5 * T + 4.20481691e-8 * T2) /
+            (1 - 2.89741816e-5 * T + 1.61456053e-7 * T2);
         return { u, v };
     }
 }

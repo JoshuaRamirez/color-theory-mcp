@@ -54,10 +54,26 @@ export declare function getColorInfo(input: GetColorInfoInput): Promise<{
         suggestedTextColor: string;
         contrastWithWhite: number;
         contrastWithBlack: number;
+        apca: {
+            suggestedTextColor: string;
+            contrastWithWhite: number;
+            contrastWithBlack: number;
+        };
+        estimatedTemperature: {
+            kelvin: number;
+            description: string;
+            isNearBlackbody: boolean;
+        };
     };
     closestNamedColor: {
-        name: string;
-        hex: string;
+        css: {
+            name: string;
+            hex: string;
+        };
+        xkcd: {
+            name: string;
+            hex: string;
+        };
     };
     alpha: number;
 }>;

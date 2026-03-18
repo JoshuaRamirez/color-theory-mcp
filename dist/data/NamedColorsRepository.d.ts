@@ -18,6 +18,9 @@ export interface NamedColor {
 export declare class NamedColorsRepository {
     private readonly colors;
     private readonly colorsByHex;
+    private readonly labCache;
+    private readonly conversionService;
+    private readonly deltaE;
     private readonly includeXkcd;
     constructor(options?: {
         includeXkcd?: boolean;
@@ -34,7 +37,8 @@ export declare class NamedColorsRepository {
     getByHex(hex: string): NamedColor[];
     /**
      * Finds the closest named color to a given color.
-     * Uses simple Euclidean distance in sRGB space.
+     * Uses CIEDE2000 perceptual distance in Lab space.
+     * Lab values are pre-computed at load time for performance.
      */
     findClosest(color: Color): NamedColor;
     /**

@@ -1,10 +1,14 @@
 import { z } from 'zod';
 import { parseColor } from '../parseColor.js';
-import { ThemeService } from '../../../services/ThemeService.js';
+import { ThemeService, } from '../../../services/ThemeService.js';
 const themeService = new ThemeService();
 export const generateThemeSchema = z.object({
     seedColor: z.string().describe('Seed color for theme generation'),
-    mode: z.enum(['light', 'dark', 'both']).optional().default('both').describe('Theme mode to generate'),
+    mode: z
+        .enum(['light', 'dark', 'both'])
+        .optional()
+        .default('both')
+        .describe('Theme mode to generate'),
 });
 /**
  * Generates a Material Design 3 theme from a seed color.

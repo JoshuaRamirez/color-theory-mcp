@@ -3,12 +3,18 @@ import { parseColor } from '../parseColor.js';
 import { ConversionService } from '../../../services/ConversionService.js';
 const conversionService = new ConversionService();
 export const generateDesignTokensSchema = z.object({
-    colors: z.array(z.object({
+    colors: z
+        .array(z.object({
         name: z.string().describe('Token name, e.g., "primary-500"'),
         value: z.string().describe('Color value as hex or CSS name'),
-    })).describe('Colors to include as design tokens'),
+    }))
+        .describe('Colors to include as design tokens'),
     prefix: z.string().optional().default('color').describe('Token name prefix'),
-    format: z.enum(['w3c', 'css-variables', 'tailwind']).optional().default('w3c').describe('Output format'),
+    format: z
+        .enum(['w3c', 'css-variables', 'tailwind'])
+        .optional()
+        .default('w3c')
+        .describe('Output format'),
 });
 /**
  * Generates design tokens from a list of named colors in one of three output formats:

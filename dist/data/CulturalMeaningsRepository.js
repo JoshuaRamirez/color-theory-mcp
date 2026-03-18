@@ -68,7 +68,15 @@ export class CulturalMeaningsRepository {
             return [];
         }
         const results = [];
-        const regions = ['western', 'eastAsian', 'southAsian', 'middleEastern', 'african', 'latinAmerican', 'indigenous'];
+        const regions = [
+            'western',
+            'eastAsian',
+            'southAsian',
+            'middleEastern',
+            'african',
+            'latinAmerican',
+            'indigenous',
+        ];
         for (const region of regions) {
             const meanings = colorData[region]?.[context];
             if (meanings) {
@@ -86,7 +94,7 @@ export class CulturalMeaningsRepository {
         for (const [color, regions] of Object.entries(this.data)) {
             for (const [region, contexts] of Object.entries(regions)) {
                 for (const [context, meanings] of Object.entries(contexts)) {
-                    const matchingMeanings = meanings.filter(m => m.toLowerCase().includes(lowerKeyword));
+                    const matchingMeanings = meanings.filter((m) => m.toLowerCase().includes(lowerKeyword));
                     if (matchingMeanings.length > 0) {
                         results.push({
                             color,

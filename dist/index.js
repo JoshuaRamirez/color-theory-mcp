@@ -73,7 +73,7 @@ server.tool('calculate-luminance', 'Calculate the relative luminance of a color'
     const result = await calculateLuminance(input);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
 });
-server.tool('calculate-temperature', 'Convert between color temperature (Kelvin) and color, or estimate a color\'s temperature', calculateTemperatureSchema.shape, async (input) => {
+server.tool('calculate-temperature', "Convert between color temperature (Kelvin) and color, or estimate a color's temperature", calculateTemperatureSchema.shape, async (input) => {
     const result = await calculateTemperature(input);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
 });

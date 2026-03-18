@@ -5,7 +5,8 @@ import { ConversionService } from '../../../services/ConversionService.js';
 const conversionService = new ConversionService();
 export const validateGamutSchema = z.object({
     color: z.string().describe('Color to check'),
-    targetGamut: ColorSpaceSchema.optional().default('srgb')
+    targetGamut: ColorSpaceSchema.optional()
+        .default('srgb')
         .describe('Target color space gamut to check against'),
 });
 export async function validateGamut(input) {
@@ -43,7 +44,7 @@ export async function validateGamut(input) {
         inGamut,
         original: {
             hex: originalSrgb.toHex(),
-            components: components.map(c => Math.round(c * 10000) / 10000),
+            components: components.map((c) => Math.round(c * 10000) / 10000),
         },
         analysis: inGamut
             ? {
@@ -64,9 +65,9 @@ export async function validateGamut(input) {
         gamutInfo: {
             srgb: 'Standard web RGB color space',
             'display-p3': '25% larger than sRGB, used by Apple devices',
-            'rec2020': 'HDR/UHD color space, much wider than Display P3',
+            rec2020: 'HDR/UHD color space, much wider than Display P3',
             'prophoto-rgb': 'Very wide gamut for photography',
-            'acescg': 'Scene-referred, used in film/VFX',
+            acescg: 'Scene-referred, used in film/VFX',
             'linear-srgb': 'Linear light sRGB (no gamma)',
         },
     };

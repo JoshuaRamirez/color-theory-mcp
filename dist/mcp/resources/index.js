@@ -13,16 +13,18 @@ export function registerResources(server) {
         description: '147 CSS named colors with hex values',
         mimeType: 'application/json',
     }, async () => {
-        const colors = cssColors.listAll().map(c => ({
+        const colors = cssColors.listAll().map((c) => ({
             name: c.name,
             hex: c.hex,
         }));
         return {
-            contents: [{
+            contents: [
+                {
                     uri: 'color://named-colors/css',
                     text: JSON.stringify({ count: colors.length, colors }, null, 2),
                     mimeType: 'application/json',
-                }],
+                },
+            ],
         };
     });
     // XKCD Named Colors resource
@@ -30,17 +32,19 @@ export function registerResources(server) {
         description: '795+ XKCD survey colors with hex values (includes CSS colors)',
         mimeType: 'application/json',
     }, async () => {
-        const colors = xkcdColors.listAll().map(c => ({
+        const colors = xkcdColors.listAll().map((c) => ({
             name: c.name,
             hex: c.hex,
             source: c.source,
         }));
         return {
-            contents: [{
+            contents: [
+                {
                     uri: 'color://named-colors/xkcd',
                     text: JSON.stringify({ count: colors.length, colors }, null, 2),
                     mimeType: 'application/json',
-                }],
+                },
+            ],
         };
     });
     // Color Spaces reference
@@ -49,7 +53,7 @@ export function registerResources(server) {
         mimeType: 'application/json',
     }, async () => {
         const registry = ColorSpaceRegistry.createDefault();
-        const spaces = registry.list().map(type => {
+        const spaces = registry.list().map((type) => {
             const space = registry.get(type);
             return {
                 type: space.type,
@@ -58,11 +62,13 @@ export function registerResources(server) {
             };
         });
         return {
-            contents: [{
+            contents: [
+                {
                     uri: 'color://color-spaces',
                     text: JSON.stringify({ count: spaces.length, spaces }, null, 2),
                     mimeType: 'application/json',
-                }],
+                },
+            ],
         };
     });
     // Cultural Meanings reference
@@ -71,16 +77,30 @@ export function registerResources(server) {
         mimeType: 'application/json',
     }, async () => {
         const colors = culturalMeanings.listColors();
-        const data = colors.map(name => ({
+        const data = colors.map((name) => ({
             color: name,
             meanings: culturalMeanings.getByColor(name),
         }));
         return {
-            contents: [{
+            contents: [
+                {
                     uri: 'color://cultural-meanings',
-                    text: JSON.stringify({ count: colors.length, regions: ['western', 'eastAsian', 'southAsian', 'middleEastern', 'african', 'latinAmerican', 'indigenous'], colors: data }, null, 2),
+                    text: JSON.stringify({
+                        count: colors.length,
+                        regions: [
+                            'western',
+                            'eastAsian',
+                            'southAsian',
+                            'middleEastern',
+                            'african',
+                            'latinAmerican',
+                            'indigenous',
+                        ],
+                        colors: data,
+                    }, null, 2),
                     mimeType: 'application/json',
-                }],
+                },
+            ],
         };
     });
 }

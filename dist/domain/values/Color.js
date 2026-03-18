@@ -1,4 +1,5 @@
 import { COLOR_SPACE_COMPONENTS } from './ColorSpaceType.js';
+import { ColorParseError, ComponentCountError, ColorSpaceMismatchError } from '../errors.js';
 /**
  * Immutable color value object.
  *
@@ -21,7 +22,7 @@ export class Color {
     static create(space, components, alpha = 1) {
         const expectedCount = COLOR_SPACE_COMPONENTS[space].length;
         if (components.length !== expectedCount) {
-            throw new Error(`Color space '${space}' requires ${expectedCount} components, got ${components.length}`);
+            throw new ComponentCountError(space, expectedCount, components.length);
         }
         return new Color(space, components, alpha);
     }
@@ -49,10 +50,10 @@ export class Color {
             }
         }
         else {
-            throw new Error(`Invalid hex color: ${hex}`);
+            throw new ColorParseError(hex, 'Invalid hex color');
         }
         if ([r, g, b, a].some(isNaN)) {
-            throw new Error(`Invalid hex color: ${hex}`);
+            throw new ColorParseError(hex, 'Invalid hex color');
         }
         return new Color('srgb', [r, g, b], a);
     }
@@ -70,7 +71,7 @@ export class Color {
         // Note: Actual conversion will be handled by ConversionService
         // For now, only works correctly for sRGB colors
         if (this.space !== 'srgb') {
-            throw new Error('Call toSpace("srgb") before toHex() for non-sRGB colors');
+            throw new ColorSpaceMismatchError('srgb', this.space);
         }
         const [r, g, b] = this.components;
         const toHexByte = (n) => Math.round(Math.max(0, Math.min(1, n)) * 255)
@@ -87,7 +88,7 @@ export class Color {
      */
     toRgbArray() {
         if (this.space !== 'srgb') {
-            throw new Error('Call toSpace("srgb") before toRgbArray() for non-sRGB colors');
+            throw new ColorSpaceMismatchError('srgb', this.space);
         }
         const [r, g, b] = this.components;
         return [

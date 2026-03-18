@@ -29,7 +29,7 @@ export class ThemeService {
         // Build the six key color palettes
         const primaryPalette = this.generateTonalPalette(seedHue, seedChroma);
         const secondaryPalette = this.generateTonalPalette(seedHue, seedChroma * 0.33);
-        const tertiaryHue = ((seedHue + 60) % 360 + 360) % 360;
+        const tertiaryHue = (((seedHue + 60) % 360) + 360) % 360;
         const tertiaryPalette = this.generateTonalPalette(tertiaryHue, seedChroma * 0.5);
         const neutralPalette = this.generateTonalPalette(seedHue, seedChroma * 0.04);
         const neutralVariantPalette = this.generateTonalPalette(seedHue, seedChroma * 0.08);

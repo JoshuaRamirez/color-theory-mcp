@@ -2,11 +2,16 @@ import { z } from 'zod';
 import { parseColor } from '../parseColor.js';
 import { ConversionService } from '../../../services/ConversionService.js';
 import { ContrastService } from '../../../services/ContrastService.js';
+import { APCAService } from '../../../services/APCAService.js';
+import { TemperatureService } from '../../../services/TemperatureService.js';
 import { NamedColorsRepository } from '../../../data/NamedColorsRepository.js';
 import { Color } from '../../../domain/values/Color.js';
 const conversionService = new ConversionService();
 const contrastService = new ContrastService();
+const apcaService = new APCAService();
+const temperatureService = new TemperatureService();
 const namedColors = new NamedColorsRepository();
+const xkcdColors = new NamedColorsRepository({ includeXkcd: true });
 export const getColorInfoSchema = z.object({
     color: z.string().describe('Color value (hex, RGB, or named color)'),
 });
@@ -31,6 +36,15 @@ export async function getColorInfo(input) {
     const black = Color.fromHex('#000000');
     const contrastWithWhite = contrastService.calculateContrastRatio(srgb, white);
     const contrastWithBlack = contrastService.calculateContrastRatio(srgb, black);
+    // APCA contrast with white and black
+    const apcaWithWhite = apcaService.calculateAPCA(srgb, white);
+    const apcaWithBlack = apcaService.calculateAPCA(srgb, black);
+    const apcaSuggested = apcaService.suggestTextColor(srgb);
+    const apcaSuggestedSrgb = conversionService.convert(apcaSuggested, 'srgb');
+    // Closest XKCD color name
+    const closestXkcd = xkcdColors.findClosest(srgb);
+    // Estimated color temperature
+    const tempResult = temperatureService.colorToTemperature(srgb);
     const [r, g, b] = srgb.toRgbArray();
     const [h, s, l] = hsl.components;
     const [hv, sv, v] = hsv.components;
@@ -85,10 +99,26 @@ export async function getColorInfo(input) {
             suggestedTextColor: isLight ? '#000000' : '#FFFFFF',
             contrastWithWhite: Math.round(contrastWithWhite * 100) / 100,
             contrastWithBlack: Math.round(contrastWithBlack * 100) / 100,
+            apca: {
+                suggestedTextColor: apcaSuggestedSrgb.toHex(),
+                contrastWithWhite: Math.round(apcaWithWhite.Lc * 100) / 100,
+                contrastWithBlack: Math.round(apcaWithBlack.Lc * 100) / 100,
+            },
+            estimatedTemperature: {
+                kelvin: tempResult.estimatedKelvin,
+                description: tempResult.description,
+                isNearBlackbody: tempResult.isOnPlanckianLocus,
+            },
         },
         closestNamedColor: {
-            name: closestNamed.name,
-            hex: closestNamed.hex,
+            css: {
+                name: closestNamed.name,
+                hex: closestNamed.hex,
+            },
+            xkcd: {
+                name: closestXkcd.name,
+                hex: closestXkcd.hex,
+            },
         },
         alpha: srgb.alpha,
     };

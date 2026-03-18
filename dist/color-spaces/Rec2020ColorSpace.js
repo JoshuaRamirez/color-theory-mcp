@@ -10,9 +10,9 @@ const REC2020_BETA = 0.018053968510807;
  * Rec.2020 (ITU-R BT.2020) to XYZ-D65 transformation matrix.
  */
 const REC2020_TO_XYZ_D65 = Matrix3x3.create([
-    [0.6369580, 0.1446169, 0.1688810],
+    [0.636958, 0.1446169, 0.168881],
     [0.2627002, 0.6779981, 0.0593017],
-    [0.0000000, 0.0280727, 1.0609851],
+    [0.0, 0.0280727, 1.0609851],
 ]);
 /**
  * XYZ-D65 to Rec.2020 transformation matrix.
@@ -82,10 +82,10 @@ export class Rec2020ColorSpace {
         return Color.create('rec2020', encoded, color.alpha);
     }
     isInGamut(components) {
-        return components.every(c => c >= 0 && c <= 1);
+        return components.every((c) => c >= 0 && c <= 1);
     }
     clampToGamut(components) {
-        return components.map(c => Math.max(0, Math.min(1, c)));
+        return components.map((c) => Math.max(0, Math.min(1, c)));
     }
 }
 //# sourceMappingURL=Rec2020ColorSpace.js.map

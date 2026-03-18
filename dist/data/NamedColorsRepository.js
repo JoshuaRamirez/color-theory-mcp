@@ -1,4 +1,6 @@
 import { Color } from '../domain/values/Color.js';
+import { ConversionService } from '../services/ConversionService.js';
+import { CIEDE2000Strategy } from '../strategies/delta-e/CIEDE2000Strategy.js';
 import cssColors from './css-colors.json' with { type: 'json' };
 import xkcdColors from './xkcd-colors.json' with { type: 'json' };
 /**
@@ -7,6 +9,9 @@ import xkcdColors from './xkcd-colors.json' with { type: 'json' };
 export class NamedColorsRepository {
     colors = new Map();
     colorsByHex = new Map();
+    labCache = new Map();
+    conversionService = new ConversionService();
+    deltaE = new CIEDE2000Strategy();
     includeXkcd;
     constructor(options) {
         this.includeXkcd = options?.includeXkcd ?? false;
@@ -30,6 +35,9 @@ export class NamedColorsRepository {
         const color = Color.fromHex(hex);
         const entry = { name, hex: hex.toLowerCase(), color, source };
         this.colors.set(name.toLowerCase(), entry);
+        // Pre-compute Lab for perceptual distance matching
+        const lab = this.conversionService.convert(color, 'lab');
+        this.labCache.set(name.toLowerCase(), lab.components);
         const hexKey = hex.toLowerCase();
         const existing = this.colorsByHex.get(hexKey) ?? [];
         existing.push(entry);
@@ -51,23 +59,22 @@ export class NamedColorsRepository {
     }
     /**
      * Finds the closest named color to a given color.
-     * Uses simple Euclidean distance in sRGB space.
+     * Uses CIEDE2000 perceptual distance in Lab space.
+     * Lab values are pre-computed at load time for performance.
      */
     findClosest(color) {
-        // Convert to sRGB for comparison
-        const targetRgb = color.space === 'srgb'
-            ? color.components
-            : Color.fromHex('#000000').components; // Fallback
+        // Convert target to Lab for perceptual comparison
+        const targetLab = this.conversionService.convert(color, 'lab');
         let closest;
-        let minDistance = Infinity;
-        for (const entry of this.colors.values()) {
-            const [r1, g1, b1] = entry.color.components;
-            const [r2, g2, b2] = targetRgb;
-            const distance = Math.sqrt(Math.pow(r1 - r2, 2) +
-                Math.pow(g1 - g2, 2) +
-                Math.pow(b1 - b2, 2));
-            if (distance < minDistance) {
-                minDistance = distance;
+        let minDeltaE = Infinity;
+        for (const [name, entry] of this.colors.entries()) {
+            const entryLabComponents = this.labCache.get(name);
+            if (!entryLabComponents)
+                continue;
+            const entryLab = Color.create('lab', entryLabComponents, 1);
+            const de = this.deltaE.calculate(targetLab, entryLab);
+            if (de < minDeltaE) {
+                minDeltaE = de;
                 closest = entry;
             }
         }
@@ -84,7 +91,7 @@ export class NamedColorsRepository {
      */
     search(query) {
         const lowerQuery = query.toLowerCase();
-        return [...this.colors.values()].filter(entry => entry.name.toLowerCase().includes(lowerQuery));
+        return [...this.colors.values()].filter((entry) => entry.name.toLowerCase().includes(lowerQuery));
     }
     /**
      * Gets the total count of named colors.

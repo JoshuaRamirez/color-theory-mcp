@@ -53,11 +53,11 @@ export class ACEScgColorSpace {
     }
     isInGamut(components) {
         // Scene-referred: allow values within half-float range
-        return components.every(c => c >= 0 && c <= HALF_FLOAT_MAX);
+        return components.every((c) => c >= 0 && c <= HALF_FLOAT_MAX);
     }
     clampToGamut(components) {
         // Clamp to 0-1 for display mapping purposes
-        return components.map(c => Math.max(0, Math.min(1, c)));
+        return components.map((c) => Math.max(0, Math.min(1, c)));
     }
 }
 //# sourceMappingURL=ACEScgColorSpace.js.map

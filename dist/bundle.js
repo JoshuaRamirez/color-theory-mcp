@@ -29930,22 +29930,68 @@ import { createRequire } from "module";
 
 // src/domain/values/ColorSpaceType.ts
 var COLOR_SPACE_COMPONENTS = {
-  "srgb": ["r", "g", "b"],
+  srgb: ["r", "g", "b"],
   "linear-srgb": ["r", "g", "b"],
   "display-p3": ["r", "g", "b"],
-  "rec2020": ["r", "g", "b"],
+  rec2020: ["r", "g", "b"],
   "prophoto-rgb": ["r", "g", "b"],
-  "acescg": ["r", "g", "b"],
+  acescg: ["r", "g", "b"],
   "xyz-d65": ["x", "y", "z"],
   "xyz-d50": ["x", "y", "z"],
-  "lab": ["l", "a", "b"],
-  "lch": ["l", "c", "h"],
-  "oklab": ["l", "a", "b"],
-  "oklch": ["l", "c", "h"],
-  "hsl": ["h", "s", "l"],
-  "hsv": ["h", "s", "v"],
-  "hwb": ["h", "w", "b"],
-  "cmyk": ["c", "m", "y", "k"]
+  lab: ["l", "a", "b"],
+  lch: ["l", "c", "h"],
+  oklab: ["l", "a", "b"],
+  oklch: ["l", "c", "h"],
+  hsl: ["h", "s", "l"],
+  hsv: ["h", "s", "v"],
+  hwb: ["h", "w", "b"],
+  cmyk: ["c", "m", "y", "k"]
+};
+
+// src/domain/errors.ts
+var ColorError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ColorError";
+  }
+};
+var ColorParseError = class extends ColorError {
+  input;
+  constructor(input, reason) {
+    super(reason ? `Unable to parse color "${input}": ${reason}` : `Unable to parse color: ${input}`);
+    this.name = "ColorParseError";
+    this.input = input;
+  }
+};
+var UnknownColorSpaceError = class extends ColorError {
+  space;
+  constructor(space) {
+    super(`Unknown color space: ${space}`);
+    this.name = "UnknownColorSpaceError";
+    this.space = space;
+  }
+};
+var ColorSpaceMismatchError = class extends ColorError {
+  expected;
+  actual;
+  constructor(expected, actual) {
+    super(`Expected ${expected} color, got ${actual}`);
+    this.name = "ColorSpaceMismatchError";
+    this.expected = expected;
+    this.actual = actual;
+  }
+};
+var ComponentCountError = class extends ColorError {
+  space;
+  expected;
+  actual;
+  constructor(space, expected, actual) {
+    super(`Color space '${space}' requires ${expected} components, got ${actual}`);
+    this.name = "ComponentCountError";
+    this.space = space;
+    this.expected = expected;
+    this.actual = actual;
+  }
 };
 
 // src/domain/values/Color.ts
@@ -29965,9 +30011,7 @@ var Color = class _Color {
   static create(space, components, alpha = 1) {
     const expectedCount = COLOR_SPACE_COMPONENTS[space].length;
     if (components.length !== expectedCount) {
-      throw new Error(
-        `Color space '${space}' requires ${expectedCount} components, got ${components.length}`
-      );
+      throw new ComponentCountError(space, expectedCount, components.length);
     }
     return new _Color(space, components, alpha);
   }
@@ -29993,10 +30037,10 @@ var Color = class _Color {
         a = parseInt(cleaned.slice(6, 8), 16) / 255;
       }
     } else {
-      throw new Error(`Invalid hex color: ${hex3}`);
+      throw new ColorParseError(hex3, "Invalid hex color");
     }
     if ([r, g, b, a].some(isNaN)) {
-      throw new Error(`Invalid hex color: ${hex3}`);
+      throw new ColorParseError(hex3, "Invalid hex color");
     }
     return new _Color("srgb", [r, g, b], a);
   }
@@ -30012,7 +30056,7 @@ var Color = class _Color {
    */
   toHex(includeAlpha = false) {
     if (this.space !== "srgb") {
-      throw new Error('Call toSpace("srgb") before toHex() for non-sRGB colors');
+      throw new ColorSpaceMismatchError("srgb", this.space);
     }
     const [r, g, b] = this.components;
     const toHexByte = (n) => Math.round(Math.max(0, Math.min(1, n)) * 255).toString(16).padStart(2, "0");
@@ -30027,7 +30071,7 @@ var Color = class _Color {
    */
   toRgbArray() {
     if (this.space !== "srgb") {
-      throw new Error('Call toSpace("srgb") before toRgbArray() for non-sRGB colors');
+      throw new ColorSpaceMismatchError("srgb", this.space);
     }
     const [r, g, b] = this.components;
     return [
@@ -30094,1075 +30138,6 @@ var Color = class _Color {
     return `Color(${this.space}: [${comps}], alpha: ${this.alpha.toFixed(3)})`;
   }
 };
-
-// src/data/css-colors.json
-var css_colors_default = {
-  aliceblue: "#f0f8ff",
-  antiquewhite: "#faebd7",
-  aqua: "#00ffff",
-  aquamarine: "#7fffd4",
-  azure: "#f0ffff",
-  beige: "#f5f5dc",
-  bisque: "#ffe4c4",
-  black: "#000000",
-  blanchedalmond: "#ffebcd",
-  blue: "#0000ff",
-  blueviolet: "#8a2be2",
-  brown: "#a52a2a",
-  burlywood: "#deb887",
-  cadetblue: "#5f9ea0",
-  chartreuse: "#7fff00",
-  chocolate: "#d2691e",
-  coral: "#ff7f50",
-  cornflowerblue: "#6495ed",
-  cornsilk: "#fff8dc",
-  crimson: "#dc143c",
-  cyan: "#00ffff",
-  darkblue: "#00008b",
-  darkcyan: "#008b8b",
-  darkgoldenrod: "#b8860b",
-  darkgray: "#a9a9a9",
-  darkgreen: "#006400",
-  darkgrey: "#a9a9a9",
-  darkkhaki: "#bdb76b",
-  darkmagenta: "#8b008b",
-  darkolivegreen: "#556b2f",
-  darkorange: "#ff8c00",
-  darkorchid: "#9932cc",
-  darkred: "#8b0000",
-  darksalmon: "#e9967a",
-  darkseagreen: "#8fbc8f",
-  darkslateblue: "#483d8b",
-  darkslategray: "#2f4f4f",
-  darkslategrey: "#2f4f4f",
-  darkturquoise: "#00ced1",
-  darkviolet: "#9400d3",
-  deeppink: "#ff1493",
-  deepskyblue: "#00bfff",
-  dimgray: "#696969",
-  dimgrey: "#696969",
-  dodgerblue: "#1e90ff",
-  firebrick: "#b22222",
-  floralwhite: "#fffaf0",
-  forestgreen: "#228b22",
-  fuchsia: "#ff00ff",
-  gainsboro: "#dcdcdc",
-  ghostwhite: "#f8f8ff",
-  gold: "#ffd700",
-  goldenrod: "#daa520",
-  gray: "#808080",
-  green: "#008000",
-  greenyellow: "#adff2f",
-  grey: "#808080",
-  honeydew: "#f0fff0",
-  hotpink: "#ff69b4",
-  indianred: "#cd5c5c",
-  indigo: "#4b0082",
-  ivory: "#fffff0",
-  khaki: "#f0e68c",
-  lavender: "#e6e6fa",
-  lavenderblush: "#fff0f5",
-  lawngreen: "#7cfc00",
-  lemonchiffon: "#fffacd",
-  lightblue: "#add8e6",
-  lightcoral: "#f08080",
-  lightcyan: "#e0ffff",
-  lightgoldenrodyellow: "#fafad2",
-  lightgray: "#d3d3d3",
-  lightgreen: "#90ee90",
-  lightgrey: "#d3d3d3",
-  lightpink: "#ffb6c1",
-  lightsalmon: "#ffa07a",
-  lightseagreen: "#20b2aa",
-  lightskyblue: "#87cefa",
-  lightslategray: "#778899",
-  lightslategrey: "#778899",
-  lightsteelblue: "#b0c4de",
-  lightyellow: "#ffffe0",
-  lime: "#00ff00",
-  limegreen: "#32cd32",
-  linen: "#faf0e6",
-  magenta: "#ff00ff",
-  maroon: "#800000",
-  mediumaquamarine: "#66cdaa",
-  mediumblue: "#0000cd",
-  mediumorchid: "#ba55d3",
-  mediumpurple: "#9370db",
-  mediumseagreen: "#3cb371",
-  mediumslateblue: "#7b68ee",
-  mediumspringgreen: "#00fa9a",
-  mediumturquoise: "#48d1cc",
-  mediumvioletred: "#c71585",
-  midnightblue: "#191970",
-  mintcream: "#f5fffa",
-  mistyrose: "#ffe4e1",
-  moccasin: "#ffe4b5",
-  navajowhite: "#ffdead",
-  navy: "#000080",
-  oldlace: "#fdf5e6",
-  olive: "#808000",
-  olivedrab: "#6b8e23",
-  orange: "#ffa500",
-  orangered: "#ff4500",
-  orchid: "#da70d6",
-  palegoldenrod: "#eee8aa",
-  palegreen: "#98fb98",
-  paleturquoise: "#afeeee",
-  palevioletred: "#db7093",
-  papayawhip: "#ffefd5",
-  peachpuff: "#ffdab9",
-  peru: "#cd853f",
-  pink: "#ffc0cb",
-  plum: "#dda0dd",
-  powderblue: "#b0e0e6",
-  purple: "#800080",
-  rebeccapurple: "#663399",
-  red: "#ff0000",
-  rosybrown: "#bc8f8f",
-  royalblue: "#4169e1",
-  saddlebrown: "#8b4513",
-  salmon: "#fa8072",
-  sandybrown: "#f4a460",
-  seagreen: "#2e8b57",
-  seashell: "#fff5ee",
-  sienna: "#a0522d",
-  silver: "#c0c0c0",
-  skyblue: "#87ceeb",
-  slateblue: "#6a5acd",
-  slategray: "#708090",
-  slategrey: "#708090",
-  snow: "#fffafa",
-  springgreen: "#00ff7f",
-  steelblue: "#4682b4",
-  tan: "#d2b48c",
-  teal: "#008080",
-  thistle: "#d8bfd8",
-  tomato: "#ff6347",
-  turquoise: "#40e0d0",
-  violet: "#ee82ee",
-  wheat: "#f5deb3",
-  white: "#ffffff",
-  whitesmoke: "#f5f5f5",
-  yellow: "#ffff00",
-  yellowgreen: "#9acd32"
-};
-
-// src/data/xkcd-colors.json
-var xkcd_colors_default = {
-  acidgreen: "#8ffe09",
-  adobe: "#bd6c48",
-  algae: "#54ac68",
-  algaegreen: "#21c36f",
-  almostblack: "#070d0d",
-  amber: "#feb308",
-  amethyst: "#9b5fc0",
-  apple: "#6ecb3c",
-  applegreen: "#76cd26",
-  apricot: "#ffb16d",
-  aqua: "#13eac9",
-  aquablue: "#02d8e9",
-  aquagreen: "#12e193",
-  aquamarine: "#2ee8bb",
-  armygreen: "#4b5d16",
-  aubergine: "#3d0734",
-  auburn: "#9a3001",
-  avocado: "#90b134",
-  avocadogreen: "#87a922",
-  azure: "#069af3",
-  babyblue: "#a2cffe",
-  babypink: "#ffb7ce",
-  babypurple: "#ca9bf7",
-  banana: "#ffff7e",
-  bananayellow: "#fafe4b",
-  barbiepink: "#fe46a5",
-  barney: "#ac1db8",
-  barneyurple: "#a00498",
-  battleshipgrey: "#6b7c85",
-  berry: "#7e0044",
-  bile: "#b5c306",
-  black: "#000000",
-  bland: "#afa88b",
-  blood: "#770001",
-  bloodorange: "#fe4b03",
-  bloodred: "#980002",
-  blueberry: "#464196",
-  bluegreen: "#137e6d",
-  bluegrey: "#607c8e",
-  bluepurple: "#5729ce",
-  blueviolet: "#5d06e9",
-  blurple: "#5539cc",
-  blush: "#f29e8e",
-  blushpink: "#fe828c",
-  bordeaux: "#7b002c",
-  brick: "#a03623",
-  brickred: "#8f1402",
-  brightaqua: "#0bf9ea",
-  brightblue: "#0165fc",
-  brightcyan: "#41fdfe",
-  brightgreen: "#01ff07",
-  brightlavender: "#c760ff",
-  brightlilac: "#c95efb",
-  brightlime: "#87fd05",
-  brightlimegreen: "#65fe08",
-  brightmagenta: "#ff08e8",
-  brightorange: "#ff5b00",
-  brightpink: "#fe01b1",
-  brightpurple: "#be03fd",
-  brightred: "#ff000d",
-  brightskyblue: "#02ccfe",
-  brightteal: "#01f9c6",
-  brightturquoise: "#0ffef9",
-  brightviolet: "#ad0afd",
-  brightyellow: "#fffd01",
-  brightyellowgreen: "#9dff00",
-  bronze: "#a87900",
-  brown: "#653700",
-  brownish: "#9c6d57",
-  brownorange: "#b96902",
-  brownred: "#922b05",
-  brownyellow: "#b29705",
-  bubblegum: "#ff6cb5",
-  bubblegumpink: "#fe83cc",
-  buff: "#fef69e",
-  burgundy: "#610023",
-  burntorange: "#c04e01",
-  burntred: "#9f2305",
-  burntsienna: "#b04e0f",
-  burntumber: "#a0450e",
-  burntyellow: "#d5ab09",
-  butter: "#ffff81",
-  buttercup: "#fef200",
-  butterscotch: "#fdb147",
-  cadetblue: "#4e7496",
-  camel: "#c69f59",
-  camo: "#7f8f4e",
-  camogreen: "#526525",
-  camouflagegreen: "#4b6113",
-  canary: "#fdff63",
-  canaryyellow: "#fffe40",
-  candypink: "#ff63e9",
-  caramel: "#af6f09",
-  carmine: "#9d0216",
-  carnation: "#fd798f",
-  carnationpink: "#ff7fa7",
-  celadon: "#befdb7",
-  celery: "#c1fd95",
-  cement: "#a5a391",
-  cerise: "#de0c62",
-  cerulean: "#0485d1",
-  ceruleanblue: "#056eee",
-  charcoal: "#343837",
-  charcoalgrey: "#3c4142",
-  chartreuse: "#c1f80a",
-  cherry: "#cf0234",
-  cherryred: "#f7022a",
-  chestnut: "#742802",
-  chocolate: "#3d1c02",
-  chocolatebrown: "#411900",
-  cinnamon: "#ac4f06",
-  clay: "#b66a50",
-  claybrown: "#b2713d",
-  clearblue: "#247afd",
-  claret: "#680018",
-  cobalt: "#1e488f",
-  cobaltblue: "#030aa7",
-  cocoa: "#875f42",
-  coffee: "#a6814c",
-  coolblue: "#4984b8",
-  coolgreen: "#33b864",
-  coolgreyn: "#95a3a6",
-  copper: "#b66325",
-  coral: "#fc5a50",
-  coralpink: "#ff6163",
-  cornflower: "#6a79f7",
-  cornflowerblue: "#5170d7",
-  cranberry: "#9e003a",
-  cream: "#ffffc2",
-  creme: "#ffffb6",
-  crimson: "#8c000f",
-  custard: "#fffd78",
-  cyan: "#00ffff",
-  dandelion: "#fedf08",
-  dark: "#1b2431",
-  darkaqua: "#05696b",
-  darkaquamarine: "#017371",
-  darkbeige: "#ac9362",
-  darkblue: "#00035b",
-  darkbluegreen: "#005249",
-  darkbluegrey: "#1f3b4d",
-  darkbrown: "#341c02",
-  darkcoral: "#cf524e",
-  darkcream: "#fff39a",
-  darkcyan: "#0a888a",
-  darkforestgreen: "#002d04",
-  darkfuchsia: "#9d0759",
-  darkgold: "#b59410",
-  darkgrassgreen: "#388004",
-  darkgreen: "#033500",
-  darkgreenblue: "#1c6b72",
-  darkgrey: "#363737",
-  darkgreyblue: "#29465b",
-  darkhotpink: "#d90166",
-  darkindigo: "#1f0954",
-  darkishblue: "#0149fe",
-  darkishgreen: "#287c37",
-  darkishpink: "#da467d",
-  darkishpurple: "#751973",
-  darkishred: "#a90308",
-  darkkhaki: "#9b8f55",
-  darklavender: "#856798",
-  darklilac: "#9c6da5",
-  darklime: "#84b701",
-  darklimegreen: "#7ebd01",
-  darkmagenta: "#960056",
-  darkmaroon: "#3c0008",
-  darkmauve: "#874c62",
-  darkmint: "#48c072",
-  darkmintgreen: "#20c073",
-  darkmustard: "#a88905",
-  darknavy: "#000435",
-  darknavyblue: "#00022e",
-  darkolive: "#373e02",
-  darkolivegreen: "#3c4d03",
-  darkorange: "#c65102",
-  darkpastelgreen: "#56ae57",
-  darkpeach: "#de7e5d",
-  darkperiwinkle: "#665fd1",
-  darkpink: "#cb416b",
-  darkplum: "#3f012c",
-  darkpurple: "#35063e",
-  darkred: "#840000",
-  darkrose: "#b5485d",
-  darkroyalblue: "#02066f",
-  darksage: "#598556",
-  darksalmon: "#c85a53",
-  darksand: "#a88f59",
-  darkseafoam: "#1fb57a",
-  darkseafoamgreen: "#3eaf76",
-  darkseagreen: "#11875d",
-  darkskyblue: "#448ee4",
-  darkslateblue: "#214761",
-  darktaupe: "#7f684e",
-  darkteal: "#014d4e",
-  darkturquoise: "#045c5a",
-  darkviolet: "#34013f",
-  darkyellow: "#d5b60a",
-  darkyellowgreen: "#728f02",
-  deeppink: "#cb0162",
-  deeppurple: "#36013f",
-  deepred: "#9a0200",
-  deeprose: "#c74767",
-  deepskyblue: "#0d75f8",
-  deepteal: "#00555a",
-  deepturquoise: "#017374",
-  deepviolet: "#490648",
-  denim: "#3b638c",
-  denimblue: "#3b5b92",
-  desert: "#ccad60",
-  diarrhea: "#9f8303",
-  dirt: "#8a6e45",
-  dirtbrown: "#836539",
-  dirtyblue: "#3f829d",
-  dirtygreen: "#667e2c",
-  dirtyorange: "#c87606",
-  dirtypink: "#ca7b80",
-  dirtypurple: "#734a65",
-  dirtyyellow: "#cdc50a",
-  dodgerblue: "#3e82fc",
-  drab: "#828344",
-  drabgreen: "#749551",
-  driedblood: "#4b0101",
-  dullblue: "#49759c",
-  dullbrown: "#876e4b",
-  dullgreen: "#74a662",
-  dullorange: "#d8863b",
-  dullpink: "#d5869d",
-  dullpurple: "#84597e",
-  dullred: "#bb3f3f",
-  dullteal: "#5f9e8f",
-  dullyellow: "#eedc5b",
-  dusk: "#4e5481",
-  duskblue: "#26538d",
-  duskyblue: "#475f94",
-  duskypink: "#cc7a8b",
-  duskypurple: "#895b7b",
-  duskyrose: "#ba6873",
-  dust: "#b2996e",
-  dustyblue: "#5a86ad",
-  dustygreen: "#76a973",
-  dustylavender: "#ac86a8",
-  dustyorange: "#f0833a",
-  dustypink: "#d58a94",
-  dustypurple: "#825f87",
-  dustyred: "#b9484e",
-  dustyrose: "#c0737a",
-  dustyteal: "#4c9085",
-  earth: "#a2653e",
-  eastergreen: "#8cfd7e",
-  easterpurple: "#c071fe",
-  ecru: "#feffca",
-  eggplant: "#380835",
-  eggplantpurple: "#430541",
-  eggshell: "#ffffd4",
-  eggshellblue: "#c4fff7",
-  electricblue: "#0652ff",
-  electricgreen: "#21fc0d",
-  electriclime: "#a8ff04",
-  electricpink: "#ff0490",
-  electricpurple: "#aa23ff",
-  emerald: "#01a049",
-  emeraldgreen: "#028f1e",
-  evergreen: "#05472a",
-  fadedblue: "#658cbb",
-  fadedgreen: "#7bb274",
-  fadedorange: "#f0944d",
-  fadedpink: "#de9dac",
-  fadedpurple: "#916e99",
-  fadedred: "#d3494e",
-  fadedyellow: "#feff7f",
-  fawn: "#cfaf7b",
-  fern: "#63a950",
-  ferngreen: "#548d44",
-  fireenginered: "#fe0002",
-  flatblue: "#3c73a8",
-  flatgreen: "#699d4c",
-  fluorescentgreen: "#08ff08",
-  flurogreen: "#0aff02",
-  foamgreen: "#90fda9",
-  forest: "#0b5509",
-  forestgreen: "#06470c",
-  forrestgreen: "#154406",
-  frenchblue: "#436bad",
-  freshgreen: "#69d84f",
-  froggreen: "#58bc08",
-  fuchsia: "#ed0dd9",
-  gold: "#dbb40c",
-  golden: "#f5bf03",
-  goldenbrown: "#b27a01",
-  goldenrod: "#fac205",
-  goldenyellow: "#fce100",
-  grape: "#6c3461",
-  grapefruit: "#fd5956",
-  grapepurple: "#5d1451",
-  grass: "#5cac2d",
-  grassgreen: "#3f9b0b",
-  grassygreen: "#419c03",
-  green: "#15b01a",
-  greenapple: "#5edc1f",
-  greenblue: "#06b48b",
-  greenbrown: "#544e03",
-  greengrey: "#77926f",
-  greenteal: "#0cb577",
-  greenyellow: "#c6f808",
-  greenish: "#40a368",
-  greenishbeige: "#c9d179",
-  greenishblue: "#0b8b87",
-  greenishbrown: "#696112",
-  greenishcyan: "#2afeb7",
-  greenishgrey: "#96ae8d",
-  greenishtan: "#bccb7a",
-  greenishteal: "#32bf84",
-  greenishturquoise: "#00fbb0",
-  greenishyellow: "#cdfd02",
-  grey: "#929591",
-  greyblue: "#6b8ba4",
-  greybrown: "#7f7053",
-  greygreen: "#789b73",
-  greypink: "#c3909b",
-  greypurple: "#826d8c",
-  greyteal: "#5e9b8a",
-  greyish: "#a8a495",
-  greyishblue: "#5e819d",
-  greyishbrown: "#7a6a4f",
-  greyishgreen: "#82a67d",
-  greyishpink: "#c88d94",
-  greyishpurple: "#887191",
-  greyishteal: "#719f91",
-  grossgreen: "#a0bf16",
-  gunmetal: "#536267",
-  hazel: "#8e7618",
-  heather: "#a484ac",
-  heliotrope: "#d94ff5",
-  highlightergreen: "#1bfc06",
-  hospitalgreen: "#9be5aa",
-  hotgreen: "#25ff29",
-  hotmagenta: "#f504c9",
-  hotpink: "#ff028d",
-  hotpurple: "#cb00f5",
-  huntergreen: "#0b4008",
-  ice: "#d6fffa",
-  iceblue: "#d7fffe",
-  ickygreen: "#8fae22",
-  indianred: "#850e04",
-  indigo: "#380282",
-  indigoblue: "#3a18b1",
-  iris: "#6258c4",
-  irishgreen: "#019529",
-  ivory: "#ffffcb",
-  jade: "#1fa774",
-  jadegreen: "#2baf6a",
-  jean: "#507b9c",
-  junglegreen: "#048243",
-  kellygreen: "#02ab2e",
-  kermitgreen: "#5cb200",
-  keylime: "#aeff6e",
-  khaki: "#aaa662",
-  khakigreen: "#728639",
-  kiwi: "#9cef43",
-  kiwigreen: "#8ee53f",
-  lavender: "#c79fef",
-  lavenderblue: "#8b88f8",
-  lavenderpink: "#dd85d7",
-  lawngreen: "#4da409",
-  leaf: "#71aa34",
-  leafgreen: "#5ca904",
-  leafygreen: "#51b73b",
-  leather: "#ac7434",
-  lemon: "#fdff52",
-  lemongreen: "#adf802",
-  lemonlime: "#bffe28",
-  lemonyellow: "#fdff38",
-  lichen: "#8fb67b",
-  lightaqua: "#8cffdb",
-  lightaquamarine: "#7bfdc7",
-  lightbeige: "#fffeb6",
-  lightblue: "#95d0fc",
-  lightbluegreen: "#7efbb3",
-  lightbluegrey: "#b7c9e2",
-  lightbluishgreen: "#76fda8",
-  lightbluishpurple: "#a578d6",
-  lightbrightgreen: "#53fe5c",
-  lightbrown: "#ad8150",
-  lightburgundy: "#a8415b",
-  lightcyan: "#acfffc",
-  lighteggplant: "#894585",
-  lightforestgreen: "#4f9153",
-  lightgold: "#fddc5c",
-  lightgrassgreen: "#9af764",
-  lightgreen: "#96f97b",
-  lightgreenblue: "#56fca2",
-  lightgreenish: "#61e160",
-  lightgrey: "#d8dcd6",
-  lightgreyblue: "#9dbcd4",
-  lightgreygreen: "#b7e1a1",
-  lightgreyishblue: "#a0b7c4",
-  lightindigo: "#6d5acf",
-  lightkhaki: "#e6f2a2",
-  lightlavendar: "#efc0fe",
-  lightlavender: "#dfc5fe",
-  lightlilac: "#edc8ff",
-  lightlime: "#aefd6c",
-  lightlimegreen: "#b9ff66",
-  lightmagenta: "#fa5ff7",
-  lightmaroon: "#a24857",
-  lightmauve: "#c292a1",
-  lightmint: "#b6ffbb",
-  lightmintgreen: "#a6fbb2",
-  lightmossgreen: "#a6c875",
-  lightmustard: "#f7d560",
-  lightnavy: "#155084",
-  lightnavyblue: "#2e5a88",
-  lightneongreen: "#4efd54",
-  lightolive: "#acbf69",
-  lightolivegreen: "#a4be5c",
-  lightorange: "#fdaa48",
-  lightpastelgreen: "#b2fba5",
-  lightpeach: "#ffd8b1",
-  lightpeagreen: "#c4fe82",
-  lightperiwinkle: "#c1c6fc",
-  lightpink: "#ffd1df",
-  lightplum: "#9d5783",
-  lightpurple: "#bf77f6",
-  lightred: "#ff474c",
-  lightrose: "#ffc5cb",
-  lightroyalblue: "#3a2efe",
-  lightsage: "#bcecac",
-  lightsalmon: "#fea993",
-  lightsalmonpink: "#fe7b7c",
-  lightseafoam: "#a0febf",
-  lightseafoamgreen: "#a7ffb5",
-  lightseagreen: "#98f6b0",
-  lightskyblue: "#c6fcff",
-  lighttan: "#fbeeac",
-  lightteal: "#90e4c1",
-  lightturquoise: "#7ef4cc",
-  lighturple: "#b36ff6",
-  lightviolet: "#d6b4fc",
-  lightyellow: "#fffe7a",
-  lightyellowgreen: "#ccfd7f",
-  lightyellowishgreen: "#c2ff89",
-  lilac: "#cea2fd",
-  lime: "#aaff32",
-  limegreen: "#89fe05",
-  limeyellow: "#d0fe1d",
-  lipstick: "#d5174e",
-  lipstickred: "#c0022f",
-  magenta: "#c20078",
-  mahogany: "#4a0100",
-  maize: "#f4d054",
-  mango: "#ffa62b",
-  manilla: "#fffa86",
-  marigold: "#fcc006",
-  maroon: "#650021",
-  mauve: "#ae7181",
-  mediumblue: "#2c6fbb",
-  mediumgreen: "#39ad48",
-  mediumpurple: "#9e43a2",
-  melon: "#ff7855",
-  metallicblue: "#4f738e",
-  midnight: "#03012d",
-  midnightblue: "#020035",
-  midnightpurple: "#280137",
-  militarygreen: "#667c3e",
-  milkchocolate: "#7f4e1e",
-  mint: "#9ffeb0",
-  mintgreen: "#8fff9f",
-  mintygreen: "#0bf77d",
-  mocha: "#9d7651",
-  moss: "#769958",
-  mossgreen: "#658b38",
-  mossygreen: "#638b27",
-  mud: "#735c12",
-  mudbrown: "#60460f",
-  mudgreen: "#606602",
-  muddybrown: "#886806",
-  muddygreen: "#657432",
-  muddyyellow: "#bfac05",
-  mulberry: "#920a4e",
-  murkygreen: "#6c7a0e",
-  mushroom: "#ba9e88",
-  mustard: "#ceb301",
-  mustardyellow: "#d2bd0a",
-  mutedblue: "#3b719f",
-  mutedgreen: "#5fa052",
-  mutedpink: "#d1768f",
-  mutedpurple: "#805b87",
-  nastygreen: "#70b23f",
-  navy: "#01153e",
-  navyblue: "#001146",
-  navygreen: "#35530a",
-  neonblue: "#04d9ff",
-  neongreen: "#0cff0c",
-  neonpink: "#fe019a",
-  neonpurple: "#bc13fe",
-  neonred: "#ff073a",
-  neonyellow: "#cfff04",
-  nickel: "#5a7d8b",
-  nightblue: "#040348",
-  ocean: "#017b92",
-  oceanblue: "#03719c",
-  oceangreen: "#3d9973",
-  ocher: "#bf9b0c",
-  ochre: "#bf9005",
-  offwhite: "#ffffe4",
-  offyellow: "#f1f33f",
-  oldpink: "#c77986",
-  oldrose: "#c87f89",
-  olive: "#6e750e",
-  olivebrown: "#645403",
-  olivedrab: "#6f7632",
-  olivegreen: "#677a04",
-  oliveyellow: "#c2b709",
-  orange: "#f97306",
-  orangebrown: "#be6400",
-  orangepink: "#ff6f52",
-  orangered: "#fe420f",
-  orangeyellow: "#ffad01",
-  orchid: "#c875c4",
-  pale: "#fff9d0",
-  paleaqua: "#b8ffeb",
-  palebrown: "#b1916e",
-  palecyan: "#b7fffa",
-  palegold: "#fdde6c",
-  palegreen: "#c7fdb5",
-  palelavender: "#eecffe",
-  palelilac: "#e4cbff",
-  palelime: "#befd73",
-  palelimegreen: "#b1ff3c",
-  palemagenta: "#d767ad",
-  palemauve: "#fed0fc",
-  paleolive: "#b9cc81",
-  paleolivegreen: "#b1d27b",
-  paleorange: "#ffa756",
-  palepeach: "#ffe5ad",
-  palepink: "#ffcfdc",
-  palepurple: "#b790d4",
-  palered: "#d9544d",
-  palerose: "#fdc1c5",
-  palesalmon: "#ffb19a",
-  paleskyblue: "#bdf6fe",
-  paleteal: "#82cbb2",
-  paleturquoise: "#a5fbd5",
-  paleviolet: "#ceaefa",
-  paleyellow: "#ffff84",
-  parchment: "#fefcaf",
-  pastelblue: "#a2bffe",
-  pastelgreen: "#b0ff9d",
-  pastelorange: "#ff964f",
-  pastelpink: "#ffbacd",
-  pastelpurple: "#caa0ff",
-  pastelred: "#db5856",
-  pastelyellow: "#fffe71",
-  pea: "#a4bf20",
-  peagreen: "#8eab12",
-  peach: "#ffb07c",
-  peachypink: "#ff9a8a",
-  peacockblue: "#016795",
-  pear: "#cbf85f",
-  periwinkle: "#8e82fe",
-  periwinkleblue: "#8f99fb",
-  petrol: "#005f6a",
-  pigpink: "#e78ea5",
-  pine: "#2b5d34",
-  pinegreen: "#0a481e",
-  pink: "#ff81c0",
-  pinkish: "#d46a7e",
-  pinkishbrown: "#b17261",
-  pinkishgrey: "#c8aca9",
-  pinkishorange: "#ff724c",
-  pinkishpurple: "#d648d7",
-  pinkishred: "#f10c45",
-  pinkishtan: "#d99b82",
-  pinkpurple: "#db4bda",
-  pinkred: "#f5054f",
-  pinky: "#fc86aa",
-  pinkypurple: "#c94cbe",
-  pinkyred: "#fc2647",
-  pissyellow: "#ddd618",
-  pistachio: "#c0fa8b",
-  plum: "#580f41",
-  plumpurple: "#4e0550",
-  poisongreen: "#40fd14",
-  poo: "#8f7303",
-  poobrown: "#885f01",
-  powderblue: "#b1d1fc",
-  powderpink: "#ffb2d0",
-  primaryblue: "#0804f9",
-  prussianblue: "#004577",
-  puce: "#a57e52",
-  puke: "#a5a502",
-  pukebrown: "#947706",
-  pukegreen: "#9aae07",
-  pukeyellow: "#c2be0e",
-  pumpkin: "#e17701",
-  pumpkinorange: "#fb7d07",
-  pureblue: "#0203e2",
-  purple: "#7e1e9c",
-  purpleblue: "#632de9",
-  purplebrown: "#673a3f",
-  purplegrey: "#866f85",
-  purplepink: "#e03fd8",
-  purplered: "#990147",
-  purplish: "#94568c",
-  purplishblue: "#601ef9",
-  purplishbrown: "#6b4247",
-  purplishgrey: "#7a687f",
-  purplishpink: "#ce5dae",
-  purplishred: "#b0054b",
-  purply: "#983fb2",
-  purplyblue: "#661aee",
-  purplypink: "#f075e6",
-  putty: "#beae8a",
-  racinggreen: "#014600",
-  radioactivegreen: "#2cfa1f",
-  raspberry: "#b00149",
-  rawsienna: "#9a6200",
-  rawumber: "#a75e09",
-  red: "#e50000",
-  redbrown: "#8b2e16",
-  redorange: "#fd3c06",
-  redpink: "#fa2a55",
-  redpurple: "#820747",
-  redviolet: "#9e0168",
-  reddish: "#c44240",
-  reddishbrown: "#7f2b0a",
-  reddishorange: "#f8481c",
-  reddishpink: "#fe2c54",
-  reddishpurple: "#910951",
-  reddybrown: "#6e1005",
-  richblue: "#021bf9",
-  richpurple: "#720058",
-  robinseggblue: "#98eff9",
-  robineggblue: "#8af1fe",
-  rosa: "#fe86a4",
-  rose: "#cf6275",
-  rosepink: "#f7879a",
-  rosered: "#be013c",
-  rosypink: "#f6688e",
-  rouge: "#ab1239",
-  royal: "#0c1793",
-  royalblue: "#0504aa",
-  royalpurple: "#4b006e",
-  ruby: "#ca0147",
-  russet: "#a13905",
-  rust: "#a83c09",
-  rustbrown: "#8b3103",
-  rustorange: "#c45508",
-  rustred: "#aa2704",
-  rustyorange: "#cd5909",
-  rustyred: "#af2f0d",
-  saffron: "#feb209",
-  sage: "#87ae73",
-  sagegreen: "#88b378",
-  salmon: "#ff796c",
-  salmonpink: "#fe7b7c",
-  sand: "#e2ca76",
-  sandbrown: "#cba560",
-  sandstone: "#c9ae74",
-  sandy: "#f1da7a",
-  sandybrown: "#c4a661",
-  sandyyellow: "#fdee73",
-  sapgreen: "#5c8b15",
-  sapphire: "#2138ab",
-  scarlet: "#be0119",
-  sea: "#3c9992",
-  seablue: "#047495",
-  seafoam: "#80f9ad",
-  seafoamblue: "#78d1b6",
-  seafoamgreen: "#7af9ab",
-  seagreen: "#53fca1",
-  seaweed: "#18d17b",
-  seaweedgreen: "#35ad6b",
-  shamrock: "#01b44c",
-  shamrockgreen: "#02c14d",
-  shit: "#7f5f00",
-  shitbrown: "#7b5804",
-  shitgreen: "#758000",
-  silver: "#c5c9c7",
-  sky: "#82cafc",
-  skyblue: "#75bbfd",
-  slate: "#516572",
-  slateblue: "#5b7c99",
-  slategreen: "#658d6d",
-  slategrey: "#59656d",
-  slimegreen: "#99cc04",
-  snot: "#acbb0d",
-  snotgreen: "#9dc100",
-  softblue: "#6488ea",
-  softgreen: "#6fc276",
-  softorange: "#ffab4a",
-  softpink: "#fdb0c0",
-  softpurple: "#a66fb5",
-  spearmint: "#1ef876",
-  springgreen: "#a9f971",
-  spruce: "#0a5f38",
-  squash: "#f2ab15",
-  steel: "#738595",
-  steelblue: "#5a7d9a",
-  steelgrey: "#6f828a",
-  stone: "#ada587",
-  stormyblue: "#507b9c",
-  straw: "#fcf679",
-  strawberry: "#fb2943",
-  strongblue: "#0c06f7",
-  strongpink: "#ff0789",
-  sunflower: "#ffc512",
-  sunflowyellow: "#ffda03",
-  sunnyyellow: "#fff917",
-  sunshineyellow: "#fffd37",
-  swamp: "#698339",
-  swampgreen: "#748500",
-  tan: "#d1b26f",
-  tanbrown: "#ab7e4c",
-  tangerine: "#ff9408",
-  tangreen: "#a9be70",
-  taupe: "#b9a281",
-  tea: "#65ab7c",
-  teagreen: "#bdf8a3",
-  teal: "#029386",
-  tealblue: "#01889f",
-  tealgreen: "#25a36f",
-  terracota: "#cb6843",
-  terracotta: "#c9643b",
-  tiffanyblue: "#7bf2da",
-  tomato: "#ef4026",
-  tomatored: "#ec2d01",
-  topaz: "#13bbaf",
-  toxicgreen: "#61de2a",
-  trueblue: "#010fcc",
-  truegreen: "#089404",
-  turquoise: "#06c2ac",
-  turquoiseblue: "#06b1c4",
-  turquoisegreen: "#04f489",
-  turtlegreen: "#75b84f",
-  twilight: "#4e518b",
-  twilightblue: "#0a437a",
-  uglyblue: "#31668a",
-  uglygreen: "#7a9703",
-  uglypink: "#cd7584",
-  uglypurple: "#a442a0",
-  uglyyellow: "#d0c101",
-  ultramarine: "#2000b1",
-  ultramarineblue: "#1805db",
-  umber: "#b26400",
-  velvet: "#750851",
-  vermillion: "#f4320c",
-  verydarkblue: "#000133",
-  verydarkbrown: "#1d0200",
-  verydarkgreen: "#062e03",
-  verydarkpurple: "#2a0134",
-  verypaleblue: "#d6fffe",
-  verypalegreen: "#cffdbc",
-  vibrantblue: "#0339f8",
-  vibrantgreen: "#0add08",
-  vibrantpurple: "#ad03de",
-  violet: "#9a0eea",
-  violetblue: "#510ac9",
-  violetpink: "#fb5ffc",
-  violetred: "#a50055",
-  viridian: "#1e9167",
-  vividblue: "#152eff",
-  vividgreen: "#2fef10",
-  vividpurple: "#9900fa",
-  vomit: "#a2a415",
-  vomitgreen: "#89a203",
-  vomityellow: "#c7c10c",
-  warmblue: "#4b57db",
-  warmbrown: "#964e02",
-  warmgrey: "#978a84",
-  warmpink: "#fb5581",
-  warmpurple: "#952e8f",
-  washedoutgreen: "#bcf5a6",
-  waterblue: "#0e87cc",
-  watermelon: "#fd4659",
-  wheat: "#fbdd7e",
-  white: "#ffffff",
-  windowsblue: "#3778bf",
-  wine: "#80013f",
-  winered: "#7b0323",
-  wintergreen: "#20f986",
-  wisteria: "#a87dc2",
-  yellow: "#ffff14",
-  yellowbrown: "#b79400",
-  yellowgreen: "#c0fb2d",
-  yellowish: "#faee66",
-  yellowishbrown: "#9b7a01",
-  yellowishgreen: "#b0dd16",
-  yellowishorange: "#ffab0f",
-  yellowishtan: "#fcfc81",
-  yellowochre: "#cb7723",
-  yelloworange: "#fcb001",
-  yellowtan: "#ffe36e",
-  yellowygreen: "#bff128"
-};
-
-// src/data/NamedColorsRepository.ts
-var NamedColorsRepository = class {
-  colors = /* @__PURE__ */ new Map();
-  colorsByHex = /* @__PURE__ */ new Map();
-  includeXkcd;
-  constructor(options) {
-    this.includeXkcd = options?.includeXkcd ?? false;
-    this.loadColors();
-  }
-  loadColors() {
-    for (const [name, hex3] of Object.entries(css_colors_default)) {
-      this.addColor(name, hex3, "css");
-    }
-    if (this.includeXkcd) {
-      for (const [name, hex3] of Object.entries(xkcd_colors_default)) {
-        if (!this.colors.has(name.toLowerCase())) {
-          this.addColor(name, hex3, "xkcd");
-        }
-      }
-    }
-  }
-  addColor(name, hex3, source) {
-    const color = Color.fromHex(hex3);
-    const entry = { name, hex: hex3.toLowerCase(), color, source };
-    this.colors.set(name.toLowerCase(), entry);
-    const hexKey = hex3.toLowerCase();
-    const existing = this.colorsByHex.get(hexKey) ?? [];
-    existing.push(entry);
-    this.colorsByHex.set(hexKey, existing);
-  }
-  /**
-   * Gets a named color by name.
-   */
-  getByName(name) {
-    return this.colors.get(name.toLowerCase());
-  }
-  /**
-   * Gets named colors by hex value.
-   */
-  getByHex(hex3) {
-    const normalized = hex3.toLowerCase().replace(/^#/, "");
-    const fullHex = `#${normalized}`;
-    return this.colorsByHex.get(fullHex) ?? [];
-  }
-  /**
-   * Finds the closest named color to a given color.
-   * Uses simple Euclidean distance in sRGB space.
-   */
-  findClosest(color) {
-    const targetRgb = color.space === "srgb" ? color.components : Color.fromHex("#000000").components;
-    let closest;
-    let minDistance = Infinity;
-    for (const entry of this.colors.values()) {
-      const [r1, g1, b1] = entry.color.components;
-      const [r2, g2, b2] = targetRgb;
-      const distance = Math.sqrt(
-        Math.pow(r1 - r2, 2) + Math.pow(g1 - g2, 2) + Math.pow(b1 - b2, 2)
-      );
-      if (distance < minDistance) {
-        minDistance = distance;
-        closest = entry;
-      }
-    }
-    return closest;
-  }
-  /**
-   * Lists all named colors.
-   */
-  listAll() {
-    return [...this.colors.values()];
-  }
-  /**
-   * Searches for colors by partial name match.
-   */
-  search(query) {
-    const lowerQuery = query.toLowerCase();
-    return [...this.colors.values()].filter(
-      (entry) => entry.name.toLowerCase().includes(lowerQuery)
-    );
-  }
-  /**
-   * Gets the total count of named colors.
-   */
-  get count() {
-    return this.colors.size;
-  }
-};
-
-// src/mcp/tools/parseColor.ts
-var namedColors = new NamedColorsRepository();
-function parseColor(input) {
-  const trimmed = input.trim().toLowerCase();
-  if (trimmed.startsWith("#")) {
-    return Color.fromHex(trimmed);
-  }
-  const namedColor = namedColors.getByName(trimmed);
-  if (namedColor) {
-    return namedColor.color;
-  }
-  const rgbMatch = trimmed.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
-  if (rgbMatch) {
-    const r = parseInt(rgbMatch[1], 10);
-    const g = parseInt(rgbMatch[2], 10);
-    const b = parseInt(rgbMatch[3], 10);
-    const a = rgbMatch[4] ? parseFloat(rgbMatch[4]) : 1;
-    return Color.fromRgb(r, g, b, a);
-  }
-  const hslMatch = trimmed.match(/^hsla?\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+)\s*)?\)$/);
-  if (hslMatch) {
-    const h = parseFloat(hslMatch[1]);
-    const s = parseFloat(hslMatch[2]) / 100;
-    const l = parseFloat(hslMatch[3]) / 100;
-    const a = hslMatch[4] ? parseFloat(hslMatch[4]) : 1;
-    return Color.create("hsl", [h, s, l], a);
-  }
-  throw new Error(`Unable to parse color: ${input}`);
-}
 
 // src/domain/values/Matrix3x3.ts
 var Matrix3x3 = class _Matrix3x3 {
@@ -32214,10 +31189,10 @@ var ConversionService = class {
     const sourceColorSpace = this.registry.get(color.space);
     const targetColorSpace = this.registry.get(targetSpace);
     if (!sourceColorSpace) {
-      throw new Error(`Unknown source color space: ${color.space}`);
+      throw new UnknownColorSpaceError(color.space);
     }
     if (!targetColorSpace) {
-      throw new Error(`Unknown target color space: ${targetSpace}`);
+      throw new UnknownColorSpaceError(targetSpace);
     }
     const xyzColor = sourceColorSpace.toXyzD65(color);
     return targetColorSpace.fromXyzD65(xyzColor);
@@ -32234,7 +31209,7 @@ var ConversionService = class {
   isInGamut(color, targetSpace) {
     const colorSpace = this.registry.get(targetSpace);
     if (!colorSpace) {
-      throw new Error(`Unknown color space: ${targetSpace}`);
+      throw new UnknownColorSpaceError(targetSpace);
     }
     const converted = this.convert(color, targetSpace);
     return colorSpace.isInGamut(converted.components);
@@ -32246,7 +31221,7 @@ var ConversionService = class {
   clampToGamut(color) {
     const colorSpace = this.registry.get(color.space);
     if (!colorSpace) {
-      throw new Error(`Unknown color space: ${color.space}`);
+      throw new UnknownColorSpaceError(color.space);
     }
     const clamped = colorSpace.clampToGamut(color.components);
     return color.withComponents(clamped);
@@ -32270,7 +31245,7 @@ var ConversionService = class {
     const destination = targetSpace ?? color.space;
     const destSpace = this.registry.get(destination);
     if (!destSpace) {
-      throw new Error(`Unknown color space: ${destination}`);
+      throw new UnknownColorSpaceError(destination);
     }
     const converted = this.convert(color, destination);
     if (destSpace.isInGamut(converted.components)) {
@@ -32304,351 +31279,14 @@ var ConversionService = class {
   }
 };
 
-// src/services/ContrastService.ts
-var conversionService = new ConversionService();
-var WCAG_THRESHOLDS = {
-  AA: { normal: 4.5, large: 3 },
-  AAA: { normal: 7, large: 4.5 }
-};
-var ContrastService = class {
-  /**
-   * Calculates the relative luminance of a color.
-   * Formula from WCAG 2.1: https://www.w3.org/WAI/GL/wiki/Relative_luminance
-   *
-   * L = 0.2126 * R + 0.7152 * G + 0.0722 * B
-   * where R, G, B are linearized sRGB values
-   */
-  calculateLuminance(color) {
-    const srgbColor = conversionService.convert(color, "srgb");
-    const [r, g, b] = srgbColor.components;
-    const rLin = srgbToLinear(r);
-    const gLin = srgbToLinear(g);
-    const bLin = srgbToLinear(b);
-    return 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin;
-  }
-  /**
-   * Calculates the contrast ratio between two colors.
-   * Formula from WCAG 2.1: (L1 + 0.05) / (L2 + 0.05)
-   * where L1 is the lighter color's luminance
-   */
-  calculateContrastRatio(foreground, background) {
-    const L1 = this.calculateLuminance(foreground);
-    const L2 = this.calculateLuminance(background);
-    const lighter = Math.max(L1, L2);
-    const darker = Math.min(L1, L2);
-    return (lighter + 0.05) / (darker + 0.05);
-  }
-  /**
-   * Checks WCAG contrast compliance and returns detailed results.
-   */
-  checkContrast(foreground, background) {
-    const fgLum = this.calculateLuminance(foreground);
-    const bgLum = this.calculateLuminance(background);
-    const ratio = this.calculateContrastRatio(foreground, background);
-    return {
-      ratio,
-      ratioString: `${ratio.toFixed(2)}:1`,
-      passes: {
-        AA: {
-          normal: ratio >= WCAG_THRESHOLDS.AA.normal,
-          large: ratio >= WCAG_THRESHOLDS.AA.large
-        },
-        AAA: {
-          normal: ratio >= WCAG_THRESHOLDS.AAA.normal,
-          large: ratio >= WCAG_THRESHOLDS.AAA.large
-        }
-      },
-      foregroundLuminance: fgLum,
-      backgroundLuminance: bgLum
-    };
-  }
-  /**
-   * Checks if a color combination meets a specific WCAG level.
-   */
-  meetsWCAG(foreground, background, level, textSize) {
-    const ratio = this.calculateContrastRatio(foreground, background);
-    const threshold = WCAG_THRESHOLDS[level][textSize];
-    return ratio >= threshold;
-  }
-  /**
-   * Suggests a foreground color that meets WCAG AA for the given background.
-   * Returns either black or white depending on which provides better contrast.
-   */
-  suggestForeground(background) {
-    const bgLum = this.calculateLuminance(background);
-    if (bgLum < 0.179) {
-      return Color.fromHex("#FFFFFF");
-    } else {
-      return Color.fromHex("#000000");
-    }
-  }
-  /**
-   * Finds the minimum lightness adjustment needed to meet WCAG requirements.
-   * Uses Oklch for perceptually uniform lightness adjustments.
-   */
-  adjustForContrast(foreground, background, level = "AA", textSize = "normal") {
-    const threshold = WCAG_THRESHOLDS[level][textSize];
-    const currentRatio = this.calculateContrastRatio(foreground, background);
-    if (currentRatio >= threshold) {
-      return foreground;
-    }
-    const oklchColor = conversionService.convert(foreground, "oklch");
-    const bgLum = this.calculateLuminance(background);
-    const [, c, h] = oklchColor.components;
-    const shouldLighten = bgLum < 0.5;
-    let low = shouldLighten ? oklchColor.components[0] : 0;
-    let high = shouldLighten ? 1 : oklchColor.components[0];
-    for (let i = 0; i < 20; i++) {
-      const mid = (low + high) / 2;
-      const testColor = Color.create("oklch", [mid, c, h], foreground.alpha);
-      const testRatio = this.calculateContrastRatio(testColor, background);
-      if (testRatio >= threshold) {
-        if (shouldLighten) {
-          high = mid;
-        } else {
-          low = mid;
-        }
-      } else {
-        if (shouldLighten) {
-          low = mid;
-        } else {
-          high = mid;
-        }
-      }
-    }
-    const finalL = (low + high) / 2;
-    const adjustedOklch = Color.create("oklch", [finalL, c, h], foreground.alpha);
-    return conversionService.convert(adjustedOklch, foreground.space);
-  }
-  /**
-   * Gets the WCAG threshold for a given level and text size.
-   */
-  getThreshold(level, textSize) {
-    return WCAG_THRESHOLDS[level][textSize];
-  }
-};
-
-// src/mcp/tools/query/getColorInfo.ts
-var conversionService2 = new ConversionService();
-var contrastService = new ContrastService();
-var namedColors2 = new NamedColorsRepository();
-var getColorInfoSchema = external_exports3.object({
-  color: external_exports3.string().describe("Color value (hex, RGB, or named color)")
-});
-async function getColorInfo(input) {
-  const color = parseColor(input.color);
-  const srgb = conversionService2.convert(color, "srgb");
-  const hsl = conversionService2.convert(color, "hsl");
-  const hsv = conversionService2.convert(color, "hsv");
-  const lab = conversionService2.convert(color, "lab");
-  const lch = conversionService2.convert(color, "lch");
-  const oklab = conversionService2.convert(color, "oklab");
-  const oklch = conversionService2.convert(color, "oklch");
-  const closestNamed = namedColors2.findClosest(srgb);
-  const luminance = contrastService.calculateLuminance(srgb);
-  const isLight = luminance > 0.179;
-  const white = Color.fromHex("#FFFFFF");
-  const black = Color.fromHex("#000000");
-  const contrastWithWhite = contrastService.calculateContrastRatio(srgb, white);
-  const contrastWithBlack = contrastService.calculateContrastRatio(srgb, black);
-  const [r, g, b] = srgb.toRgbArray();
-  const [h, s, l] = hsl.components;
-  const [hv, sv, v] = hsv.components;
-  const [L, a, labB] = lab.components;
-  const [lchL, lchC, lchH] = lch.components;
-  const [okL, okA, okB] = oklab.components;
-  const [oklchL, oklchC, oklchH] = oklch.components;
-  return {
-    input: input.color,
-    formats: {
-      hex: srgb.toHex(),
-      hexWithAlpha: srgb.toHex(true),
-      rgb: { r, g, b },
-      rgbString: `rgb(${r}, ${g}, ${b})`,
-      hsl: {
-        h: Math.round(h),
-        s: Math.round(s * 100),
-        l: Math.round(l * 100)
-      },
-      hslString: `hsl(${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`,
-      hsv: {
-        h: Math.round(hv),
-        s: Math.round(sv * 100),
-        v: Math.round(v * 100)
-      }
-    },
-    perceptual: {
-      lab: {
-        L: Math.round(L * 100) / 100,
-        a: Math.round(a * 100) / 100,
-        b: Math.round(labB * 100) / 100
-      },
-      lch: {
-        L: Math.round(lchL * 100) / 100,
-        C: Math.round(lchC * 100) / 100,
-        H: Math.round(lchH * 100) / 100
-      },
-      oklab: {
-        L: Math.round(okL * 1e3) / 1e3,
-        a: Math.round(okA * 1e3) / 1e3,
-        b: Math.round(okB * 1e3) / 1e3
-      },
-      oklch: {
-        L: Math.round(oklchL * 1e3) / 1e3,
-        C: Math.round(oklchC * 1e3) / 1e3,
-        H: Math.round(oklchH * 100) / 100
-      }
-    },
-    analysis: {
-      luminance: Math.round(luminance * 1e4) / 1e4,
-      isLight,
-      suggestedTextColor: isLight ? "#000000" : "#FFFFFF",
-      contrastWithWhite: Math.round(contrastWithWhite * 100) / 100,
-      contrastWithBlack: Math.round(contrastWithBlack * 100) / 100
-    },
-    closestNamedColor: {
-      name: closestNamed.name,
-      hex: closestNamed.hex
-    },
-    alpha: srgb.alpha
-  };
-}
-
-// src/strategies/delta-e/CIE76Strategy.ts
-var conversionService3 = new ConversionService();
-var CIE76Strategy = class {
-  method = "CIE76";
-  description = "CIE 1976 Lab color difference (Euclidean distance)";
-  calculate(color1, color2, _options) {
-    const lab1 = conversionService3.convert(color1, "lab");
-    const lab2 = conversionService3.convert(color2, "lab");
-    const [L1, a1, b1] = lab1.components;
-    const [L2, a2, b2] = lab2.components;
-    const dL = L1 - L2;
-    const da = a1 - a2;
-    const db = b1 - b2;
-    return Math.sqrt(dL * dL + da * da + db * db);
-  }
-  interpret(deltaE) {
-    if (deltaE < 1) {
-      return {
-        value: deltaE,
-        description: "Not perceptible by human eyes",
-        perceptible: false,
-        acceptable: true
-      };
-    } else if (deltaE < 2) {
-      return {
-        value: deltaE,
-        description: "Perceptible through close observation",
-        perceptible: true,
-        acceptable: true
-      };
-    } else if (deltaE < 3.5) {
-      return {
-        value: deltaE,
-        description: "Perceptible at a glance",
-        perceptible: true,
-        acceptable: true
-      };
-    } else if (deltaE < 5) {
-      return {
-        value: deltaE,
-        description: "Colors are more similar than different",
-        perceptible: true,
-        acceptable: true
-      };
-    } else {
-      return {
-        value: deltaE,
-        description: "Colors are noticeably different",
-        perceptible: true,
-        acceptable: false
-      };
-    }
-  }
-};
-
-// src/strategies/delta-e/CIE94Strategy.ts
-var conversionService4 = new ConversionService();
-var CIE94Strategy = class {
-  method = "CIE94";
-  description = "CIE 1994 color difference with chroma/hue weighting";
-  calculate(color1, color2, options) {
-    const lab1 = conversionService4.convert(color1, "lab");
-    const lab2 = conversionService4.convert(color2, "lab");
-    const [L1, a1, b1] = lab1.components;
-    const [L2, a2, b2] = lab2.components;
-    const isTextiles = options?.application === "textiles";
-    const kL = isTextiles ? 2 : 1;
-    const K1 = isTextiles ? 0.048 : 0.045;
-    const K2 = isTextiles ? 0.014 : 0.015;
-    const kC = 1;
-    const kH = 1;
-    const C1 = Math.sqrt(a1 * a1 + b1 * b1);
-    const C2 = Math.sqrt(a2 * a2 + b2 * b2);
-    const dL = L1 - L2;
-    const dC = C1 - C2;
-    const da = a1 - a2;
-    const db = b1 - b2;
-    const dH2 = da * da + db * db - dC * dC;
-    const dH = dH2 > 0 ? Math.sqrt(dH2) : 0;
-    const SL = 1;
-    const SC = 1 + K1 * C1;
-    const SH = 1 + K2 * C1;
-    const term1 = dL / (kL * SL);
-    const term2 = dC / (kC * SC);
-    const term3 = dH / (kH * SH);
-    return Math.sqrt(term1 * term1 + term2 * term2 + term3 * term3);
-  }
-  interpret(deltaE) {
-    if (deltaE < 1) {
-      return {
-        value: deltaE,
-        description: "Not perceptible by human eyes",
-        perceptible: false,
-        acceptable: true
-      };
-    } else if (deltaE < 2) {
-      return {
-        value: deltaE,
-        description: "Perceptible through close observation",
-        perceptible: true,
-        acceptable: true
-      };
-    } else if (deltaE < 3) {
-      return {
-        value: deltaE,
-        description: "Perceptible at a glance",
-        perceptible: true,
-        acceptable: true
-      };
-    } else if (deltaE < 5) {
-      return {
-        value: deltaE,
-        description: "Colors are more similar than different",
-        perceptible: true,
-        acceptable: true
-      };
-    } else {
-      return {
-        value: deltaE,
-        description: "Colors are noticeably different",
-        perceptible: true,
-        acceptable: false
-      };
-    }
-  }
-};
-
 // src/strategies/delta-e/CIEDE2000Strategy.ts
-var conversionService5 = new ConversionService();
+var conversionService = new ConversionService();
 var CIEDE2000Strategy = class {
   method = "CIEDE2000";
   description = "CIEDE2000 color difference (current CIE standard)";
   calculate(color1, color2, _options) {
-    const lab1 = conversionService5.convert(color1, "lab");
-    const lab2 = conversionService5.convert(color2, "lab");
+    const lab1 = conversionService.convert(color1, "lab");
+    const lab2 = conversionService.convert(color2, "lab");
     const [L1, a1, b1] = lab1.components;
     const [L2, a2, b2] = lab2.components;
     const kL = 1;
@@ -32760,6 +31398,1814 @@ var CIEDE2000Strategy = class {
   }
 };
 
+// src/data/css-colors.json
+var css_colors_default = {
+  aliceblue: "#f0f8ff",
+  antiquewhite: "#faebd7",
+  aqua: "#00ffff",
+  aquamarine: "#7fffd4",
+  azure: "#f0ffff",
+  beige: "#f5f5dc",
+  bisque: "#ffe4c4",
+  black: "#000000",
+  blanchedalmond: "#ffebcd",
+  blue: "#0000ff",
+  blueviolet: "#8a2be2",
+  brown: "#a52a2a",
+  burlywood: "#deb887",
+  cadetblue: "#5f9ea0",
+  chartreuse: "#7fff00",
+  chocolate: "#d2691e",
+  coral: "#ff7f50",
+  cornflowerblue: "#6495ed",
+  cornsilk: "#fff8dc",
+  crimson: "#dc143c",
+  cyan: "#00ffff",
+  darkblue: "#00008b",
+  darkcyan: "#008b8b",
+  darkgoldenrod: "#b8860b",
+  darkgray: "#a9a9a9",
+  darkgreen: "#006400",
+  darkgrey: "#a9a9a9",
+  darkkhaki: "#bdb76b",
+  darkmagenta: "#8b008b",
+  darkolivegreen: "#556b2f",
+  darkorange: "#ff8c00",
+  darkorchid: "#9932cc",
+  darkred: "#8b0000",
+  darksalmon: "#e9967a",
+  darkseagreen: "#8fbc8f",
+  darkslateblue: "#483d8b",
+  darkslategray: "#2f4f4f",
+  darkslategrey: "#2f4f4f",
+  darkturquoise: "#00ced1",
+  darkviolet: "#9400d3",
+  deeppink: "#ff1493",
+  deepskyblue: "#00bfff",
+  dimgray: "#696969",
+  dimgrey: "#696969",
+  dodgerblue: "#1e90ff",
+  firebrick: "#b22222",
+  floralwhite: "#fffaf0",
+  forestgreen: "#228b22",
+  fuchsia: "#ff00ff",
+  gainsboro: "#dcdcdc",
+  ghostwhite: "#f8f8ff",
+  gold: "#ffd700",
+  goldenrod: "#daa520",
+  gray: "#808080",
+  green: "#008000",
+  greenyellow: "#adff2f",
+  grey: "#808080",
+  honeydew: "#f0fff0",
+  hotpink: "#ff69b4",
+  indianred: "#cd5c5c",
+  indigo: "#4b0082",
+  ivory: "#fffff0",
+  khaki: "#f0e68c",
+  lavender: "#e6e6fa",
+  lavenderblush: "#fff0f5",
+  lawngreen: "#7cfc00",
+  lemonchiffon: "#fffacd",
+  lightblue: "#add8e6",
+  lightcoral: "#f08080",
+  lightcyan: "#e0ffff",
+  lightgoldenrodyellow: "#fafad2",
+  lightgray: "#d3d3d3",
+  lightgreen: "#90ee90",
+  lightgrey: "#d3d3d3",
+  lightpink: "#ffb6c1",
+  lightsalmon: "#ffa07a",
+  lightseagreen: "#20b2aa",
+  lightskyblue: "#87cefa",
+  lightslategray: "#778899",
+  lightslategrey: "#778899",
+  lightsteelblue: "#b0c4de",
+  lightyellow: "#ffffe0",
+  lime: "#00ff00",
+  limegreen: "#32cd32",
+  linen: "#faf0e6",
+  magenta: "#ff00ff",
+  maroon: "#800000",
+  mediumaquamarine: "#66cdaa",
+  mediumblue: "#0000cd",
+  mediumorchid: "#ba55d3",
+  mediumpurple: "#9370db",
+  mediumseagreen: "#3cb371",
+  mediumslateblue: "#7b68ee",
+  mediumspringgreen: "#00fa9a",
+  mediumturquoise: "#48d1cc",
+  mediumvioletred: "#c71585",
+  midnightblue: "#191970",
+  mintcream: "#f5fffa",
+  mistyrose: "#ffe4e1",
+  moccasin: "#ffe4b5",
+  navajowhite: "#ffdead",
+  navy: "#000080",
+  oldlace: "#fdf5e6",
+  olive: "#808000",
+  olivedrab: "#6b8e23",
+  orange: "#ffa500",
+  orangered: "#ff4500",
+  orchid: "#da70d6",
+  palegoldenrod: "#eee8aa",
+  palegreen: "#98fb98",
+  paleturquoise: "#afeeee",
+  palevioletred: "#db7093",
+  papayawhip: "#ffefd5",
+  peachpuff: "#ffdab9",
+  peru: "#cd853f",
+  pink: "#ffc0cb",
+  plum: "#dda0dd",
+  powderblue: "#b0e0e6",
+  purple: "#800080",
+  rebeccapurple: "#663399",
+  red: "#ff0000",
+  rosybrown: "#bc8f8f",
+  royalblue: "#4169e1",
+  saddlebrown: "#8b4513",
+  salmon: "#fa8072",
+  sandybrown: "#f4a460",
+  seagreen: "#2e8b57",
+  seashell: "#fff5ee",
+  sienna: "#a0522d",
+  silver: "#c0c0c0",
+  skyblue: "#87ceeb",
+  slateblue: "#6a5acd",
+  slategray: "#708090",
+  slategrey: "#708090",
+  snow: "#fffafa",
+  springgreen: "#00ff7f",
+  steelblue: "#4682b4",
+  tan: "#d2b48c",
+  teal: "#008080",
+  thistle: "#d8bfd8",
+  tomato: "#ff6347",
+  turquoise: "#40e0d0",
+  violet: "#ee82ee",
+  wheat: "#f5deb3",
+  white: "#ffffff",
+  whitesmoke: "#f5f5f5",
+  yellow: "#ffff00",
+  yellowgreen: "#9acd32"
+};
+
+// src/data/xkcd-colors.json
+var xkcd_colors_default = {
+  acidgreen: "#8ffe09",
+  adobe: "#bd6c48",
+  algae: "#54ac68",
+  algaegreen: "#21c36f",
+  almostblack: "#070d0d",
+  amber: "#feb308",
+  amethyst: "#9b5fc0",
+  apple: "#6ecb3c",
+  applegreen: "#76cd26",
+  apricot: "#ffb16d",
+  aqua: "#13eac9",
+  aquablue: "#02d8e9",
+  aquagreen: "#12e193",
+  aquamarine: "#2ee8bb",
+  armygreen: "#4b5d16",
+  aubergine: "#3d0734",
+  auburn: "#9a3001",
+  avocado: "#90b134",
+  avocadogreen: "#87a922",
+  azure: "#069af3",
+  babyblue: "#a2cffe",
+  babypink: "#ffb7ce",
+  babypurple: "#ca9bf7",
+  banana: "#ffff7e",
+  bananayellow: "#fafe4b",
+  barbiepink: "#fe46a5",
+  barney: "#ac1db8",
+  barneyurple: "#a00498",
+  battleshipgrey: "#6b7c85",
+  berry: "#7e0044",
+  bile: "#b5c306",
+  black: "#000000",
+  bland: "#afa88b",
+  blood: "#770001",
+  bloodorange: "#fe4b03",
+  bloodred: "#980002",
+  blueberry: "#464196",
+  bluegreen: "#137e6d",
+  bluegrey: "#607c8e",
+  bluepurple: "#5729ce",
+  blueviolet: "#5d06e9",
+  blurple: "#5539cc",
+  blush: "#f29e8e",
+  blushpink: "#fe828c",
+  bordeaux: "#7b002c",
+  brick: "#a03623",
+  brickred: "#8f1402",
+  brightaqua: "#0bf9ea",
+  brightblue: "#0165fc",
+  brightcyan: "#41fdfe",
+  brightgreen: "#01ff07",
+  brightlavender: "#c760ff",
+  brightlilac: "#c95efb",
+  brightlime: "#87fd05",
+  brightlimegreen: "#65fe08",
+  brightmagenta: "#ff08e8",
+  brightorange: "#ff5b00",
+  brightpink: "#fe01b1",
+  brightpurple: "#be03fd",
+  brightred: "#ff000d",
+  brightskyblue: "#02ccfe",
+  brightteal: "#01f9c6",
+  brightturquoise: "#0ffef9",
+  brightviolet: "#ad0afd",
+  brightyellow: "#fffd01",
+  brightyellowgreen: "#9dff00",
+  bronze: "#a87900",
+  brown: "#653700",
+  brownish: "#9c6d57",
+  brownorange: "#b96902",
+  brownred: "#922b05",
+  brownyellow: "#b29705",
+  bubblegum: "#ff6cb5",
+  bubblegumpink: "#fe83cc",
+  buff: "#fef69e",
+  burgundy: "#610023",
+  burntorange: "#c04e01",
+  burntred: "#9f2305",
+  burntsienna: "#b04e0f",
+  burntumber: "#a0450e",
+  burntyellow: "#d5ab09",
+  butter: "#ffff81",
+  buttercup: "#fef200",
+  butterscotch: "#fdb147",
+  cadetblue: "#4e7496",
+  camel: "#c69f59",
+  camo: "#7f8f4e",
+  camogreen: "#526525",
+  camouflagegreen: "#4b6113",
+  canary: "#fdff63",
+  canaryyellow: "#fffe40",
+  candypink: "#ff63e9",
+  caramel: "#af6f09",
+  carmine: "#9d0216",
+  carnation: "#fd798f",
+  carnationpink: "#ff7fa7",
+  celadon: "#befdb7",
+  celery: "#c1fd95",
+  cement: "#a5a391",
+  cerise: "#de0c62",
+  cerulean: "#0485d1",
+  ceruleanblue: "#056eee",
+  charcoal: "#343837",
+  charcoalgrey: "#3c4142",
+  chartreuse: "#c1f80a",
+  cherry: "#cf0234",
+  cherryred: "#f7022a",
+  chestnut: "#742802",
+  chocolate: "#3d1c02",
+  chocolatebrown: "#411900",
+  cinnamon: "#ac4f06",
+  clay: "#b66a50",
+  claybrown: "#b2713d",
+  clearblue: "#247afd",
+  claret: "#680018",
+  cobalt: "#1e488f",
+  cobaltblue: "#030aa7",
+  cocoa: "#875f42",
+  coffee: "#a6814c",
+  coolblue: "#4984b8",
+  coolgreen: "#33b864",
+  coolgreyn: "#95a3a6",
+  copper: "#b66325",
+  coral: "#fc5a50",
+  coralpink: "#ff6163",
+  cornflower: "#6a79f7",
+  cornflowerblue: "#5170d7",
+  cranberry: "#9e003a",
+  cream: "#ffffc2",
+  creme: "#ffffb6",
+  crimson: "#8c000f",
+  custard: "#fffd78",
+  cyan: "#00ffff",
+  dandelion: "#fedf08",
+  dark: "#1b2431",
+  darkaqua: "#05696b",
+  darkaquamarine: "#017371",
+  darkbeige: "#ac9362",
+  darkblue: "#00035b",
+  darkbluegreen: "#005249",
+  darkbluegrey: "#1f3b4d",
+  darkbrown: "#341c02",
+  darkcoral: "#cf524e",
+  darkcream: "#fff39a",
+  darkcyan: "#0a888a",
+  darkforestgreen: "#002d04",
+  darkfuchsia: "#9d0759",
+  darkgold: "#b59410",
+  darkgrassgreen: "#388004",
+  darkgreen: "#033500",
+  darkgreenblue: "#1c6b72",
+  darkgrey: "#363737",
+  darkgreyblue: "#29465b",
+  darkhotpink: "#d90166",
+  darkindigo: "#1f0954",
+  darkishblue: "#0149fe",
+  darkishgreen: "#287c37",
+  darkishpink: "#da467d",
+  darkishpurple: "#751973",
+  darkishred: "#a90308",
+  darkkhaki: "#9b8f55",
+  darklavender: "#856798",
+  darklilac: "#9c6da5",
+  darklime: "#84b701",
+  darklimegreen: "#7ebd01",
+  darkmagenta: "#960056",
+  darkmaroon: "#3c0008",
+  darkmauve: "#874c62",
+  darkmint: "#48c072",
+  darkmintgreen: "#20c073",
+  darkmustard: "#a88905",
+  darknavy: "#000435",
+  darknavyblue: "#00022e",
+  darkolive: "#373e02",
+  darkolivegreen: "#3c4d03",
+  darkorange: "#c65102",
+  darkpastelgreen: "#56ae57",
+  darkpeach: "#de7e5d",
+  darkperiwinkle: "#665fd1",
+  darkpink: "#cb416b",
+  darkplum: "#3f012c",
+  darkpurple: "#35063e",
+  darkred: "#840000",
+  darkrose: "#b5485d",
+  darkroyalblue: "#02066f",
+  darksage: "#598556",
+  darksalmon: "#c85a53",
+  darksand: "#a88f59",
+  darkseafoam: "#1fb57a",
+  darkseafoamgreen: "#3eaf76",
+  darkseagreen: "#11875d",
+  darkskyblue: "#448ee4",
+  darkslateblue: "#214761",
+  darktaupe: "#7f684e",
+  darkteal: "#014d4e",
+  darkturquoise: "#045c5a",
+  darkviolet: "#34013f",
+  darkyellow: "#d5b60a",
+  darkyellowgreen: "#728f02",
+  deeppink: "#cb0162",
+  deeppurple: "#36013f",
+  deepred: "#9a0200",
+  deeprose: "#c74767",
+  deepskyblue: "#0d75f8",
+  deepteal: "#00555a",
+  deepturquoise: "#017374",
+  deepviolet: "#490648",
+  denim: "#3b638c",
+  denimblue: "#3b5b92",
+  desert: "#ccad60",
+  diarrhea: "#9f8303",
+  dirt: "#8a6e45",
+  dirtbrown: "#836539",
+  dirtyblue: "#3f829d",
+  dirtygreen: "#667e2c",
+  dirtyorange: "#c87606",
+  dirtypink: "#ca7b80",
+  dirtypurple: "#734a65",
+  dirtyyellow: "#cdc50a",
+  dodgerblue: "#3e82fc",
+  drab: "#828344",
+  drabgreen: "#749551",
+  driedblood: "#4b0101",
+  dullblue: "#49759c",
+  dullbrown: "#876e4b",
+  dullgreen: "#74a662",
+  dullorange: "#d8863b",
+  dullpink: "#d5869d",
+  dullpurple: "#84597e",
+  dullred: "#bb3f3f",
+  dullteal: "#5f9e8f",
+  dullyellow: "#eedc5b",
+  dusk: "#4e5481",
+  duskblue: "#26538d",
+  duskyblue: "#475f94",
+  duskypink: "#cc7a8b",
+  duskypurple: "#895b7b",
+  duskyrose: "#ba6873",
+  dust: "#b2996e",
+  dustyblue: "#5a86ad",
+  dustygreen: "#76a973",
+  dustylavender: "#ac86a8",
+  dustyorange: "#f0833a",
+  dustypink: "#d58a94",
+  dustypurple: "#825f87",
+  dustyred: "#b9484e",
+  dustyrose: "#c0737a",
+  dustyteal: "#4c9085",
+  earth: "#a2653e",
+  eastergreen: "#8cfd7e",
+  easterpurple: "#c071fe",
+  ecru: "#feffca",
+  eggplant: "#380835",
+  eggplantpurple: "#430541",
+  eggshell: "#ffffd4",
+  eggshellblue: "#c4fff7",
+  electricblue: "#0652ff",
+  electricgreen: "#21fc0d",
+  electriclime: "#a8ff04",
+  electricpink: "#ff0490",
+  electricpurple: "#aa23ff",
+  emerald: "#01a049",
+  emeraldgreen: "#028f1e",
+  evergreen: "#05472a",
+  fadedblue: "#658cbb",
+  fadedgreen: "#7bb274",
+  fadedorange: "#f0944d",
+  fadedpink: "#de9dac",
+  fadedpurple: "#916e99",
+  fadedred: "#d3494e",
+  fadedyellow: "#feff7f",
+  fawn: "#cfaf7b",
+  fern: "#63a950",
+  ferngreen: "#548d44",
+  fireenginered: "#fe0002",
+  flatblue: "#3c73a8",
+  flatgreen: "#699d4c",
+  fluorescentgreen: "#08ff08",
+  flurogreen: "#0aff02",
+  foamgreen: "#90fda9",
+  forest: "#0b5509",
+  forestgreen: "#06470c",
+  forrestgreen: "#154406",
+  frenchblue: "#436bad",
+  freshgreen: "#69d84f",
+  froggreen: "#58bc08",
+  fuchsia: "#ed0dd9",
+  gold: "#dbb40c",
+  golden: "#f5bf03",
+  goldenbrown: "#b27a01",
+  goldenrod: "#fac205",
+  goldenyellow: "#fce100",
+  grape: "#6c3461",
+  grapefruit: "#fd5956",
+  grapepurple: "#5d1451",
+  grass: "#5cac2d",
+  grassgreen: "#3f9b0b",
+  grassygreen: "#419c03",
+  green: "#15b01a",
+  greenapple: "#5edc1f",
+  greenblue: "#06b48b",
+  greenbrown: "#544e03",
+  greengrey: "#77926f",
+  greenteal: "#0cb577",
+  greenyellow: "#c6f808",
+  greenish: "#40a368",
+  greenishbeige: "#c9d179",
+  greenishblue: "#0b8b87",
+  greenishbrown: "#696112",
+  greenishcyan: "#2afeb7",
+  greenishgrey: "#96ae8d",
+  greenishtan: "#bccb7a",
+  greenishteal: "#32bf84",
+  greenishturquoise: "#00fbb0",
+  greenishyellow: "#cdfd02",
+  grey: "#929591",
+  greyblue: "#6b8ba4",
+  greybrown: "#7f7053",
+  greygreen: "#789b73",
+  greypink: "#c3909b",
+  greypurple: "#826d8c",
+  greyteal: "#5e9b8a",
+  greyish: "#a8a495",
+  greyishblue: "#5e819d",
+  greyishbrown: "#7a6a4f",
+  greyishgreen: "#82a67d",
+  greyishpink: "#c88d94",
+  greyishpurple: "#887191",
+  greyishteal: "#719f91",
+  grossgreen: "#a0bf16",
+  gunmetal: "#536267",
+  hazel: "#8e7618",
+  heather: "#a484ac",
+  heliotrope: "#d94ff5",
+  highlightergreen: "#1bfc06",
+  hospitalgreen: "#9be5aa",
+  hotgreen: "#25ff29",
+  hotmagenta: "#f504c9",
+  hotpink: "#ff028d",
+  hotpurple: "#cb00f5",
+  huntergreen: "#0b4008",
+  ice: "#d6fffa",
+  iceblue: "#d7fffe",
+  ickygreen: "#8fae22",
+  indianred: "#850e04",
+  indigo: "#380282",
+  indigoblue: "#3a18b1",
+  iris: "#6258c4",
+  irishgreen: "#019529",
+  ivory: "#ffffcb",
+  jade: "#1fa774",
+  jadegreen: "#2baf6a",
+  jean: "#507b9c",
+  junglegreen: "#048243",
+  kellygreen: "#02ab2e",
+  kermitgreen: "#5cb200",
+  keylime: "#aeff6e",
+  khaki: "#aaa662",
+  khakigreen: "#728639",
+  kiwi: "#9cef43",
+  kiwigreen: "#8ee53f",
+  lavender: "#c79fef",
+  lavenderblue: "#8b88f8",
+  lavenderpink: "#dd85d7",
+  lawngreen: "#4da409",
+  leaf: "#71aa34",
+  leafgreen: "#5ca904",
+  leafygreen: "#51b73b",
+  leather: "#ac7434",
+  lemon: "#fdff52",
+  lemongreen: "#adf802",
+  lemonlime: "#bffe28",
+  lemonyellow: "#fdff38",
+  lichen: "#8fb67b",
+  lightaqua: "#8cffdb",
+  lightaquamarine: "#7bfdc7",
+  lightbeige: "#fffeb6",
+  lightblue: "#95d0fc",
+  lightbluegreen: "#7efbb3",
+  lightbluegrey: "#b7c9e2",
+  lightbluishgreen: "#76fda8",
+  lightbluishpurple: "#a578d6",
+  lightbrightgreen: "#53fe5c",
+  lightbrown: "#ad8150",
+  lightburgundy: "#a8415b",
+  lightcyan: "#acfffc",
+  lighteggplant: "#894585",
+  lightforestgreen: "#4f9153",
+  lightgold: "#fddc5c",
+  lightgrassgreen: "#9af764",
+  lightgreen: "#96f97b",
+  lightgreenblue: "#56fca2",
+  lightgreenish: "#61e160",
+  lightgrey: "#d8dcd6",
+  lightgreyblue: "#9dbcd4",
+  lightgreygreen: "#b7e1a1",
+  lightgreyishblue: "#a0b7c4",
+  lightindigo: "#6d5acf",
+  lightkhaki: "#e6f2a2",
+  lightlavendar: "#efc0fe",
+  lightlavender: "#dfc5fe",
+  lightlilac: "#edc8ff",
+  lightlime: "#aefd6c",
+  lightlimegreen: "#b9ff66",
+  lightmagenta: "#fa5ff7",
+  lightmaroon: "#a24857",
+  lightmauve: "#c292a1",
+  lightmint: "#b6ffbb",
+  lightmintgreen: "#a6fbb2",
+  lightmossgreen: "#a6c875",
+  lightmustard: "#f7d560",
+  lightnavy: "#155084",
+  lightnavyblue: "#2e5a88",
+  lightneongreen: "#4efd54",
+  lightolive: "#acbf69",
+  lightolivegreen: "#a4be5c",
+  lightorange: "#fdaa48",
+  lightpastelgreen: "#b2fba5",
+  lightpeach: "#ffd8b1",
+  lightpeagreen: "#c4fe82",
+  lightperiwinkle: "#c1c6fc",
+  lightpink: "#ffd1df",
+  lightplum: "#9d5783",
+  lightpurple: "#bf77f6",
+  lightred: "#ff474c",
+  lightrose: "#ffc5cb",
+  lightroyalblue: "#3a2efe",
+  lightsage: "#bcecac",
+  lightsalmon: "#fea993",
+  lightsalmonpink: "#fe7b7c",
+  lightseafoam: "#a0febf",
+  lightseafoamgreen: "#a7ffb5",
+  lightseagreen: "#98f6b0",
+  lightskyblue: "#c6fcff",
+  lighttan: "#fbeeac",
+  lightteal: "#90e4c1",
+  lightturquoise: "#7ef4cc",
+  lighturple: "#b36ff6",
+  lightviolet: "#d6b4fc",
+  lightyellow: "#fffe7a",
+  lightyellowgreen: "#ccfd7f",
+  lightyellowishgreen: "#c2ff89",
+  lilac: "#cea2fd",
+  lime: "#aaff32",
+  limegreen: "#89fe05",
+  limeyellow: "#d0fe1d",
+  lipstick: "#d5174e",
+  lipstickred: "#c0022f",
+  magenta: "#c20078",
+  mahogany: "#4a0100",
+  maize: "#f4d054",
+  mango: "#ffa62b",
+  manilla: "#fffa86",
+  marigold: "#fcc006",
+  maroon: "#650021",
+  mauve: "#ae7181",
+  mediumblue: "#2c6fbb",
+  mediumgreen: "#39ad48",
+  mediumpurple: "#9e43a2",
+  melon: "#ff7855",
+  metallicblue: "#4f738e",
+  midnight: "#03012d",
+  midnightblue: "#020035",
+  midnightpurple: "#280137",
+  militarygreen: "#667c3e",
+  milkchocolate: "#7f4e1e",
+  mint: "#9ffeb0",
+  mintgreen: "#8fff9f",
+  mintygreen: "#0bf77d",
+  mocha: "#9d7651",
+  moss: "#769958",
+  mossgreen: "#658b38",
+  mossygreen: "#638b27",
+  mud: "#735c12",
+  mudbrown: "#60460f",
+  mudgreen: "#606602",
+  muddybrown: "#886806",
+  muddygreen: "#657432",
+  muddyyellow: "#bfac05",
+  mulberry: "#920a4e",
+  murkygreen: "#6c7a0e",
+  mushroom: "#ba9e88",
+  mustard: "#ceb301",
+  mustardyellow: "#d2bd0a",
+  mutedblue: "#3b719f",
+  mutedgreen: "#5fa052",
+  mutedpink: "#d1768f",
+  mutedpurple: "#805b87",
+  nastygreen: "#70b23f",
+  navy: "#01153e",
+  navyblue: "#001146",
+  navygreen: "#35530a",
+  neonblue: "#04d9ff",
+  neongreen: "#0cff0c",
+  neonpink: "#fe019a",
+  neonpurple: "#bc13fe",
+  neonred: "#ff073a",
+  neonyellow: "#cfff04",
+  nickel: "#5a7d8b",
+  nightblue: "#040348",
+  ocean: "#017b92",
+  oceanblue: "#03719c",
+  oceangreen: "#3d9973",
+  ocher: "#bf9b0c",
+  ochre: "#bf9005",
+  offwhite: "#ffffe4",
+  offyellow: "#f1f33f",
+  oldpink: "#c77986",
+  oldrose: "#c87f89",
+  olive: "#6e750e",
+  olivebrown: "#645403",
+  olivedrab: "#6f7632",
+  olivegreen: "#677a04",
+  oliveyellow: "#c2b709",
+  orange: "#f97306",
+  orangebrown: "#be6400",
+  orangepink: "#ff6f52",
+  orangered: "#fe420f",
+  orangeyellow: "#ffad01",
+  orchid: "#c875c4",
+  pale: "#fff9d0",
+  paleaqua: "#b8ffeb",
+  palebrown: "#b1916e",
+  palecyan: "#b7fffa",
+  palegold: "#fdde6c",
+  palegreen: "#c7fdb5",
+  palelavender: "#eecffe",
+  palelilac: "#e4cbff",
+  palelime: "#befd73",
+  palelimegreen: "#b1ff3c",
+  palemagenta: "#d767ad",
+  palemauve: "#fed0fc",
+  paleolive: "#b9cc81",
+  paleolivegreen: "#b1d27b",
+  paleorange: "#ffa756",
+  palepeach: "#ffe5ad",
+  palepink: "#ffcfdc",
+  palepurple: "#b790d4",
+  palered: "#d9544d",
+  palerose: "#fdc1c5",
+  palesalmon: "#ffb19a",
+  paleskyblue: "#bdf6fe",
+  paleteal: "#82cbb2",
+  paleturquoise: "#a5fbd5",
+  paleviolet: "#ceaefa",
+  paleyellow: "#ffff84",
+  parchment: "#fefcaf",
+  pastelblue: "#a2bffe",
+  pastelgreen: "#b0ff9d",
+  pastelorange: "#ff964f",
+  pastelpink: "#ffbacd",
+  pastelpurple: "#caa0ff",
+  pastelred: "#db5856",
+  pastelyellow: "#fffe71",
+  pea: "#a4bf20",
+  peagreen: "#8eab12",
+  peach: "#ffb07c",
+  peachypink: "#ff9a8a",
+  peacockblue: "#016795",
+  pear: "#cbf85f",
+  periwinkle: "#8e82fe",
+  periwinkleblue: "#8f99fb",
+  petrol: "#005f6a",
+  pigpink: "#e78ea5",
+  pine: "#2b5d34",
+  pinegreen: "#0a481e",
+  pink: "#ff81c0",
+  pinkish: "#d46a7e",
+  pinkishbrown: "#b17261",
+  pinkishgrey: "#c8aca9",
+  pinkishorange: "#ff724c",
+  pinkishpurple: "#d648d7",
+  pinkishred: "#f10c45",
+  pinkishtan: "#d99b82",
+  pinkpurple: "#db4bda",
+  pinkred: "#f5054f",
+  pinky: "#fc86aa",
+  pinkypurple: "#c94cbe",
+  pinkyred: "#fc2647",
+  pissyellow: "#ddd618",
+  pistachio: "#c0fa8b",
+  plum: "#580f41",
+  plumpurple: "#4e0550",
+  poisongreen: "#40fd14",
+  poo: "#8f7303",
+  poobrown: "#885f01",
+  powderblue: "#b1d1fc",
+  powderpink: "#ffb2d0",
+  primaryblue: "#0804f9",
+  prussianblue: "#004577",
+  puce: "#a57e52",
+  puke: "#a5a502",
+  pukebrown: "#947706",
+  pukegreen: "#9aae07",
+  pukeyellow: "#c2be0e",
+  pumpkin: "#e17701",
+  pumpkinorange: "#fb7d07",
+  pureblue: "#0203e2",
+  purple: "#7e1e9c",
+  purpleblue: "#632de9",
+  purplebrown: "#673a3f",
+  purplegrey: "#866f85",
+  purplepink: "#e03fd8",
+  purplered: "#990147",
+  purplish: "#94568c",
+  purplishblue: "#601ef9",
+  purplishbrown: "#6b4247",
+  purplishgrey: "#7a687f",
+  purplishpink: "#ce5dae",
+  purplishred: "#b0054b",
+  purply: "#983fb2",
+  purplyblue: "#661aee",
+  purplypink: "#f075e6",
+  putty: "#beae8a",
+  racinggreen: "#014600",
+  radioactivegreen: "#2cfa1f",
+  raspberry: "#b00149",
+  rawsienna: "#9a6200",
+  rawumber: "#a75e09",
+  red: "#e50000",
+  redbrown: "#8b2e16",
+  redorange: "#fd3c06",
+  redpink: "#fa2a55",
+  redpurple: "#820747",
+  redviolet: "#9e0168",
+  reddish: "#c44240",
+  reddishbrown: "#7f2b0a",
+  reddishorange: "#f8481c",
+  reddishpink: "#fe2c54",
+  reddishpurple: "#910951",
+  reddybrown: "#6e1005",
+  richblue: "#021bf9",
+  richpurple: "#720058",
+  robinseggblue: "#98eff9",
+  robineggblue: "#8af1fe",
+  rosa: "#fe86a4",
+  rose: "#cf6275",
+  rosepink: "#f7879a",
+  rosered: "#be013c",
+  rosypink: "#f6688e",
+  rouge: "#ab1239",
+  royal: "#0c1793",
+  royalblue: "#0504aa",
+  royalpurple: "#4b006e",
+  ruby: "#ca0147",
+  russet: "#a13905",
+  rust: "#a83c09",
+  rustbrown: "#8b3103",
+  rustorange: "#c45508",
+  rustred: "#aa2704",
+  rustyorange: "#cd5909",
+  rustyred: "#af2f0d",
+  saffron: "#feb209",
+  sage: "#87ae73",
+  sagegreen: "#88b378",
+  salmon: "#ff796c",
+  salmonpink: "#fe7b7c",
+  sand: "#e2ca76",
+  sandbrown: "#cba560",
+  sandstone: "#c9ae74",
+  sandy: "#f1da7a",
+  sandybrown: "#c4a661",
+  sandyyellow: "#fdee73",
+  sapgreen: "#5c8b15",
+  sapphire: "#2138ab",
+  scarlet: "#be0119",
+  sea: "#3c9992",
+  seablue: "#047495",
+  seafoam: "#80f9ad",
+  seafoamblue: "#78d1b6",
+  seafoamgreen: "#7af9ab",
+  seagreen: "#53fca1",
+  seaweed: "#18d17b",
+  seaweedgreen: "#35ad6b",
+  shamrock: "#01b44c",
+  shamrockgreen: "#02c14d",
+  shit: "#7f5f00",
+  shitbrown: "#7b5804",
+  shitgreen: "#758000",
+  silver: "#c5c9c7",
+  sky: "#82cafc",
+  skyblue: "#75bbfd",
+  slate: "#516572",
+  slateblue: "#5b7c99",
+  slategreen: "#658d6d",
+  slategrey: "#59656d",
+  slimegreen: "#99cc04",
+  snot: "#acbb0d",
+  snotgreen: "#9dc100",
+  softblue: "#6488ea",
+  softgreen: "#6fc276",
+  softorange: "#ffab4a",
+  softpink: "#fdb0c0",
+  softpurple: "#a66fb5",
+  spearmint: "#1ef876",
+  springgreen: "#a9f971",
+  spruce: "#0a5f38",
+  squash: "#f2ab15",
+  steel: "#738595",
+  steelblue: "#5a7d9a",
+  steelgrey: "#6f828a",
+  stone: "#ada587",
+  stormyblue: "#507b9c",
+  straw: "#fcf679",
+  strawberry: "#fb2943",
+  strongblue: "#0c06f7",
+  strongpink: "#ff0789",
+  sunflower: "#ffc512",
+  sunflowyellow: "#ffda03",
+  sunnyyellow: "#fff917",
+  sunshineyellow: "#fffd37",
+  swamp: "#698339",
+  swampgreen: "#748500",
+  tan: "#d1b26f",
+  tanbrown: "#ab7e4c",
+  tangerine: "#ff9408",
+  tangreen: "#a9be70",
+  taupe: "#b9a281",
+  tea: "#65ab7c",
+  teagreen: "#bdf8a3",
+  teal: "#029386",
+  tealblue: "#01889f",
+  tealgreen: "#25a36f",
+  terracota: "#cb6843",
+  terracotta: "#c9643b",
+  tiffanyblue: "#7bf2da",
+  tomato: "#ef4026",
+  tomatored: "#ec2d01",
+  topaz: "#13bbaf",
+  toxicgreen: "#61de2a",
+  trueblue: "#010fcc",
+  truegreen: "#089404",
+  turquoise: "#06c2ac",
+  turquoiseblue: "#06b1c4",
+  turquoisegreen: "#04f489",
+  turtlegreen: "#75b84f",
+  twilight: "#4e518b",
+  twilightblue: "#0a437a",
+  uglyblue: "#31668a",
+  uglygreen: "#7a9703",
+  uglypink: "#cd7584",
+  uglypurple: "#a442a0",
+  uglyyellow: "#d0c101",
+  ultramarine: "#2000b1",
+  ultramarineblue: "#1805db",
+  umber: "#b26400",
+  velvet: "#750851",
+  vermillion: "#f4320c",
+  verydarkblue: "#000133",
+  verydarkbrown: "#1d0200",
+  verydarkgreen: "#062e03",
+  verydarkpurple: "#2a0134",
+  verypaleblue: "#d6fffe",
+  verypalegreen: "#cffdbc",
+  vibrantblue: "#0339f8",
+  vibrantgreen: "#0add08",
+  vibrantpurple: "#ad03de",
+  violet: "#9a0eea",
+  violetblue: "#510ac9",
+  violetpink: "#fb5ffc",
+  violetred: "#a50055",
+  viridian: "#1e9167",
+  vividblue: "#152eff",
+  vividgreen: "#2fef10",
+  vividpurple: "#9900fa",
+  vomit: "#a2a415",
+  vomitgreen: "#89a203",
+  vomityellow: "#c7c10c",
+  warmblue: "#4b57db",
+  warmbrown: "#964e02",
+  warmgrey: "#978a84",
+  warmpink: "#fb5581",
+  warmpurple: "#952e8f",
+  washedoutgreen: "#bcf5a6",
+  waterblue: "#0e87cc",
+  watermelon: "#fd4659",
+  wheat: "#fbdd7e",
+  white: "#ffffff",
+  windowsblue: "#3778bf",
+  wine: "#80013f",
+  winered: "#7b0323",
+  wintergreen: "#20f986",
+  wisteria: "#a87dc2",
+  yellow: "#ffff14",
+  yellowbrown: "#b79400",
+  yellowgreen: "#c0fb2d",
+  yellowish: "#faee66",
+  yellowishbrown: "#9b7a01",
+  yellowishgreen: "#b0dd16",
+  yellowishorange: "#ffab0f",
+  yellowishtan: "#fcfc81",
+  yellowochre: "#cb7723",
+  yelloworange: "#fcb001",
+  yellowtan: "#ffe36e",
+  yellowygreen: "#bff128"
+};
+
+// src/data/NamedColorsRepository.ts
+var NamedColorsRepository = class {
+  colors = /* @__PURE__ */ new Map();
+  colorsByHex = /* @__PURE__ */ new Map();
+  labCache = /* @__PURE__ */ new Map();
+  conversionService = new ConversionService();
+  deltaE = new CIEDE2000Strategy();
+  includeXkcd;
+  constructor(options) {
+    this.includeXkcd = options?.includeXkcd ?? false;
+    this.loadColors();
+  }
+  loadColors() {
+    for (const [name, hex3] of Object.entries(css_colors_default)) {
+      this.addColor(name, hex3, "css");
+    }
+    if (this.includeXkcd) {
+      for (const [name, hex3] of Object.entries(xkcd_colors_default)) {
+        if (!this.colors.has(name.toLowerCase())) {
+          this.addColor(name, hex3, "xkcd");
+        }
+      }
+    }
+  }
+  addColor(name, hex3, source) {
+    const color = Color.fromHex(hex3);
+    const entry = { name, hex: hex3.toLowerCase(), color, source };
+    this.colors.set(name.toLowerCase(), entry);
+    const lab = this.conversionService.convert(color, "lab");
+    this.labCache.set(name.toLowerCase(), lab.components);
+    const hexKey = hex3.toLowerCase();
+    const existing = this.colorsByHex.get(hexKey) ?? [];
+    existing.push(entry);
+    this.colorsByHex.set(hexKey, existing);
+  }
+  /**
+   * Gets a named color by name.
+   */
+  getByName(name) {
+    return this.colors.get(name.toLowerCase());
+  }
+  /**
+   * Gets named colors by hex value.
+   */
+  getByHex(hex3) {
+    const normalized = hex3.toLowerCase().replace(/^#/, "");
+    const fullHex = `#${normalized}`;
+    return this.colorsByHex.get(fullHex) ?? [];
+  }
+  /**
+   * Finds the closest named color to a given color.
+   * Uses CIEDE2000 perceptual distance in Lab space.
+   * Lab values are pre-computed at load time for performance.
+   */
+  findClosest(color) {
+    const targetLab = this.conversionService.convert(color, "lab");
+    let closest;
+    let minDeltaE = Infinity;
+    for (const [name, entry] of this.colors.entries()) {
+      const entryLabComponents = this.labCache.get(name);
+      if (!entryLabComponents) continue;
+      const entryLab = Color.create("lab", entryLabComponents, 1);
+      const de = this.deltaE.calculate(targetLab, entryLab);
+      if (de < minDeltaE) {
+        minDeltaE = de;
+        closest = entry;
+      }
+    }
+    return closest;
+  }
+  /**
+   * Lists all named colors.
+   */
+  listAll() {
+    return [...this.colors.values()];
+  }
+  /**
+   * Searches for colors by partial name match.
+   */
+  search(query) {
+    const lowerQuery = query.toLowerCase();
+    return [...this.colors.values()].filter(
+      (entry) => entry.name.toLowerCase().includes(lowerQuery)
+    );
+  }
+  /**
+   * Gets the total count of named colors.
+   */
+  get count() {
+    return this.colors.size;
+  }
+};
+
+// src/mcp/tools/parseColor.ts
+var namedColors = new NamedColorsRepository();
+function parseColor(input) {
+  const trimmed = input.trim().toLowerCase();
+  if (trimmed.startsWith("#")) {
+    return Color.fromHex(trimmed);
+  }
+  const namedColor = namedColors.getByName(trimmed);
+  if (namedColor) {
+    return namedColor.color;
+  }
+  const rgbMatch = trimmed.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1], 10);
+    const g = parseInt(rgbMatch[2], 10);
+    const b = parseInt(rgbMatch[3], 10);
+    const a = rgbMatch[4] ? parseFloat(rgbMatch[4]) : 1;
+    return Color.fromRgb(r, g, b, a);
+  }
+  const hslMatch = trimmed.match(/^hsla?\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+)\s*)?\)$/);
+  if (hslMatch) {
+    const h = parseFloat(hslMatch[1]);
+    const s = parseFloat(hslMatch[2]) / 100;
+    const l = parseFloat(hslMatch[3]) / 100;
+    const a = hslMatch[4] ? parseFloat(hslMatch[4]) : 1;
+    return Color.create("hsl", [h, s, l], a);
+  }
+  throw new ColorParseError(input);
+}
+
+// src/services/ContrastService.ts
+var conversionService2 = new ConversionService();
+var WCAG_THRESHOLDS = {
+  AA: { normal: 4.5, large: 3 },
+  AAA: { normal: 7, large: 4.5 }
+};
+var ContrastService = class {
+  /**
+   * Calculates the relative luminance of a color.
+   * Formula from WCAG 2.1: https://www.w3.org/WAI/GL/wiki/Relative_luminance
+   *
+   * L = 0.2126 * R + 0.7152 * G + 0.0722 * B
+   * where R, G, B are linearized sRGB values
+   */
+  calculateLuminance(color) {
+    const srgbColor = conversionService2.convert(color, "srgb");
+    const [r, g, b] = srgbColor.components;
+    const rLin = srgbToLinear(r);
+    const gLin = srgbToLinear(g);
+    const bLin = srgbToLinear(b);
+    return 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin;
+  }
+  /**
+   * Calculates the contrast ratio between two colors.
+   * Formula from WCAG 2.1: (L1 + 0.05) / (L2 + 0.05)
+   * where L1 is the lighter color's luminance
+   */
+  calculateContrastRatio(foreground, background) {
+    const L1 = this.calculateLuminance(foreground);
+    const L2 = this.calculateLuminance(background);
+    const lighter = Math.max(L1, L2);
+    const darker = Math.min(L1, L2);
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+  /**
+   * Checks WCAG contrast compliance and returns detailed results.
+   */
+  checkContrast(foreground, background) {
+    const fgLum = this.calculateLuminance(foreground);
+    const bgLum = this.calculateLuminance(background);
+    const ratio = this.calculateContrastRatio(foreground, background);
+    return {
+      ratio,
+      ratioString: `${ratio.toFixed(2)}:1`,
+      passes: {
+        AA: {
+          normal: ratio >= WCAG_THRESHOLDS.AA.normal,
+          large: ratio >= WCAG_THRESHOLDS.AA.large
+        },
+        AAA: {
+          normal: ratio >= WCAG_THRESHOLDS.AAA.normal,
+          large: ratio >= WCAG_THRESHOLDS.AAA.large
+        }
+      },
+      foregroundLuminance: fgLum,
+      backgroundLuminance: bgLum
+    };
+  }
+  /**
+   * Checks if a color combination meets a specific WCAG level.
+   */
+  meetsWCAG(foreground, background, level, textSize) {
+    const ratio = this.calculateContrastRatio(foreground, background);
+    const threshold = WCAG_THRESHOLDS[level][textSize];
+    return ratio >= threshold;
+  }
+  /**
+   * Suggests a foreground color that meets WCAG AA for the given background.
+   * Returns either black or white depending on which provides better contrast.
+   */
+  suggestForeground(background) {
+    const bgLum = this.calculateLuminance(background);
+    if (bgLum < 0.179) {
+      return Color.fromHex("#FFFFFF");
+    } else {
+      return Color.fromHex("#000000");
+    }
+  }
+  /**
+   * Finds the minimum lightness adjustment needed to meet WCAG requirements.
+   * Uses Oklch for perceptually uniform lightness adjustments.
+   */
+  adjustForContrast(foreground, background, level = "AA", textSize = "normal") {
+    const threshold = WCAG_THRESHOLDS[level][textSize];
+    const currentRatio = this.calculateContrastRatio(foreground, background);
+    if (currentRatio >= threshold) {
+      return foreground;
+    }
+    const oklchColor = conversionService2.convert(foreground, "oklch");
+    const bgLum = this.calculateLuminance(background);
+    const [, c, h] = oklchColor.components;
+    const shouldLighten = bgLum < 0.5;
+    let low = shouldLighten ? oklchColor.components[0] : 0;
+    let high = shouldLighten ? 1 : oklchColor.components[0];
+    for (let i = 0; i < 20; i++) {
+      const mid = (low + high) / 2;
+      const testColor = Color.create("oklch", [mid, c, h], foreground.alpha);
+      const testRatio = this.calculateContrastRatio(testColor, background);
+      if (testRatio >= threshold) {
+        if (shouldLighten) {
+          high = mid;
+        } else {
+          low = mid;
+        }
+      } else {
+        if (shouldLighten) {
+          low = mid;
+        } else {
+          high = mid;
+        }
+      }
+    }
+    const finalL = (low + high) / 2;
+    const adjustedOklch = Color.create("oklch", [finalL, c, h], foreground.alpha);
+    return conversionService2.convert(adjustedOklch, foreground.space);
+  }
+  /**
+   * Gets the WCAG threshold for a given level and text size.
+   */
+  getThreshold(level, textSize) {
+    return WCAG_THRESHOLDS[level][textSize];
+  }
+};
+
+// src/services/APCAService.ts
+var conversionService3 = new ConversionService();
+var APCA_COEFFICIENTS = {
+  R: 0.2126729,
+  G: 0.7151522,
+  B: 0.072175
+};
+var SOFT_CLAMP = {
+  THRESHOLD: 0.022,
+  EXPONENT: 1.414
+};
+var POWER_CURVES = {
+  NORMAL: { BG: 0.56, TEXT: 0.57 },
+  REVERSE: { BG: 0.65, TEXT: 0.62 },
+  SCALE: 1.14
+};
+var OUTPUT_CLAMP = {
+  THRESHOLD: 0.1,
+  OFFSET: 0.027
+};
+var APCA_THRESHOLDS = {
+  BODY_TEXT: 75,
+  LARGE_TEXT: 60,
+  NON_TEXT: 45,
+  SPOT_TEXT: 30,
+  NON_CONTENT: 15
+};
+var DEFAULT_TARGET_LC = 75;
+var MAX_BINARY_SEARCH_ITERATIONS = 25;
+var APCAService = class {
+  /**
+   * Calculates the APCA luminance (Y) for a color.
+   * Linearizes sRGB components and applies the APCA luminance coefficients.
+   */
+  calculateY(color) {
+    const srgbColor = conversionService3.convert(color, "srgb");
+    const [r, g, b] = srgbColor.components;
+    const rLin = srgbToLinear(r);
+    const gLin = srgbToLinear(g);
+    const bLin = srgbToLinear(b);
+    return APCA_COEFFICIENTS.R * rLin + APCA_COEFFICIENTS.G * gLin + APCA_COEFFICIENTS.B * bLin;
+  }
+  /**
+   * Applies the APCA soft-clamp pre-processing to a Y (luminance) value.
+   * Negative values are floored to zero. Values below the soft-clamp threshold
+   * are boosted by a power-curve offset to prevent artifacts in the SAPC calculation.
+   */
+  softClampY(y) {
+    if (y < 0) {
+      return 0;
+    }
+    if (y > SOFT_CLAMP.THRESHOLD) {
+      return y;
+    }
+    return y + Math.pow(SOFT_CLAMP.THRESHOLD - y, SOFT_CLAMP.EXPONENT);
+  }
+  /**
+   * Produces a human-readable interpretation string for a given absolute Lc value.
+   */
+  interpretLc(absLc) {
+    if (absLc >= 90) {
+      return "Preferred for body text";
+    }
+    if (absLc >= APCA_THRESHOLDS.BODY_TEXT) {
+      return "Minimum for body text";
+    }
+    if (absLc >= APCA_THRESHOLDS.LARGE_TEXT) {
+      return "Minimum for large text (24px+)";
+    }
+    if (absLc >= APCA_THRESHOLDS.NON_TEXT) {
+      return "Minimum for non-text elements and large bold text";
+    }
+    if (absLc >= APCA_THRESHOLDS.SPOT_TEXT) {
+      return "Minimum for spot text and placeholders";
+    }
+    if (absLc >= APCA_THRESHOLDS.NON_CONTENT) {
+      return "Minimum for non-content borders and dividers only";
+    }
+    return "Not suitable for any visible content";
+  }
+  /**
+   * Calculates the APCA lightness contrast (Lc) between a text color and background color.
+   *
+   * The algorithm:
+   * 1. Converts both colors to sRGB, linearizes, and computes luminance (Y).
+   * 2. Applies soft-clamp pre-processing to both Y values.
+   * 3. Determines polarity (normal = dark-on-light, reverse = light-on-dark).
+   * 4. Applies asymmetric power curves to compute raw SAPC.
+   * 5. Applies output clamp and scales to the 0-100+ Lc range.
+   *
+   * @param textColor - The foreground/text color
+   * @param backgroundColor - The background color
+   * @returns Full APCA result with Lc, polarity, and threshold compliance
+   */
+  calculateAPCA(textColor, backgroundColor) {
+    const yTextRaw = this.calculateY(textColor);
+    const yBgRaw = this.calculateY(backgroundColor);
+    const yText = this.softClampY(yTextRaw);
+    const yBg = this.softClampY(yBgRaw);
+    let sapc;
+    let polarity;
+    if (yBg > yText) {
+      polarity = "normal";
+      sapc = (Math.pow(yBg, POWER_CURVES.NORMAL.BG) - Math.pow(yText, POWER_CURVES.NORMAL.TEXT)) * POWER_CURVES.SCALE;
+    } else {
+      polarity = "reverse";
+      sapc = (Math.pow(yBg, POWER_CURVES.REVERSE.BG) - Math.pow(yText, POWER_CURVES.REVERSE.TEXT)) * POWER_CURVES.SCALE;
+    }
+    let lc;
+    if (Math.abs(sapc) < OUTPUT_CLAMP.THRESHOLD) {
+      lc = 0;
+    } else if (sapc > 0) {
+      lc = sapc - OUTPUT_CLAMP.OFFSET;
+    } else {
+      lc = sapc + OUTPUT_CLAMP.OFFSET;
+    }
+    lc = lc * 100;
+    const absLc = Math.abs(lc);
+    return {
+      Lc: lc,
+      absLc,
+      polarity,
+      textLuminance: yText,
+      backgroundLuminance: yBg,
+      interpretation: this.interpretLc(absLc),
+      meetsMinimum: {
+        bodyText: absLc >= APCA_THRESHOLDS.BODY_TEXT,
+        largeText: absLc >= APCA_THRESHOLDS.LARGE_TEXT,
+        nonText: absLc >= APCA_THRESHOLDS.NON_TEXT,
+        spotText: absLc >= APCA_THRESHOLDS.SPOT_TEXT
+      }
+    };
+  }
+  /**
+   * Suggests either black or white text for the given background,
+   * choosing whichever yields a higher absolute Lc value.
+   *
+   * @param backgroundColor - The background color to evaluate against
+   * @param targetLc - Optional minimum Lc target (informational; the method
+   *   always returns the better of black or white regardless)
+   * @returns Black (#000000) or white (#FFFFFF)
+   */
+  suggestTextColor(backgroundColor, _targetLc) {
+    const black = Color.fromHex("#000000");
+    const white = Color.fromHex("#FFFFFF");
+    const blackResult = this.calculateAPCA(black, backgroundColor);
+    const whiteResult = this.calculateAPCA(white, backgroundColor);
+    if (whiteResult.absLc >= blackResult.absLc) {
+      return white;
+    }
+    return black;
+  }
+  /**
+   * Adjusts a text color's lightness to meet a target APCA Lc value
+   * against the given background. Uses binary search in Oklch lightness space
+   * for perceptually uniform adjustments.
+   *
+   * If the text color already meets the target, it is returned unchanged.
+   * The search direction (lighter or darker) is determined by the background
+   * luminance: for dark backgrounds the text is lightened, for light backgrounds
+   * it is darkened.
+   *
+   * @param textColor - The text color to adjust
+   * @param backgroundColor - The background to measure against
+   * @param targetLc - The desired absolute Lc value (default: 75, minimum for body text)
+   * @returns An adjusted color in the same color space as the input text color
+   */
+  adjustForAPCA(textColor, backgroundColor, targetLc = DEFAULT_TARGET_LC) {
+    const currentResult = this.calculateAPCA(textColor, backgroundColor);
+    if (currentResult.absLc >= targetLc) {
+      return textColor;
+    }
+    const oklchColor = conversionService3.convert(textColor, "oklch");
+    const bgY = this.calculateY(backgroundColor);
+    const [, chroma, hue] = oklchColor.components;
+    const shouldLighten = bgY < 0.5;
+    let low = shouldLighten ? oklchColor.components[0] : 0;
+    let high = shouldLighten ? 1 : oklchColor.components[0];
+    for (let i = 0; i < MAX_BINARY_SEARCH_ITERATIONS; i++) {
+      const mid = (low + high) / 2;
+      const candidate = Color.create("oklch", [mid, chroma, hue], textColor.alpha);
+      const candidateResult = this.calculateAPCA(candidate, backgroundColor);
+      if (candidateResult.absLc >= targetLc) {
+        if (shouldLighten) {
+          high = mid;
+        } else {
+          low = mid;
+        }
+      } else {
+        if (shouldLighten) {
+          low = mid;
+        } else {
+          high = mid;
+        }
+      }
+    }
+    const finalLightness = (low + high) / 2;
+    const adjustedOklch = Color.create("oklch", [finalLightness, chroma, hue], textColor.alpha);
+    return conversionService3.convert(adjustedOklch, textColor.space);
+  }
+};
+
+// src/services/TemperatureService.ts
+var conversionService4 = new ConversionService();
+var MIN_KELVIN = 1e3;
+var MAX_KELVIN = 4e4;
+var TEMPERATURE_BANDS = [
+  { maxKelvin: 2e3, description: "Candlelight", category: "warm" },
+  { maxKelvin: 3e3, description: "Warm white (tungsten-like)", category: "warm" },
+  { maxKelvin: 4e3, description: "Warm white (halogen)", category: "warm" },
+  { maxKelvin: 5e3, description: "Neutral white (fluorescent)", category: "neutral" },
+  { maxKelvin: 6e3, description: "Daylight (noon sun)", category: "daylight" },
+  { maxKelvin: 7500, description: "Cool daylight (overcast)", category: "cool" },
+  { maxKelvin: 1e4, description: "Blue sky", category: "cool" },
+  { maxKelvin: Infinity, description: "Deep blue sky", category: "cool" }
+];
+var TemperatureService = class {
+  /**
+   * Converts a Kelvin color temperature to its corresponding sRGB color.
+   *
+   * Uses the Tanner Helland algorithm, a fast polynomial/logarithmic
+   * approximation of the Planckian (blackbody) radiation spectrum.
+   *
+   * @param kelvin - Color temperature in Kelvin (clamped to 1000-40000)
+   * @returns TemperatureInfo with the hex color, RGB components, and description
+   */
+  kelvinToColor(kelvin) {
+    const clampedKelvin = Math.max(MIN_KELVIN, Math.min(MAX_KELVIN, kelvin));
+    const temp = clampedKelvin / 100;
+    let r;
+    let g;
+    let b;
+    if (temp <= 66) {
+      r = 255;
+      g = 99.4708025861 * Math.log(temp) - 161.1195681661;
+      b = temp <= 19 ? 0 : 138.5177312231 * Math.log(temp - 10) - 305.0447927307;
+    } else {
+      r = 329.698727446 * Math.pow(temp - 60, -0.1332047592);
+      g = 288.1221695283 * Math.pow(temp - 60, -0.0755148492);
+      b = 255;
+    }
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    const rInt = Math.round(r);
+    const gInt = Math.round(g);
+    const bInt = Math.round(b);
+    const color = Color.create("srgb", [r / 255, g / 255, b / 255], 1);
+    const clamped = conversionService4.clampToGamut(color);
+    const hex3 = clamped.toHex();
+    const { description, category } = this.describeTemperature(clampedKelvin);
+    return {
+      kelvin: clampedKelvin,
+      color: { hex: hex3, rgb: { r: rInt, g: gInt, b: bInt } },
+      description,
+      category
+    };
+  }
+  /**
+   * Estimates the correlated color temperature (CCT) of a color.
+   *
+   * Converts the color to CIE XYZ-D65, derives xy chromaticity,
+   * then applies McCamy's cubic approximation formula for CCT.
+   *
+   * Planckian locus proximity is checked in CIE 1960 uv space:
+   * a deltaUV below 0.02 indicates the color is close to a
+   * blackbody radiator.
+   *
+   * @param color - Any Color instance
+   * @returns ColorTemperatureResult with estimated Kelvin, chromaticity, and classification
+   */
+  colorToTemperature(color) {
+    const xyz = conversionService4.convert(color, "xyz-d65");
+    const [X, Y, Z] = xyz.components;
+    const sum = X + Y + Z;
+    if (sum === 0) {
+      return {
+        estimatedKelvin: 0,
+        chromaticity: { x: 0, y: 0 },
+        isOnPlanckianLocus: false,
+        description: "No measurable color temperature (black)",
+        category: "neutral"
+      };
+    }
+    const x = X / sum;
+    const y = Y / sum;
+    const n = (x - 0.332) / (0.1858 - y);
+    const cct = 449 * Math.pow(n, 3) + 3525 * Math.pow(n, 2) + 6823.3 * n + 5520.33;
+    const isOnLocus = this.isNearPlanckianLocus(x, y, cct);
+    const reportedKelvin = Math.round(Math.max(MIN_KELVIN, Math.min(MAX_KELVIN, cct)));
+    const { description, category } = this.describeTemperature(reportedKelvin);
+    return {
+      estimatedKelvin: reportedKelvin,
+      chromaticity: { x, y },
+      isOnPlanckianLocus: isOnLocus,
+      description,
+      category
+    };
+  }
+  /**
+   * Generates a series of TemperatureInfo samples between two Kelvin values.
+   *
+   * @param startKelvin - Starting temperature (inclusive)
+   * @param endKelvin - Ending temperature (inclusive)
+   * @param steps - Number of evenly-spaced samples (minimum 2)
+   * @returns Array of TemperatureInfo from startKelvin to endKelvin
+   */
+  generateTemperatureGradient(startKelvin, endKelvin, steps) {
+    if (steps < 2) {
+      throw new Error("Temperature gradient must have at least 2 steps");
+    }
+    const results = [];
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const kelvin = startKelvin + (endKelvin - startKelvin) * t;
+      results.push(this.kelvinToColor(kelvin));
+    }
+    return results;
+  }
+  /**
+   * Returns a human-readable description and category for a Kelvin value.
+   */
+  describeTemperature(kelvin) {
+    for (const band of TEMPERATURE_BANDS) {
+      if (kelvin < band.maxKelvin) {
+        return { description: band.description, category: band.category };
+      }
+    }
+    const last = TEMPERATURE_BANDS[TEMPERATURE_BANDS.length - 1];
+    return { description: last.description, category: last.category };
+  }
+  /**
+   * Checks whether a chromaticity coordinate (in CIE xy) lies near the
+   * Planckian locus by comparing it against the expected blackbody
+   * chromaticity at the given CCT in CIE 1960 uv space.
+   *
+   * The threshold is deltaUV < 0.02, which is the standard tolerance
+   * used in lighting engineering for "on-locus" determination.
+   *
+   * @param x - CIE x chromaticity of the test color
+   * @param y - CIE y chromaticity of the test color
+   * @param cct - Estimated correlated color temperature
+   * @returns True if the color is within 0.02 deltaUV of the Planckian locus
+   */
+  isNearPlanckianLocus(x, y, cct) {
+    const denominator = -2 * x + 12 * y + 3;
+    if (denominator === 0) {
+      return false;
+    }
+    const uTest = 4 * x / denominator;
+    const vTest = 6 * y / denominator;
+    const planckianUV = this.planckianLocusUV(cct);
+    const du = uTest - planckianUV.u;
+    const dv = vTest - planckianUV.v;
+    const deltaUV = Math.sqrt(du * du + dv * dv);
+    return deltaUV < 0.02;
+  }
+  /**
+   * Approximates the CIE 1960 uv coordinates on the Planckian locus
+   * at a given color temperature using Krystek's rational polynomial
+   * approximation. Accurate to ~1e-5 for 1000K-15000K; reasonable
+   * extrapolation beyond that range.
+   */
+  planckianLocusUV(kelvin) {
+    const T = kelvin;
+    const T2 = T * T;
+    const u = (0.860117757 + 154118254e-12 * T + 128641212e-15 * T2) / (1 + 842420235e-12 * T + 708145163e-15 * T2);
+    const v = (0.317398726 + 422806245e-13 * T + 420481691e-16 * T2) / (1 - 289741816e-13 * T + 161456053e-15 * T2);
+    return { u, v };
+  }
+};
+
+// src/mcp/tools/query/getColorInfo.ts
+var conversionService5 = new ConversionService();
+var contrastService = new ContrastService();
+var apcaService = new APCAService();
+var temperatureService = new TemperatureService();
+var namedColors2 = new NamedColorsRepository();
+var xkcdColors = new NamedColorsRepository({ includeXkcd: true });
+var getColorInfoSchema = external_exports3.object({
+  color: external_exports3.string().describe("Color value (hex, RGB, or named color)")
+});
+async function getColorInfo(input) {
+  const color = parseColor(input.color);
+  const srgb = conversionService5.convert(color, "srgb");
+  const hsl = conversionService5.convert(color, "hsl");
+  const hsv = conversionService5.convert(color, "hsv");
+  const lab = conversionService5.convert(color, "lab");
+  const lch = conversionService5.convert(color, "lch");
+  const oklab = conversionService5.convert(color, "oklab");
+  const oklch = conversionService5.convert(color, "oklch");
+  const closestNamed = namedColors2.findClosest(srgb);
+  const luminance = contrastService.calculateLuminance(srgb);
+  const isLight = luminance > 0.179;
+  const white = Color.fromHex("#FFFFFF");
+  const black = Color.fromHex("#000000");
+  const contrastWithWhite = contrastService.calculateContrastRatio(srgb, white);
+  const contrastWithBlack = contrastService.calculateContrastRatio(srgb, black);
+  const apcaWithWhite = apcaService.calculateAPCA(srgb, white);
+  const apcaWithBlack = apcaService.calculateAPCA(srgb, black);
+  const apcaSuggested = apcaService.suggestTextColor(srgb);
+  const apcaSuggestedSrgb = conversionService5.convert(apcaSuggested, "srgb");
+  const closestXkcd = xkcdColors.findClosest(srgb);
+  const tempResult = temperatureService.colorToTemperature(srgb);
+  const [r, g, b] = srgb.toRgbArray();
+  const [h, s, l] = hsl.components;
+  const [hv, sv, v] = hsv.components;
+  const [L, a, labB] = lab.components;
+  const [lchL, lchC, lchH] = lch.components;
+  const [okL, okA, okB] = oklab.components;
+  const [oklchL, oklchC, oklchH] = oklch.components;
+  return {
+    input: input.color,
+    formats: {
+      hex: srgb.toHex(),
+      hexWithAlpha: srgb.toHex(true),
+      rgb: { r, g, b },
+      rgbString: `rgb(${r}, ${g}, ${b})`,
+      hsl: {
+        h: Math.round(h),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100)
+      },
+      hslString: `hsl(${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`,
+      hsv: {
+        h: Math.round(hv),
+        s: Math.round(sv * 100),
+        v: Math.round(v * 100)
+      }
+    },
+    perceptual: {
+      lab: {
+        L: Math.round(L * 100) / 100,
+        a: Math.round(a * 100) / 100,
+        b: Math.round(labB * 100) / 100
+      },
+      lch: {
+        L: Math.round(lchL * 100) / 100,
+        C: Math.round(lchC * 100) / 100,
+        H: Math.round(lchH * 100) / 100
+      },
+      oklab: {
+        L: Math.round(okL * 1e3) / 1e3,
+        a: Math.round(okA * 1e3) / 1e3,
+        b: Math.round(okB * 1e3) / 1e3
+      },
+      oklch: {
+        L: Math.round(oklchL * 1e3) / 1e3,
+        C: Math.round(oklchC * 1e3) / 1e3,
+        H: Math.round(oklchH * 100) / 100
+      }
+    },
+    analysis: {
+      luminance: Math.round(luminance * 1e4) / 1e4,
+      isLight,
+      suggestedTextColor: isLight ? "#000000" : "#FFFFFF",
+      contrastWithWhite: Math.round(contrastWithWhite * 100) / 100,
+      contrastWithBlack: Math.round(contrastWithBlack * 100) / 100,
+      apca: {
+        suggestedTextColor: apcaSuggestedSrgb.toHex(),
+        contrastWithWhite: Math.round(apcaWithWhite.Lc * 100) / 100,
+        contrastWithBlack: Math.round(apcaWithBlack.Lc * 100) / 100
+      },
+      estimatedTemperature: {
+        kelvin: tempResult.estimatedKelvin,
+        description: tempResult.description,
+        isNearBlackbody: tempResult.isOnPlanckianLocus
+      }
+    },
+    closestNamedColor: {
+      css: {
+        name: closestNamed.name,
+        hex: closestNamed.hex
+      },
+      xkcd: {
+        name: closestXkcd.name,
+        hex: closestXkcd.hex
+      }
+    },
+    alpha: srgb.alpha
+  };
+}
+
+// src/strategies/delta-e/CIE76Strategy.ts
+var conversionService6 = new ConversionService();
+var CIE76Strategy = class {
+  method = "CIE76";
+  description = "CIE 1976 Lab color difference (Euclidean distance)";
+  calculate(color1, color2, _options) {
+    const lab1 = conversionService6.convert(color1, "lab");
+    const lab2 = conversionService6.convert(color2, "lab");
+    const [L1, a1, b1] = lab1.components;
+    const [L2, a2, b2] = lab2.components;
+    const dL = L1 - L2;
+    const da = a1 - a2;
+    const db = b1 - b2;
+    return Math.sqrt(dL * dL + da * da + db * db);
+  }
+  interpret(deltaE) {
+    if (deltaE < 1) {
+      return {
+        value: deltaE,
+        description: "Not perceptible by human eyes",
+        perceptible: false,
+        acceptable: true
+      };
+    } else if (deltaE < 2) {
+      return {
+        value: deltaE,
+        description: "Perceptible through close observation",
+        perceptible: true,
+        acceptable: true
+      };
+    } else if (deltaE < 3.5) {
+      return {
+        value: deltaE,
+        description: "Perceptible at a glance",
+        perceptible: true,
+        acceptable: true
+      };
+    } else if (deltaE < 5) {
+      return {
+        value: deltaE,
+        description: "Colors are more similar than different",
+        perceptible: true,
+        acceptable: true
+      };
+    } else {
+      return {
+        value: deltaE,
+        description: "Colors are noticeably different",
+        perceptible: true,
+        acceptable: false
+      };
+    }
+  }
+};
+
+// src/strategies/delta-e/CIE94Strategy.ts
+var conversionService7 = new ConversionService();
+var CIE94Strategy = class {
+  method = "CIE94";
+  description = "CIE 1994 color difference with chroma/hue weighting";
+  calculate(color1, color2, options) {
+    const lab1 = conversionService7.convert(color1, "lab");
+    const lab2 = conversionService7.convert(color2, "lab");
+    const [L1, a1, b1] = lab1.components;
+    const [L2, a2, b2] = lab2.components;
+    const isTextiles = options?.application === "textiles";
+    const kL = isTextiles ? 2 : 1;
+    const K1 = isTextiles ? 0.048 : 0.045;
+    const K2 = isTextiles ? 0.014 : 0.015;
+    const kC = 1;
+    const kH = 1;
+    const C1 = Math.sqrt(a1 * a1 + b1 * b1);
+    const C2 = Math.sqrt(a2 * a2 + b2 * b2);
+    const dL = L1 - L2;
+    const dC = C1 - C2;
+    const da = a1 - a2;
+    const db = b1 - b2;
+    const dH2 = da * da + db * db - dC * dC;
+    const dH = dH2 > 0 ? Math.sqrt(dH2) : 0;
+    const SL = 1;
+    const SC = 1 + K1 * C1;
+    const SH = 1 + K2 * C1;
+    const term1 = dL / (kL * SL);
+    const term2 = dC / (kC * SC);
+    const term3 = dH / (kH * SH);
+    return Math.sqrt(term1 * term1 + term2 * term2 + term3 * term3);
+  }
+  interpret(deltaE) {
+    if (deltaE < 1) {
+      return {
+        value: deltaE,
+        description: "Not perceptible by human eyes",
+        perceptible: false,
+        acceptable: true
+      };
+    } else if (deltaE < 2) {
+      return {
+        value: deltaE,
+        description: "Perceptible through close observation",
+        perceptible: true,
+        acceptable: true
+      };
+    } else if (deltaE < 3) {
+      return {
+        value: deltaE,
+        description: "Perceptible at a glance",
+        perceptible: true,
+        acceptable: true
+      };
+    } else if (deltaE < 5) {
+      return {
+        value: deltaE,
+        description: "Colors are more similar than different",
+        perceptible: true,
+        acceptable: true
+      };
+    } else {
+      return {
+        value: deltaE,
+        description: "Colors are noticeably different",
+        perceptible: true,
+        acceptable: false
+      };
+    }
+  }
+};
+
 // src/strategies/delta-e/DeltaERegistry.ts
 var DeltaERegistry = class _DeltaERegistry {
   strategies = /* @__PURE__ */ new Map();
@@ -32792,7 +33238,7 @@ var DeltaERegistry = class _DeltaERegistry {
 };
 
 // src/mcp/tools/query/getColorName.ts
-var conversionService6 = new ConversionService();
+var conversionService8 = new ConversionService();
 var namedColors3 = new NamedColorsRepository();
 var deltaERegistry = DeltaERegistry.createDefault();
 var getColorNameSchema = external_exports3.object({
@@ -32801,7 +33247,7 @@ var getColorNameSchema = external_exports3.object({
 });
 async function getColorName(input) {
   const color = parseColor(input.color);
-  const srgb = conversionService6.convert(color, "srgb");
+  const srgb = conversionService8.convert(color, "srgb");
   const exactMatch = namedColors3.getByHex(srgb.toHex());
   if (exactMatch.length > 0) {
     return {
@@ -32845,9 +33291,7 @@ async function getColorName(input) {
 }
 
 // src/mcp/tools/schemas.ts
-var ColorInputSchema = external_exports3.string().describe(
-  "Color value as hex (#RGB, #RRGGBB), CSS color name, or rgb(r,g,b)"
-);
+var ColorInputSchema = external_exports3.string().describe("Color value as hex (#RGB, #RRGGBB), CSS color name, or rgb(r,g,b)");
 var ColorSpaceSchema = external_exports3.enum([
   "srgb",
   "linear-srgb",
@@ -32875,11 +33319,7 @@ var HarmonyTypeSchema = external_exports3.enum([
   "square",
   "monochromatic"
 ]).describe("Type of color harmony");
-var DeltaEMethodSchema = external_exports3.enum([
-  "CIE76",
-  "CIE94",
-  "CIEDE2000"
-]).describe("Delta-E calculation method");
+var DeltaEMethodSchema = external_exports3.enum(["CIE76", "CIE94", "CIEDE2000"]).describe("Delta-E calculation method");
 var CVDTypeSchema = external_exports3.enum([
   "protanopia",
   "protanomaly",
@@ -32901,12 +33341,7 @@ var CultureRegionSchema = external_exports3.enum([
   "latinAmerican",
   "indigenous"
 ]).describe("Cultural region");
-var MeaningContextSchema = external_exports3.enum([
-  "general",
-  "business",
-  "wedding",
-  "mourning"
-]).describe("Context for color meaning");
+var MeaningContextSchema = external_exports3.enum(["general", "business", "wedding", "mourning"]).describe("Context for color meaning");
 
 // src/data/cultural-meanings.json
 var cultural_meanings_default = {
@@ -33202,7 +33637,13 @@ var cultural_meanings_default = {
 var expanded_cultural_meanings_default = {
   red: {
     african: {
-      general: ["vitality", "life force", "spiritual power", "political struggle", "bloodline and ancestry"],
+      general: [
+        "vitality",
+        "life force",
+        "spiritual power",
+        "political struggle",
+        "bloodline and ancestry"
+      ],
       business: ["strength", "power", "used in national branding across many African nations"],
       wedding: ["fertility", "vitality", "sometimes worn by brides in West African ceremonies"],
       mourning: ["used in some Akan funeral rites", "sacrifice", "transition to ancestral realm"]
@@ -33214,7 +33655,12 @@ var expanded_cultural_meanings_default = {
       mourning: ["sacrifice", "martyrdom", "used in Day of the Dead altars"]
     },
     indigenous: {
-      general: ["life blood", "earth connection", "south direction in some medicine wheels", "war and courage"],
+      general: [
+        "life blood",
+        "earth connection",
+        "south direction in some medicine wheels",
+        "war and courage"
+      ],
       business: ["rarely used in isolation", "strength when combined with earth tones"],
       wedding: ["vitality", "sometimes used in ceremonial regalia"],
       mourning: ["blood of ancestors", "transition", "used in some burial traditions"]
@@ -33222,7 +33668,13 @@ var expanded_cultural_meanings_default = {
   },
   blue: {
     african: {
-      general: ["sky and water", "peace", "harmony", "spiritual healing", "love in some West African traditions"],
+      general: [
+        "sky and water",
+        "peace",
+        "harmony",
+        "spiritual healing",
+        "love in some West African traditions"
+      ],
       business: ["trust", "stability", "used in corporate contexts similarly to Western usage"],
       wedding: ["fidelity", "peace", "sometimes used in Nigerian wedding attire"],
       mourning: ["serenity for the departed", "not a primary mourning color"]
@@ -33234,7 +33686,13 @@ var expanded_cultural_meanings_default = {
       mourning: ["heavenly peace", "not a primary mourning color"]
     },
     indigenous: {
-      general: ["sky", "water", "wisdom", "west direction in some medicine wheels", "spiritual intuition"],
+      general: [
+        "sky",
+        "water",
+        "wisdom",
+        "west direction in some medicine wheels",
+        "spiritual intuition"
+      ],
       business: ["trust", "calm", "used respectfully in context"],
       wedding: ["sky blessings", "spiritual wisdom", "varies by nation"],
       mourning: ["western sky and passage", "used in some traditions for spiritual transition"]
@@ -33244,7 +33702,12 @@ var expanded_cultural_meanings_default = {
     african: {
       general: ["fertility", "growth", "land and agriculture", "prosperity", "Pan-African unity"],
       business: ["agriculture", "growth", "prosperity", "featured on many national flags"],
-      wedding: ["fertility", "abundance", "new beginnings", "commonly used in West African weddings"],
+      wedding: [
+        "fertility",
+        "abundance",
+        "new beginnings",
+        "commonly used in West African weddings"
+      ],
       mourning: ["not a primary mourning color", "life continuing"]
     },
     latinAmerican: {
@@ -33254,7 +33717,12 @@ var expanded_cultural_meanings_default = {
       mourning: ["not typically used", "life and renewal"]
     },
     indigenous: {
-      general: ["earth and plant life", "healing", "north direction in some medicine wheels", "growth and renewal"],
+      general: [
+        "earth and plant life",
+        "healing",
+        "north direction in some medicine wheels",
+        "growth and renewal"
+      ],
       business: ["earth stewardship", "sustainability", "natural alignment"],
       wedding: ["earth blessings", "fertility of the land", "growth of the new family"],
       mourning: ["return to the earth", "cycle of renewal"]
@@ -33264,17 +33732,31 @@ var expanded_cultural_meanings_default = {
     african: {
       general: ["wealth", "gold", "fertility", "royalty in many kingdoms", "the sun and energy"],
       business: ["prosperity", "gold trade heritage", "associated with precious resources"],
-      wedding: ["prosperity", "wealth blessings", "gold adornment is traditional in many regions"],
+      wedding: [
+        "prosperity",
+        "wealth blessings",
+        "gold adornment is traditional in many regions"
+      ],
       mourning: ["not a primary mourning color", "sometimes used to honor a prosperous life"]
     },
     latinAmerican: {
-      general: ["sun", "warmth", "death and mourning in some contexts", "marigolds in Day of the Dead"],
+      general: [
+        "sun",
+        "warmth",
+        "death and mourning in some contexts",
+        "marigolds in Day of the Dead"
+      ],
       business: ["energy", "warmth", "attention-getting"],
       wedding: ["joy", "warmth", "sometimes associated with infidelity so used carefully"],
       mourning: ["marigold offerings for the dead", "guiding spirits home", "remembrance"]
     },
     indigenous: {
-      general: ["east direction in many medicine wheels", "sunrise", "new beginnings", "illumination"],
+      general: [
+        "east direction in many medicine wheels",
+        "sunrise",
+        "new beginnings",
+        "illumination"
+      ],
       business: ["dawn of new ventures", "clarity", "illumination"],
       wedding: ["sunrise blessings", "new chapter beginning", "spiritual illumination"],
       mourning: ["sunrise and the east", "souls traveling toward the light"]
@@ -33284,7 +33766,11 @@ var expanded_cultural_meanings_default = {
     african: {
       general: ["purity", "spirituality", "ancestral connection", "peace", "victory"],
       business: ["purity", "clarity", "sometimes associated with spiritual authority"],
-      wedding: ["purity", "spiritual blessings", "increasingly common alongside traditional colors"],
+      wedding: [
+        "purity",
+        "spiritual blessings",
+        "increasingly common alongside traditional colors"
+      ],
       mourning: ["used in some mourning traditions", "spiritual passage", "ancestor world"]
     },
     latinAmerican: {
@@ -33294,7 +33780,13 @@ var expanded_cultural_meanings_default = {
       mourning: ["peace for the departed", "angels", "heavenly rest"]
     },
     indigenous: {
-      general: ["north direction in some medicine wheels", "winter", "snow", "wisdom of elders", "purity"],
+      general: [
+        "north direction in some medicine wheels",
+        "winter",
+        "snow",
+        "wisdom of elders",
+        "purity"
+      ],
       business: ["clarity", "truth", "clean intentions"],
       wedding: ["purity of intent", "wisdom", "elder blessings"],
       mourning: ["snow and north", "the great beyond", "used in some burial customs"]
@@ -33302,19 +33794,36 @@ var expanded_cultural_meanings_default = {
   },
   black: {
     african: {
-      general: ["maturity", "spiritual energy", "ancestral power", "masculinity", "age and wisdom"],
+      general: [
+        "maturity",
+        "spiritual energy",
+        "ancestral power",
+        "masculinity",
+        "age and wisdom"
+      ],
       business: ["authority", "strength", "used in formal and powerful contexts"],
       wedding: ["maturity", "depth of commitment", "sometimes worn by elders at ceremonies"],
       mourning: ["mourning and grief in many regions", "connection to the departed", "solemnity"]
     },
     latinAmerican: {
-      general: ["mourning", "formality", "power", "elegance", "the underworld in pre-Columbian belief"],
+      general: [
+        "mourning",
+        "formality",
+        "power",
+        "elegance",
+        "the underworld in pre-Columbian belief"
+      ],
       business: ["authority", "sophistication", "formal power"],
       wedding: ["not traditional for brides", "formal wear for men", "increasingly modern"],
       mourning: ["traditional mourning color", "Catholic funeral tradition", "grief and respect"]
     },
     indigenous: {
-      general: ["west direction in some medicine wheels", "introspection", "the void before creation", "deep knowledge"],
+      general: [
+        "west direction in some medicine wheels",
+        "introspection",
+        "the void before creation",
+        "deep knowledge"
+      ],
       business: ["authority", "depth of knowledge", "used with gravity"],
       wedding: ["not commonly used", "depth of commitment in some traditions"],
       mourning: ["passage to the spirit world", "the unknown", "used in some mourning face paint"]
@@ -33351,7 +33860,11 @@ var expanded_cultural_meanings_default = {
       general: ["sun", "earth", "harvest", "Day of the Dead marigolds", "warmth"],
       business: ["friendly", "energetic", "approachable"],
       wedding: ["warmth", "festive energy", "tropical celebrations"],
-      mourning: ["marigold association with Day of the Dead", "guiding spirits", "remembrance altars"]
+      mourning: [
+        "marigold association with Day of the Dead",
+        "guiding spirits",
+        "remembrance altars"
+      ]
     },
     indigenous: {
       general: ["kinship", "warmth of fire", "community gathering", "autumn harvest"],
@@ -33408,7 +33921,13 @@ var expanded_cultural_meanings_default = {
       mourning: ["honoring a prosperous life", "not a primary mourning color"]
     },
     latinAmerican: {
-      general: ["wealth", "the sun", "pre-Columbian heritage", "divine power", "El Dorado legend"],
+      general: [
+        "wealth",
+        "the sun",
+        "pre-Columbian heritage",
+        "divine power",
+        "El Dorado legend"
+      ],
       business: ["luxury", "success", "premium status", "historical treasure association"],
       wedding: ["prosperity blessings", "luxury", "Catholic church ornamentation"],
       mourning: ["heavenly reward", "not a primary mourning color"]
@@ -33434,7 +33953,12 @@ var expanded_cultural_meanings_default = {
       mourning: ["not a primary mourning color", "quiet respect"]
     },
     indigenous: {
-      general: ["the moon", "water reflection", "feminine energy", "Navajo and Pueblo silverwork tradition"],
+      general: [
+        "the moon",
+        "water reflection",
+        "feminine energy",
+        "Navajo and Pueblo silverwork tradition"
+      ],
       business: ["craftsmanship", "artisanal quality", "silversmithing heritage in some nations"],
       wedding: ["moon blessings", "silver jewelry as ceremonial gifts", "feminine grace"],
       mourning: ["moonlight guiding spirits", "not a primary mourning color"]
@@ -33505,7 +34029,15 @@ var CulturalMeaningsRepository = class {
       return [];
     }
     const results = [];
-    const regions = ["western", "eastAsian", "southAsian", "middleEastern", "african", "latinAmerican", "indigenous"];
+    const regions = [
+      "western",
+      "eastAsian",
+      "southAsian",
+      "middleEastern",
+      "african",
+      "latinAmerican",
+      "indigenous"
+    ];
     for (const region of regions) {
       const meanings = colorData[region]?.[context];
       if (meanings) {
@@ -33615,14 +34147,14 @@ async function listNamedColors(input) {
 }
 
 // src/mcp/tools/convert/convertColor.ts
-var conversionService7 = new ConversionService();
+var conversionService9 = new ConversionService();
 var convertColorSchema = external_exports3.object({
   color: external_exports3.string().describe("Color value (hex, RGB, or named color)"),
   targetSpace: ColorSpaceSchema.describe("Target color space for conversion")
 });
 async function convertColor(input) {
   const color = parseColor(input.color);
-  const converted = conversionService7.convert(color, input.targetSpace);
+  const converted = conversionService9.convert(color, input.targetSpace);
   const components = converted.components;
   let formatted = {};
   switch (input.targetSpace) {
@@ -33703,7 +34235,7 @@ async function convertColor(input) {
   }
   let hex3;
   try {
-    const srgb = conversionService7.convert(converted, "srgb");
+    const srgb = conversionService9.convert(converted, "srgb");
     hex3 = srgb.toHex();
   } catch {
   }
@@ -33719,7 +34251,7 @@ async function convertColor(input) {
 }
 
 // src/mcp/tools/convert/convertBatch.ts
-var conversionService8 = new ConversionService();
+var conversionService10 = new ConversionService();
 var convertBatchSchema = external_exports3.object({
   colors: external_exports3.array(external_exports3.string()).describe("Array of color values to convert"),
   targetSpace: ColorSpaceSchema.describe("Target color space for all conversions")
@@ -33728,10 +34260,10 @@ async function convertBatch(input) {
   const results = input.colors.map((colorStr, index) => {
     try {
       const color = parseColor(colorStr);
-      const converted = conversionService8.convert(color, input.targetSpace);
+      const converted = conversionService10.convert(color, input.targetSpace);
       let hex3;
       try {
-        const srgb = conversionService8.convert(converted, "srgb");
+        const srgb = conversionService10.convert(converted, "srgb");
         hex3 = srgb.toHex();
       } catch {
       }
@@ -33764,7 +34296,7 @@ async function convertBatch(input) {
 }
 
 // src/mcp/tools/convert/parseColorString.ts
-var conversionService9 = new ConversionService();
+var conversionService11 = new ConversionService();
 var namedColors5 = new NamedColorsRepository();
 var parseColorStringSchema = external_exports3.object({
   color: external_exports3.string().describe("Color string in any CSS format")
@@ -33772,7 +34304,7 @@ var parseColorStringSchema = external_exports3.object({
 async function parseColorString(input) {
   try {
     const color = parseColor(input.color);
-    const srgb = conversionService9.convert(color, "srgb");
+    const srgb = conversionService11.convert(color, "srgb");
     const [r, g, b] = srgb.toRgbArray();
     const trimmed = input.color.trim().toLowerCase();
     let detectedFormat;
@@ -33825,7 +34357,7 @@ async function parseColorString(input) {
 
 // src/mcp/tools/calculate/calculateContrast.ts
 var contrastService2 = new ContrastService();
-var conversionService10 = new ConversionService();
+var conversionService12 = new ConversionService();
 var calculateContrastSchema = external_exports3.object({
   foreground: external_exports3.string().describe("Foreground (text) color"),
   background: external_exports3.string().describe("Background color")
@@ -33834,8 +34366,8 @@ async function calculateContrast(input) {
   const foreground = parseColor(input.foreground);
   const background = parseColor(input.background);
   const result = contrastService2.checkContrast(foreground, background);
-  const fgSrgb = conversionService10.convert(foreground, "srgb");
-  const bgSrgb = conversionService10.convert(background, "srgb");
+  const fgSrgb = conversionService12.convert(foreground, "srgb");
+  const bgSrgb = conversionService12.convert(background, "srgb");
   return {
     foreground: {
       input: input.foreground,
@@ -33881,7 +34413,7 @@ function getRecommendation(result) {
 
 // src/mcp/tools/calculate/calculateDeltaE.ts
 var deltaERegistry2 = DeltaERegistry.createDefault();
-var conversionService11 = new ConversionService();
+var conversionService13 = new ConversionService();
 var calculateDeltaESchema = external_exports3.object({
   color1: external_exports3.string().describe("First color"),
   color2: external_exports3.string().describe("Second color"),
@@ -33896,10 +34428,10 @@ async function calculateDeltaE(input) {
   }
   const deltaE = strategy.calculate(color1, color2);
   const interpretation = strategy.interpret(deltaE);
-  const srgb1 = conversionService11.convert(color1, "srgb");
-  const srgb2 = conversionService11.convert(color2, "srgb");
-  const lab1 = conversionService11.convert(color1, "lab");
-  const lab2 = conversionService11.convert(color2, "lab");
+  const srgb1 = conversionService13.convert(color1, "srgb");
+  const srgb2 = conversionService13.convert(color2, "srgb");
+  const lab1 = conversionService13.convert(color1, "lab");
+  const lab2 = conversionService13.convert(color2, "lab");
   return {
     color1: {
       input: input.color1,
@@ -33941,14 +34473,14 @@ async function calculateDeltaE(input) {
 
 // src/mcp/tools/calculate/calculateLuminance.ts
 var contrastService3 = new ContrastService();
-var conversionService12 = new ConversionService();
+var conversionService14 = new ConversionService();
 var calculateLuminanceSchema = external_exports3.object({
   color: external_exports3.string().describe("Color to calculate luminance for")
 });
 async function calculateLuminance(input) {
   const color = parseColor(input.color);
   const luminance = contrastService3.calculateLuminance(color);
-  const srgb = conversionService12.convert(color, "srgb");
+  const srgb = conversionService14.convert(color, "srgb");
   const [r, g, b] = srgb.toRgbArray();
   let category;
   let suggestedTextColor;
@@ -34084,11 +34616,11 @@ var Palette = class _Palette {
 };
 
 // src/strategies/harmony/BaseHarmonyAlgorithm.ts
-var conversionService13 = new ConversionService();
+var conversionService15 = new ConversionService();
 var BaseHarmonyAlgorithm = class {
   generate(baseColor, options) {
     const includeBase = options?.includeBase ?? true;
-    const oklchColor = conversionService13.convert(baseColor, "oklch");
+    const oklchColor = conversionService15.convert(baseColor, "oklch");
     const [L, C, H] = oklchColor.components;
     const colors = [];
     if (includeBase) {
@@ -34098,7 +34630,7 @@ var BaseHarmonyAlgorithm = class {
       if (angle === 0 && includeBase) continue;
       const newHue = ((H + angle) % 360 + 360) % 360;
       const newOklch = Color.create("oklch", [L, C, newHue], baseColor.alpha);
-      const converted = conversionService13.convert(newOklch, baseColor.space);
+      const converted = conversionService15.convert(newOklch, baseColor.space);
       colors.push(converted);
     }
     return Palette.create(colors, this.type, {
@@ -34109,7 +34641,7 @@ var BaseHarmonyAlgorithm = class {
 };
 
 // src/strategies/harmony/HarmonyAlgorithms.ts
-var conversionService14 = new ConversionService();
+var conversionService16 = new ConversionService();
 var ComplementaryHarmony = class extends BaseHarmonyAlgorithm {
   type = "complementary";
   description = "Two colors opposite on the color wheel (180\xB0 apart)";
@@ -34122,18 +34654,18 @@ var AnalogousHarmony = class extends BaseHarmonyAlgorithm {
   generate(baseColor, options) {
     const angleSpread = options?.angleSpread ?? 30;
     const includeBase = options?.includeBase ?? true;
-    const oklchColor = conversionService14.convert(baseColor, "oklch");
+    const oklchColor = conversionService16.convert(baseColor, "oklch");
     const [L, C, H] = oklchColor.components;
     const colors = [];
     const leftHue = ((H - angleSpread) % 360 + 360) % 360;
     const leftOklch = Color.create("oklch", [L, C, leftHue], baseColor.alpha);
-    colors.push(conversionService14.convert(leftOklch, baseColor.space));
+    colors.push(conversionService16.convert(leftOklch, baseColor.space));
     if (includeBase) {
       colors.push(baseColor);
     }
     const rightHue = ((H + angleSpread) % 360 + 360) % 360;
     const rightOklch = Color.create("oklch", [L, C, rightHue], baseColor.alpha);
-    colors.push(conversionService14.convert(rightOklch, baseColor.space));
+    colors.push(conversionService16.convert(rightOklch, baseColor.space));
     return Palette.create(colors, this.type, {
       algorithm: this.type,
       baseColor: baseColor.toJSON(),
@@ -34169,13 +34701,13 @@ var MonochromaticHarmony = class extends BaseHarmonyAlgorithm {
     const count = options?.count ?? 5;
     const lightnessSteps = options?.lightnessSteps ?? this.generateLightnessSteps(count);
     const saturationSteps = options?.saturationSteps;
-    const oklchColor = conversionService14.convert(baseColor, "oklch");
+    const oklchColor = conversionService16.convert(baseColor, "oklch");
     const [, C, H] = oklchColor.components;
     const colors = lightnessSteps.map((lStep, i) => {
       const newL = Math.max(0, Math.min(1, lStep));
       const newC = saturationSteps?.[i] !== void 0 ? Math.max(0, Math.min(0.4, saturationSteps[i])) : C;
       const newOklch = Color.create("oklch", [newL, newC, H], baseColor.alpha);
-      return conversionService14.convert(newOklch, baseColor.space);
+      return conversionService16.convert(newOklch, baseColor.space);
     });
     return Palette.create(colors, this.type, {
       algorithm: this.type,
@@ -34222,7 +34754,7 @@ var HarmonyRegistry = class _HarmonyRegistry {
 };
 
 // src/services/PaletteService.ts
-var conversionService15 = new ConversionService();
+var conversionService17 = new ConversionService();
 var PaletteService = class {
   harmonyRegistry;
   constructor(harmonyRegistry2) {
@@ -34244,7 +34776,7 @@ var PaletteService = class {
    */
   generateScale(baseColor, options) {
     const steps = options?.steps ?? [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-    const oklchColor = conversionService15.convert(baseColor, "oklch");
+    const oklchColor = conversionService17.convert(baseColor, "oklch");
     const [, C, H] = oklchColor.components;
     const lightnessMap = {
       50: 0.97,
@@ -34277,7 +34809,7 @@ var PaletteService = class {
       const L = lightnessMap[step];
       const adjustedC = C * chromaMultiplier[step];
       const stepOklch = Color.create("oklch", [L, adjustedC, H], baseColor.alpha);
-      const stepColor = conversionService15.convert(stepOklch, baseColor.space);
+      const stepColor = conversionService17.convert(stepOklch, baseColor.space);
       resultSteps.set(step, stepColor);
     }
     return {
@@ -34291,8 +34823,8 @@ var PaletteService = class {
    */
   mixColors(color1, color2, ratio = 0.5) {
     const t = Math.max(0, Math.min(1, ratio));
-    const oklch1 = conversionService15.convert(color1, "oklch");
-    const oklch2 = conversionService15.convert(color2, "oklch");
+    const oklch1 = conversionService17.convert(color1, "oklch");
+    const oklch2 = conversionService17.convert(color2, "oklch");
     const [L1, C1, H1] = oklch1.components;
     const [L2, C2, H2] = oklch2.components;
     const L = L1 * (1 - t) + L2 * t;
@@ -34309,13 +34841,13 @@ var PaletteService = class {
     H = (H % 360 + 360) % 360;
     const alpha = color1.alpha * (1 - t) + color2.alpha * t;
     const mixed = Color.create("oklch", [L, C, H], alpha);
-    return conversionService15.convert(mixed, color1.space);
+    return conversionService17.convert(mixed, color1.space);
   }
   /**
    * Adjusts a color's properties.
    */
   adjustColor(color, adjustments) {
-    const oklch = conversionService15.convert(color, "oklch");
+    const oklch = conversionService17.convert(color, "oklch");
     let [L, C, H] = oklch.components;
     if (adjustments.lighten) {
       L = Math.min(1, L + adjustments.lighten * (1 - L));
@@ -34333,7 +34865,7 @@ var PaletteService = class {
       H = ((H + adjustments.rotate) % 360 + 360) % 360;
     }
     const adjusted = Color.create("oklch", [L, C, H], color.alpha);
-    return conversionService15.convert(adjusted, color.space);
+    return conversionService17.convert(adjusted, color.space);
   }
   /**
    * Generates a gradient between colors.
@@ -34353,7 +34885,7 @@ var PaletteService = class {
 
 // src/mcp/tools/calculate/mixColors.ts
 var paletteService = new PaletteService();
-var conversionService16 = new ConversionService();
+var conversionService18 = new ConversionService();
 var mixColorsSchema = external_exports3.object({
   color1: external_exports3.string().describe("First color"),
   color2: external_exports3.string().describe("Second color"),
@@ -34364,10 +34896,10 @@ async function mixColors(input) {
   const color1 = parseColor(input.color1);
   const color2 = parseColor(input.color2);
   const mixed = paletteService.mixColors(color1, color2, input.ratio);
-  const mixedSrgb = conversionService16.convert(mixed, "srgb");
+  const mixedSrgb = conversionService18.convert(mixed, "srgb");
   const [r, g, b] = mixedSrgb.toRgbArray();
-  const srgb1 = conversionService16.convert(color1, "srgb");
-  const srgb2 = conversionService16.convert(color2, "srgb");
+  const srgb1 = conversionService18.convert(color1, "srgb");
+  const srgb2 = conversionService18.convert(color2, "srgb");
   const result = {
     color1: {
       input: input.color1,
@@ -34387,7 +34919,7 @@ async function mixColors(input) {
   if (input.steps) {
     const gradientColors = paletteService.generateGradient(color1, color2, input.steps);
     result["gradient"] = gradientColors.map((c, i) => {
-      const srgb = conversionService16.convert(c, "srgb");
+      const srgb = conversionService18.convert(c, "srgb");
       return {
         step: i,
         position: Math.round(i / (input.steps - 1) * 100),
@@ -34400,7 +34932,7 @@ async function mixColors(input) {
 
 // src/mcp/tools/calculate/adjustColor.ts
 var paletteService2 = new PaletteService();
-var conversionService17 = new ConversionService();
+var conversionService19 = new ConversionService();
 var adjustColorSchema = external_exports3.object({
   color: external_exports3.string().describe("Color to adjust"),
   lighten: external_exports3.number().min(0).max(1).optional().describe("Amount to lighten (0-1)"),
@@ -34418,10 +34950,10 @@ async function adjustColor(input) {
     desaturate: input.desaturate,
     rotate: input.rotate
   });
-  const originalSrgb = conversionService17.convert(color, "srgb");
-  const adjustedSrgb = conversionService17.convert(adjusted, "srgb");
-  const originalOklch = conversionService17.convert(color, "oklch");
-  const adjustedOklch = conversionService17.convert(adjusted, "oklch");
+  const originalSrgb = conversionService19.convert(color, "srgb");
+  const adjustedSrgb = conversionService19.convert(adjusted, "srgb");
+  const originalOklch = conversionService19.convert(color, "oklch");
+  const adjustedOklch = conversionService19.convert(adjusted, "oklch");
   const [origL, origC, origH] = originalOklch.components;
   const [adjL, adjC, adjH] = adjustedOklch.components;
   const adjustments = [];
@@ -34457,210 +34989,8 @@ async function adjustColor(input) {
   };
 }
 
-// src/services/APCAService.ts
-var conversionService18 = new ConversionService();
-var APCA_COEFFICIENTS = {
-  R: 0.2126729,
-  G: 0.7151522,
-  B: 0.072175
-};
-var SOFT_CLAMP = {
-  THRESHOLD: 0.022,
-  EXPONENT: 1.414
-};
-var POWER_CURVES = {
-  NORMAL: { BG: 0.56, TEXT: 0.57 },
-  REVERSE: { BG: 0.65, TEXT: 0.62 },
-  SCALE: 1.14
-};
-var OUTPUT_CLAMP = {
-  THRESHOLD: 0.1,
-  OFFSET: 0.027
-};
-var APCA_THRESHOLDS = {
-  BODY_TEXT: 75,
-  LARGE_TEXT: 60,
-  NON_TEXT: 45,
-  SPOT_TEXT: 30,
-  NON_CONTENT: 15
-};
-var DEFAULT_TARGET_LC = 75;
-var MAX_BINARY_SEARCH_ITERATIONS = 25;
-var APCAService = class {
-  /**
-   * Calculates the APCA luminance (Y) for a color.
-   * Linearizes sRGB components and applies the APCA luminance coefficients.
-   */
-  calculateY(color) {
-    const srgbColor = conversionService18.convert(color, "srgb");
-    const [r, g, b] = srgbColor.components;
-    const rLin = srgbToLinear(r);
-    const gLin = srgbToLinear(g);
-    const bLin = srgbToLinear(b);
-    return APCA_COEFFICIENTS.R * rLin + APCA_COEFFICIENTS.G * gLin + APCA_COEFFICIENTS.B * bLin;
-  }
-  /**
-   * Applies the APCA soft-clamp pre-processing to a Y (luminance) value.
-   * Negative values are floored to zero. Values below the soft-clamp threshold
-   * are boosted by a power-curve offset to prevent artifacts in the SAPC calculation.
-   */
-  softClampY(y) {
-    if (y < 0) {
-      return 0;
-    }
-    if (y > SOFT_CLAMP.THRESHOLD) {
-      return y;
-    }
-    return y + Math.pow(SOFT_CLAMP.THRESHOLD - y, SOFT_CLAMP.EXPONENT);
-  }
-  /**
-   * Produces a human-readable interpretation string for a given absolute Lc value.
-   */
-  interpretLc(absLc) {
-    if (absLc >= 90) {
-      return "Preferred for body text";
-    }
-    if (absLc >= APCA_THRESHOLDS.BODY_TEXT) {
-      return "Minimum for body text";
-    }
-    if (absLc >= APCA_THRESHOLDS.LARGE_TEXT) {
-      return "Minimum for large text (24px+)";
-    }
-    if (absLc >= APCA_THRESHOLDS.NON_TEXT) {
-      return "Minimum for non-text elements and large bold text";
-    }
-    if (absLc >= APCA_THRESHOLDS.SPOT_TEXT) {
-      return "Minimum for spot text and placeholders";
-    }
-    if (absLc >= APCA_THRESHOLDS.NON_CONTENT) {
-      return "Minimum for non-content borders and dividers only";
-    }
-    return "Not suitable for any visible content";
-  }
-  /**
-   * Calculates the APCA lightness contrast (Lc) between a text color and background color.
-   *
-   * The algorithm:
-   * 1. Converts both colors to sRGB, linearizes, and computes luminance (Y).
-   * 2. Applies soft-clamp pre-processing to both Y values.
-   * 3. Determines polarity (normal = dark-on-light, reverse = light-on-dark).
-   * 4. Applies asymmetric power curves to compute raw SAPC.
-   * 5. Applies output clamp and scales to the 0-100+ Lc range.
-   *
-   * @param textColor - The foreground/text color
-   * @param backgroundColor - The background color
-   * @returns Full APCA result with Lc, polarity, and threshold compliance
-   */
-  calculateAPCA(textColor, backgroundColor) {
-    const yTextRaw = this.calculateY(textColor);
-    const yBgRaw = this.calculateY(backgroundColor);
-    const yText = this.softClampY(yTextRaw);
-    const yBg = this.softClampY(yBgRaw);
-    let sapc;
-    let polarity;
-    if (yBg > yText) {
-      polarity = "normal";
-      sapc = (Math.pow(yBg, POWER_CURVES.NORMAL.BG) - Math.pow(yText, POWER_CURVES.NORMAL.TEXT)) * POWER_CURVES.SCALE;
-    } else {
-      polarity = "reverse";
-      sapc = (Math.pow(yBg, POWER_CURVES.REVERSE.BG) - Math.pow(yText, POWER_CURVES.REVERSE.TEXT)) * POWER_CURVES.SCALE;
-    }
-    let lc;
-    if (Math.abs(sapc) < OUTPUT_CLAMP.THRESHOLD) {
-      lc = 0;
-    } else if (sapc > 0) {
-      lc = sapc - OUTPUT_CLAMP.OFFSET;
-    } else {
-      lc = sapc + OUTPUT_CLAMP.OFFSET;
-    }
-    lc = lc * 100;
-    const absLc = Math.abs(lc);
-    return {
-      Lc: lc,
-      absLc,
-      polarity,
-      textLuminance: yText,
-      backgroundLuminance: yBg,
-      interpretation: this.interpretLc(absLc),
-      meetsMinimum: {
-        bodyText: absLc >= APCA_THRESHOLDS.BODY_TEXT,
-        largeText: absLc >= APCA_THRESHOLDS.LARGE_TEXT,
-        nonText: absLc >= APCA_THRESHOLDS.NON_TEXT,
-        spotText: absLc >= APCA_THRESHOLDS.SPOT_TEXT
-      }
-    };
-  }
-  /**
-   * Suggests either black or white text for the given background,
-   * choosing whichever yields a higher absolute Lc value.
-   *
-   * @param backgroundColor - The background color to evaluate against
-   * @param targetLc - Optional minimum Lc target (informational; the method
-   *   always returns the better of black or white regardless)
-   * @returns Black (#000000) or white (#FFFFFF)
-   */
-  suggestTextColor(backgroundColor, _targetLc) {
-    const black = Color.fromHex("#000000");
-    const white = Color.fromHex("#FFFFFF");
-    const blackResult = this.calculateAPCA(black, backgroundColor);
-    const whiteResult = this.calculateAPCA(white, backgroundColor);
-    if (whiteResult.absLc >= blackResult.absLc) {
-      return white;
-    }
-    return black;
-  }
-  /**
-   * Adjusts a text color's lightness to meet a target APCA Lc value
-   * against the given background. Uses binary search in Oklch lightness space
-   * for perceptually uniform adjustments.
-   *
-   * If the text color already meets the target, it is returned unchanged.
-   * The search direction (lighter or darker) is determined by the background
-   * luminance: for dark backgrounds the text is lightened, for light backgrounds
-   * it is darkened.
-   *
-   * @param textColor - The text color to adjust
-   * @param backgroundColor - The background to measure against
-   * @param targetLc - The desired absolute Lc value (default: 75, minimum for body text)
-   * @returns An adjusted color in the same color space as the input text color
-   */
-  adjustForAPCA(textColor, backgroundColor, targetLc = DEFAULT_TARGET_LC) {
-    const currentResult = this.calculateAPCA(textColor, backgroundColor);
-    if (currentResult.absLc >= targetLc) {
-      return textColor;
-    }
-    const oklchColor = conversionService18.convert(textColor, "oklch");
-    const bgY = this.calculateY(backgroundColor);
-    const [, chroma, hue] = oklchColor.components;
-    const shouldLighten = bgY < 0.5;
-    let low = shouldLighten ? oklchColor.components[0] : 0;
-    let high = shouldLighten ? 1 : oklchColor.components[0];
-    for (let i = 0; i < MAX_BINARY_SEARCH_ITERATIONS; i++) {
-      const mid = (low + high) / 2;
-      const candidate = Color.create("oklch", [mid, chroma, hue], textColor.alpha);
-      const candidateResult = this.calculateAPCA(candidate, backgroundColor);
-      if (candidateResult.absLc >= targetLc) {
-        if (shouldLighten) {
-          high = mid;
-        } else {
-          low = mid;
-        }
-      } else {
-        if (shouldLighten) {
-          low = mid;
-        } else {
-          high = mid;
-        }
-      }
-    }
-    const finalLightness = (low + high) / 2;
-    const adjustedOklch = Color.create("oklch", [finalLightness, chroma, hue], textColor.alpha);
-    return conversionService18.convert(adjustedOklch, textColor.space);
-  }
-};
-
 // src/mcp/tools/calculate/calculateAPCA.ts
-var apcaService = new APCAService();
+var apcaService2 = new APCAService();
 var calculateAPCASchema = external_exports3.object({
   textColor: external_exports3.string().describe("Text/foreground color"),
   backgroundColor: external_exports3.string().describe("Background color")
@@ -34668,7 +34998,7 @@ var calculateAPCASchema = external_exports3.object({
 async function calculateAPCA(input) {
   const text = parseColor(input.textColor);
   const bg = parseColor(input.backgroundColor);
-  const result = apcaService.calculateAPCA(text, bg);
+  const result = apcaService2.calculateAPCA(text, bg);
   return {
     textColor: input.textColor,
     backgroundColor: input.backgroundColor,
@@ -34681,189 +35011,18 @@ async function calculateAPCA(input) {
   };
 }
 
-// src/services/TemperatureService.ts
-var conversionService19 = new ConversionService();
-var MIN_KELVIN = 1e3;
-var MAX_KELVIN = 4e4;
-var TEMPERATURE_BANDS = [
-  { maxKelvin: 2e3, description: "Candlelight", category: "warm" },
-  { maxKelvin: 3e3, description: "Warm white (tungsten-like)", category: "warm" },
-  { maxKelvin: 4e3, description: "Warm white (halogen)", category: "warm" },
-  { maxKelvin: 5e3, description: "Neutral white (fluorescent)", category: "neutral" },
-  { maxKelvin: 6e3, description: "Daylight (noon sun)", category: "daylight" },
-  { maxKelvin: 7500, description: "Cool daylight (overcast)", category: "cool" },
-  { maxKelvin: 1e4, description: "Blue sky", category: "cool" },
-  { maxKelvin: Infinity, description: "Deep blue sky", category: "cool" }
-];
-var TemperatureService = class {
-  /**
-   * Converts a Kelvin color temperature to its corresponding sRGB color.
-   *
-   * Uses the Tanner Helland algorithm, a fast polynomial/logarithmic
-   * approximation of the Planckian (blackbody) radiation spectrum.
-   *
-   * @param kelvin - Color temperature in Kelvin (clamped to 1000-40000)
-   * @returns TemperatureInfo with the hex color, RGB components, and description
-   */
-  kelvinToColor(kelvin) {
-    const clampedKelvin = Math.max(MIN_KELVIN, Math.min(MAX_KELVIN, kelvin));
-    const temp = clampedKelvin / 100;
-    let r;
-    let g;
-    let b;
-    if (temp <= 66) {
-      r = 255;
-      g = 99.4708025861 * Math.log(temp) - 161.1195681661;
-      b = temp <= 19 ? 0 : 138.5177312231 * Math.log(temp - 10) - 305.0447927307;
-    } else {
-      r = 329.698727446 * Math.pow(temp - 60, -0.1332047592);
-      g = 288.1221695283 * Math.pow(temp - 60, -0.0755148492);
-      b = 255;
-    }
-    r = Math.max(0, Math.min(255, r));
-    g = Math.max(0, Math.min(255, g));
-    b = Math.max(0, Math.min(255, b));
-    const rInt = Math.round(r);
-    const gInt = Math.round(g);
-    const bInt = Math.round(b);
-    const color = Color.create("srgb", [r / 255, g / 255, b / 255], 1);
-    const clamped = conversionService19.clampToGamut(color);
-    const hex3 = clamped.toHex();
-    const { description, category } = this.describeTemperature(clampedKelvin);
-    return {
-      kelvin: clampedKelvin,
-      color: { hex: hex3, rgb: { r: rInt, g: gInt, b: bInt } },
-      description,
-      category
-    };
-  }
-  /**
-   * Estimates the correlated color temperature (CCT) of a color.
-   *
-   * Converts the color to CIE XYZ-D65, derives xy chromaticity,
-   * then applies McCamy's cubic approximation formula for CCT.
-   *
-   * Planckian locus proximity is checked in CIE 1960 uv space:
-   * a deltaUV below 0.02 indicates the color is close to a
-   * blackbody radiator.
-   *
-   * @param color - Any Color instance
-   * @returns ColorTemperatureResult with estimated Kelvin, chromaticity, and classification
-   */
-  colorToTemperature(color) {
-    const xyz = conversionService19.convert(color, "xyz-d65");
-    const [X, Y, Z] = xyz.components;
-    const sum = X + Y + Z;
-    if (sum === 0) {
-      return {
-        estimatedKelvin: 0,
-        chromaticity: { x: 0, y: 0 },
-        isOnPlanckianLocus: false,
-        description: "No measurable color temperature (black)",
-        category: "neutral"
-      };
-    }
-    const x = X / sum;
-    const y = Y / sum;
-    const n = (x - 0.332) / (0.1858 - y);
-    const cct = 449 * Math.pow(n, 3) + 3525 * Math.pow(n, 2) + 6823.3 * n + 5520.33;
-    const isOnLocus = this.isNearPlanckianLocus(x, y, cct);
-    const reportedKelvin = Math.round(Math.max(MIN_KELVIN, Math.min(MAX_KELVIN, cct)));
-    const { description, category } = this.describeTemperature(reportedKelvin);
-    return {
-      estimatedKelvin: reportedKelvin,
-      chromaticity: { x, y },
-      isOnPlanckianLocus: isOnLocus,
-      description,
-      category
-    };
-  }
-  /**
-   * Generates a series of TemperatureInfo samples between two Kelvin values.
-   *
-   * @param startKelvin - Starting temperature (inclusive)
-   * @param endKelvin - Ending temperature (inclusive)
-   * @param steps - Number of evenly-spaced samples (minimum 2)
-   * @returns Array of TemperatureInfo from startKelvin to endKelvin
-   */
-  generateTemperatureGradient(startKelvin, endKelvin, steps) {
-    if (steps < 2) {
-      throw new Error("Temperature gradient must have at least 2 steps");
-    }
-    const results = [];
-    for (let i = 0; i < steps; i++) {
-      const t = i / (steps - 1);
-      const kelvin = startKelvin + (endKelvin - startKelvin) * t;
-      results.push(this.kelvinToColor(kelvin));
-    }
-    return results;
-  }
-  /**
-   * Returns a human-readable description and category for a Kelvin value.
-   */
-  describeTemperature(kelvin) {
-    for (const band of TEMPERATURE_BANDS) {
-      if (kelvin < band.maxKelvin) {
-        return { description: band.description, category: band.category };
-      }
-    }
-    const last = TEMPERATURE_BANDS[TEMPERATURE_BANDS.length - 1];
-    return { description: last.description, category: last.category };
-  }
-  /**
-   * Checks whether a chromaticity coordinate (in CIE xy) lies near the
-   * Planckian locus by comparing it against the expected blackbody
-   * chromaticity at the given CCT in CIE 1960 uv space.
-   *
-   * The threshold is deltaUV < 0.02, which is the standard tolerance
-   * used in lighting engineering for "on-locus" determination.
-   *
-   * @param x - CIE x chromaticity of the test color
-   * @param y - CIE y chromaticity of the test color
-   * @param cct - Estimated correlated color temperature
-   * @returns True if the color is within 0.02 deltaUV of the Planckian locus
-   */
-  isNearPlanckianLocus(x, y, cct) {
-    const denominator = -2 * x + 12 * y + 3;
-    if (denominator === 0) {
-      return false;
-    }
-    const uTest = 4 * x / denominator;
-    const vTest = 6 * y / denominator;
-    const planckianUV = this.planckianLocusUV(cct);
-    const du = uTest - planckianUV.u;
-    const dv = vTest - planckianUV.v;
-    const deltaUV = Math.sqrt(du * du + dv * dv);
-    return deltaUV < 0.02;
-  }
-  /**
-   * Approximates the CIE 1960 uv coordinates on the Planckian locus
-   * at a given color temperature using Krystek's rational polynomial
-   * approximation. Accurate to ~1e-5 for 1000K-15000K; reasonable
-   * extrapolation beyond that range.
-   */
-  planckianLocusUV(kelvin) {
-    const T = kelvin;
-    const T2 = T * T;
-    const u = (0.860117757 + 154118254e-12 * T + 128641212e-15 * T2) / (1 + 842420235e-12 * T + 708145163e-15 * T2);
-    const v = (0.317398726 + 422806245e-13 * T + 420481691e-16 * T2) / (1 - 289741816e-13 * T + 161456053e-15 * T2);
-    return { u, v };
-  }
-};
-
 // src/mcp/tools/calculate/calculateTemperature.ts
-var temperatureService = new TemperatureService();
+var temperatureService2 = new TemperatureService();
 var calculateTemperatureSchema = external_exports3.object({
   color: external_exports3.string().optional().describe("A color to estimate the correlated color temperature of"),
   kelvin: external_exports3.number().optional().describe("A Kelvin value to convert to its corresponding sRGB color")
-}).refine(
-  (data) => data.color !== void 0 || data.kelvin !== void 0,
-  { message: 'At least one of "color" or "kelvin" must be provided' }
-);
+}).refine((data) => data.color !== void 0 || data.kelvin !== void 0, {
+  message: 'At least one of "color" or "kelvin" must be provided'
+});
 async function calculateTemperature(input) {
   const result = {};
   if (input.kelvin !== void 0) {
-    const kelvinResult = temperatureService.kelvinToColor(input.kelvin);
+    const kelvinResult = temperatureService2.kelvinToColor(input.kelvin);
     result.kelvinToColor = {
       inputKelvin: input.kelvin,
       kelvin: kelvinResult.kelvin,
@@ -34874,7 +35033,7 @@ async function calculateTemperature(input) {
   }
   if (input.color !== void 0) {
     const parsedColor = parseColor(input.color);
-    const tempResult = temperatureService.colorToTemperature(parsedColor);
+    const tempResult = temperatureService2.colorToTemperature(parsedColor);
     result.colorToTemperature = {
       inputColor: input.color,
       estimatedKelvin: tempResult.estimatedKelvin,
@@ -35245,10 +35404,12 @@ async function generateScale(input) {
 // src/mcp/tools/generate/generateDesignTokens.ts
 var conversionService25 = new ConversionService();
 var generateDesignTokensSchema = external_exports3.object({
-  colors: external_exports3.array(external_exports3.object({
-    name: external_exports3.string().describe('Token name, e.g., "primary-500"'),
-    value: external_exports3.string().describe("Color value as hex or CSS name")
-  })).describe("Colors to include as design tokens"),
+  colors: external_exports3.array(
+    external_exports3.object({
+      name: external_exports3.string().describe('Token name, e.g., "primary-500"'),
+      value: external_exports3.string().describe("Color value as hex or CSS name")
+    })
+  ).describe("Colors to include as design tokens"),
   prefix: external_exports3.string().optional().default("color").describe("Token name prefix"),
   format: external_exports3.enum(["w3c", "css-variables", "tailwind"]).optional().default("w3c").describe("Output format")
 });
@@ -35289,9 +35450,7 @@ function buildW3CTokens(colors, prefix) {
   };
 }
 function buildCSSVariables(colors, prefix) {
-  const lines = colors.map(
-    (color) => `  --${prefix}-${color.name}: ${color.hex};`
-  );
+  const lines = colors.map((color) => `  --${prefix}-${color.name}: ${color.hex};`);
   const css = `:root {
 ${lines.join("\n")}
 }`;
@@ -35885,7 +36044,7 @@ var CVDSimulatorRegistry = class _CVDSimulatorRegistry {
 
 // src/mcp/tools/generate/generateAccessibleReport.ts
 var contrastService5 = new ContrastService();
-var apcaService2 = new APCAService();
+var apcaService3 = new APCAService();
 var conversionService28 = new ConversionService();
 var cvdRegistry = CVDSimulatorRegistry.createDefault();
 var deltaERegistry3 = DeltaERegistry.createDefault();
@@ -35934,7 +36093,7 @@ async function generateAccessibleReport(input) {
       }
     };
     if (includeAPCA) {
-      const apcaResult = apcaService2.calculateAPCA(color, bgClamped);
+      const apcaResult = apcaService3.calculateAPCA(color, bgClamped);
       if (apcaResult.meetsMinimum.bodyText) {
         apcaBodyTextPassCount++;
       }
@@ -36208,9 +36367,9 @@ async function validateGamut(input) {
     gamutInfo: {
       srgb: "Standard web RGB color space",
       "display-p3": "25% larger than sRGB, used by Apple devices",
-      "rec2020": "HDR/UHD color space, much wider than Display P3",
+      rec2020: "HDR/UHD color space, much wider than Display P3",
       "prophoto-rgb": "Very wide gamut for photography",
-      "acescg": "Scene-referred, used in film/VFX",
+      acescg: "Scene-referred, used in film/VFX",
       "linear-srgb": "Linear light sRGB (no gamma)"
     }
   };
@@ -36431,7 +36590,7 @@ function getHarmonyDescription(type) {
 
 // src/mcp/resources/index.ts
 var cssColors = new NamedColorsRepository();
-var xkcdColors = new NamedColorsRepository({ includeXkcd: true });
+var xkcdColors2 = new NamedColorsRepository({ includeXkcd: true });
 var culturalMeanings2 = new CulturalMeaningsRepository();
 function registerResources(server2) {
   server2.resource(
@@ -36447,11 +36606,13 @@ function registerResources(server2) {
         hex: c.hex
       }));
       return {
-        contents: [{
-          uri: "color://named-colors/css",
-          text: JSON.stringify({ count: colors.length, colors }, null, 2),
-          mimeType: "application/json"
-        }]
+        contents: [
+          {
+            uri: "color://named-colors/css",
+            text: JSON.stringify({ count: colors.length, colors }, null, 2),
+            mimeType: "application/json"
+          }
+        ]
       };
     }
   );
@@ -36463,17 +36624,19 @@ function registerResources(server2) {
       mimeType: "application/json"
     },
     async () => {
-      const colors = xkcdColors.listAll().map((c) => ({
+      const colors = xkcdColors2.listAll().map((c) => ({
         name: c.name,
         hex: c.hex,
         source: c.source
       }));
       return {
-        contents: [{
-          uri: "color://named-colors/xkcd",
-          text: JSON.stringify({ count: colors.length, colors }, null, 2),
-          mimeType: "application/json"
-        }]
+        contents: [
+          {
+            uri: "color://named-colors/xkcd",
+            text: JSON.stringify({ count: colors.length, colors }, null, 2),
+            mimeType: "application/json"
+          }
+        ]
       };
     }
   );
@@ -36495,11 +36658,13 @@ function registerResources(server2) {
         };
       });
       return {
-        contents: [{
-          uri: "color://color-spaces",
-          text: JSON.stringify({ count: spaces.length, spaces }, null, 2),
-          mimeType: "application/json"
-        }]
+        contents: [
+          {
+            uri: "color://color-spaces",
+            text: JSON.stringify({ count: spaces.length, spaces }, null, 2),
+            mimeType: "application/json"
+          }
+        ]
       };
     }
   );
@@ -36517,11 +36682,29 @@ function registerResources(server2) {
         meanings: culturalMeanings2.getByColor(name)
       }));
       return {
-        contents: [{
-          uri: "color://cultural-meanings",
-          text: JSON.stringify({ count: colors.length, regions: ["western", "eastAsian", "southAsian", "middleEastern", "african", "latinAmerican", "indigenous"], colors: data }, null, 2),
-          mimeType: "application/json"
-        }]
+        contents: [
+          {
+            uri: "color://cultural-meanings",
+            text: JSON.stringify(
+              {
+                count: colors.length,
+                regions: [
+                  "western",
+                  "eastAsian",
+                  "southAsian",
+                  "middleEastern",
+                  "african",
+                  "latinAmerican",
+                  "indigenous"
+                ],
+                colors: data
+              },
+              null,
+              2
+            ),
+            mimeType: "application/json"
+          }
+        ]
       };
     }
   );
@@ -36534,11 +36717,12 @@ function registerPrompts(server2) {
     "Generate a complete design system color palette from a brand color",
     { brandColor: external_exports3.string().describe("Primary brand color (hex or CSS name)") },
     async ({ brandColor }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `Create a complete design system color palette based on the brand color "${brandColor}".
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Create a complete design system color palette based on the brand color "${brandColor}".
 
 Use these tools in sequence:
 1. **get-color-info** on "${brandColor}" to understand the base color
@@ -36553,8 +36737,9 @@ Present the results as a structured design system with:
 - Light and dark theme variants
 - Accessibility validation for all foreground/background combinations
 - Exportable design tokens`
+          }
         }
-      }]
+      ]
     })
   );
   server2.prompt(
@@ -36565,11 +36750,12 @@ Present the results as a structured design system with:
       background: external_exports3.string().optional().default("#ffffff").describe("Background color")
     },
     async ({ colors, background }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `Perform a comprehensive accessibility audit on these colors: ${colors}
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Perform a comprehensive accessibility audit on these colors: ${colors}
 Against background: ${background}
 
 Use these tools:
@@ -36584,8 +36770,9 @@ Report:
 - How colors appear under each color vision deficiency
 - Whether all colors are sufficiently distinguishable (Delta-E > 10)
 - Specific recommendations for any failing colors`
+          }
         }
-      }]
+      ]
     })
   );
   server2.prompt(
@@ -36595,11 +36782,12 @@ Report:
       scenario: external_exports3.string().optional().default("interior-design").describe("Scenario: interior-design, photography, web-design")
     },
     async ({ scenario }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `Help me understand and work with color temperature for ${scenario}.
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Help me understand and work with color temperature for ${scenario}.
 
 Use these tools:
 1. **calculate-temperature** with kelvin values for common light sources:
@@ -36615,8 +36803,9 @@ Explain how color temperature affects:
 - ${scenario === "interior-design" ? "Room mood and paint color selection" : ""}
 - ${scenario === "photography" ? "White balance and color grading" : ""}
 - ${scenario === "web-design" ? "Screen calibration and design for different displays" : ""}`
+          }
         }
-      }]
+      ]
     })
   );
   server2.prompt(
@@ -36627,11 +36816,12 @@ Explain how color temperature affects:
       purpose: external_exports3.string().optional().default("general").describe("Purpose: general, business, wedding, mourning")
     },
     async ({ colors, purpose }) => ({
-      messages: [{
-        role: "user",
-        content: {
-          type: "text",
-          text: `Analyze the cultural meanings of these colors: ${colors}
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Analyze the cultural meanings of these colors: ${colors}
 Purpose: ${purpose}
 
 Use these tools:
@@ -36643,8 +36833,9 @@ Create a cross-cultural comparison matrix showing:
 - Potential cultural conflicts or sensitivities
 - Recommendations for global-safe color choices
 - Alternative colors where cultural conflicts exist`
+          }
         }
-      }]
+      ]
     })
   );
 }
