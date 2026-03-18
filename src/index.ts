@@ -1,5 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
 // Query tools
 import {
@@ -45,7 +49,7 @@ import {
 
 const server = new McpServer({
   name: 'color-theory-mcp',
-  version: '1.0.0',
+  version: pkg.version,
 });
 
 // ============================================

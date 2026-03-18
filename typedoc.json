@@ -1,0 +1,55 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/api",
+  "readme": "README.md",
+  "name": "Color Theory MCP Server",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "exclude": ["**/*.test.ts", "**/*.spec.ts", "**/node_modules/**"],
+  "plugin": [],
+  "theme": "default",
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true
+  },
+  "categorizeByGroup": true,
+  "sort": ["source-order", "alphabetical"],
+  "kindSortOrder": [
+    "Module",
+    "Namespace",
+    "Enum",
+    "EnumMember",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Variable",
+    "Function",
+    "Accessor",
+    "Method",
+    "Parameter",
+    "TypeParameter",
+    "Reference"
+  ],
+  "visibilityFilters": {
+    "protected": true,
+    "inherited": true,
+    "external": false
+  },
+  "searchInComments": true,
+  "cleanOutputDir": true,
+  "skipErrorChecking": false,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "treatWarningsAsErrors": false,
+  "sourceLinkTemplate": "https://github.com/joshuahale/color-theory-mcp/blob/master/{path}#L{line}"
+}

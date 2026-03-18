@@ -1,8 +1,7 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Build output (dist/ is tracked — needed for Claude Code plugin to work from cache)
 
 # IDE
 .idea/
@@ -24,3 +23,9 @@ coverage/
 # Environment
 .env
 .env.local
+
+# Generated documentation
+docs/api/
+
+# Claude Code local config
+.claude/

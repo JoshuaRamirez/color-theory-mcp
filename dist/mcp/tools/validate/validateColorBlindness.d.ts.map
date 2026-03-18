@@ -1,0 +1,1 @@
+{"version":3,"file":"validateColorBlindness.d.ts","sourceRoot":"","sources":["../../../../src/mcp/tools/validate/validateColorBlindness.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,CAAC,EAAE,MAAM,KAAK,CAAC;AAYxB,eAAO,MAAM,4BAA4B;;;;;;;;;;;;;iBAMvC,CAAC;AAEH,MAAM,MAAM,2BAA2B,GAAG,CAAC,CAAC,KAAK,CAAC,OAAO,4BAA4B,CAAC,CAAC;AAEvF,wBAAsB,sBAAsB,CAAC,KAAK,EAAE,2BAA2B;;;;;;;;;GAiF9E"}

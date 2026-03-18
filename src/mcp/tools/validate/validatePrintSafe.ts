@@ -52,7 +52,7 @@ export async function validatePrintSafe(input: ValidatePrintSafeInput) {
 
   // Neon/fluorescent colors
   const hsl = conversionService.convert(color, 'hsl');
-  const [h, s, l] = hsl.components as [number, number, number];
+  const [_h, s, l] = hsl.components as [number, number, number];
   if (s > 0.9 && l > 0.5) {
     warnings.push('Highly saturated bright colors may appear duller in print than on screen');
   }

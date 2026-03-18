@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { parseColor } from '../parseColor.js';
-import { HarmonyTypeSchema } from '../schemas.js';
 import { PaletteService } from '../../../services/PaletteService.js';
 import { ConversionService } from '../../../services/ConversionService.js';
 import type { HarmonyType } from '../../../domain/interfaces/IHarmonyAlgorithm.js';
@@ -121,7 +120,7 @@ export async function generatePalette(input: GeneratePaletteInput) {
   };
 }
 
-function getRoleForIndex(index: number, total: number): string {
+function getRoleForIndex(index: number, _total: number): string {
   if (index === 0) return 'primary';
   if (index === 1) return 'secondary';
   if (index === 2) return 'accent';

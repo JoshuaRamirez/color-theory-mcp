@@ -1,4 +1,5 @@
 import type { ICVDSimulator, CVDInfo, CVDType, CVDSimulationOptions } from '../../domain/interfaces/ICVDSimulator.js';
+import type { Matrix3x3 } from '../../domain/values/Matrix3x3.js';
 import { Color } from '../../domain/values/Color.js';
 import { ConversionService } from '../../services/ConversionService.js';
 import { removeGamma, applyGamma } from '../../color-spaces/gamma.js';
@@ -17,7 +18,7 @@ const conversionService = new ConversionService();
 abstract class MachadoCVDSimulator implements ICVDSimulator {
   abstract readonly type: CVDType;
   abstract readonly info: CVDInfo;
-  protected abstract readonly matrices: Record<number, import('../../domain/values/Matrix3x3.js').Matrix3x3>;
+  protected abstract readonly matrices: Record<number, Matrix3x3>;
 
   simulate(color: Color, options?: CVDSimulationOptions): Color {
     const severity = options?.severity ?? 1.0;

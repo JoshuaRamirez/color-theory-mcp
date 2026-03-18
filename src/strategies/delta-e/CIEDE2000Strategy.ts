@@ -1,5 +1,5 @@
 import type { IDeltaEStrategy, DeltaEInterpretation, DeltaEOptions } from '../../domain/interfaces/IDeltaEStrategy.js';
-import { Color } from '../../domain/values/Color.js';
+import type { Color } from '../../domain/values/Color.js';
 import { ConversionService } from '../../services/ConversionService.js';
 
 const conversionService = new ConversionService();

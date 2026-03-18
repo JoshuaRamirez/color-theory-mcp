@@ -1,5 +1,5 @@
 import type { IColorSpaceRegistry } from '../domain/interfaces/IColorSpace.js';
-import { Color } from '../domain/values/Color.js';
+import type { Color } from '../domain/values/Color.js';
 import type { ColorSpaceType } from '../domain/values/ColorSpaceType.js';
 import { ColorSpaceRegistry } from '../color-spaces/ColorSpaceRegistry.js';
 

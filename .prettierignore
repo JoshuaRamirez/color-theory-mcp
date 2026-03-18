@@ -1,0 +1,21 @@
+# Build output
+dist/
+
+# Test coverage
+coverage/
+
+# Dependencies
+node_modules/
+
+# Package manager
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

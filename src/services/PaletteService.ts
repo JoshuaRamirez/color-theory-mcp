@@ -1,6 +1,6 @@
 import type { HarmonyType, HarmonyOptions } from '../domain/interfaces/IHarmonyAlgorithm.js';
 import { Color } from '../domain/values/Color.js';
-import { Palette } from '../domain/values/Palette.js';
+import type { Palette } from '../domain/values/Palette.js';
 import { ConversionService } from './ConversionService.js';
 import { HarmonyRegistry } from '../strategies/harmony/HarmonyRegistry.js';
 

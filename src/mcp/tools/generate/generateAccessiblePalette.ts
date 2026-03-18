@@ -3,7 +3,6 @@ import { parseColor } from '../parseColor.js';
 import { WCAGLevelSchema } from '../schemas.js';
 import { ContrastService, type WCAGLevel } from '../../../services/ContrastService.js';
 import { ConversionService } from '../../../services/ConversionService.js';
-import { Color } from '../../../domain/values/Color.js';
 
 const contrastService = new ContrastService();
 const conversionService = new ConversionService();

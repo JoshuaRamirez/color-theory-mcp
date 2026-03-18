@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/joshuahale/color-theory-mcp#readme
+    about: Check the README for usage instructions and tool documentation
+  - name: MCP Protocol Documentation
+    url: https://modelcontextprotocol.io/docs
+    about: Learn more about the Model Context Protocol
+  - name: W3C CSS Color 4 Specification
+    url: https://www.w3.org/TR/css-color-4/
+    about: Reference for color space definitions and conversions
+  - name: WCAG Accessibility Guidelines
+    url: https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html
+    about: Learn about WCAG contrast requirements

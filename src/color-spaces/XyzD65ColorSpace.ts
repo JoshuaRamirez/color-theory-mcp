@@ -1,5 +1,5 @@
 import type { IColorSpace } from '../domain/interfaces/IColorSpace.js';
-import { Color } from '../domain/values/Color.js';
+import type { Color } from '../domain/values/Color.js';
 
 /**
  * CIE XYZ color space with D65 illuminant.

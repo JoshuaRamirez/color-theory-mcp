@@ -1,5 +1,4 @@
-import type { ColorSpaceType } from './ColorSpaceType.js';
-import { COLOR_SPACE_COMPONENTS } from './ColorSpaceType.js';
+import { type ColorSpaceType, COLOR_SPACE_COMPONENTS } from './ColorSpaceType.js';
 
 /**
  * Immutable color value object.

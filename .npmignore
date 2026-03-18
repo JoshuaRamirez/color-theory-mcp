@@ -1,0 +1,12 @@
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+typedoc.json
+vitest.config.ts
+.github/
+.vscode/
+coverage/
+docs/
+*.log
+.env*
