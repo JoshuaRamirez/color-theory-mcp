@@ -2,7 +2,7 @@
   "name": "color-theory-mcp",
   "displayName": "Color Theory MCP",
   "description": "24 MCP tools for color space conversions, harmony generation, accessibility validation, and cultural meaning lookup.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Joshua Ramirez"
   }

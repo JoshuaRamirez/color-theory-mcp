@@ -1,15 +1,9 @@
 {
   "name": "color-theory-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "24 MCP tools for color space conversions, harmony generation, accessibility validation, and cultural meaning lookup.",
   "author": {
     "name": "Joshua Ramirez"
   },
-  "keywords": [
-    "color",
-    "color-theory",
-    "accessibility",
-    "wcag",
-    "mcp"
-  ]
+  "keywords": ["color", "color-theory", "accessibility", "wcag", "mcp"]
 }
