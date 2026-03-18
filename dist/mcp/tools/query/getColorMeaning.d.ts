@@ -7,6 +7,9 @@ export declare const getColorMeaningSchema: z.ZodObject<{
         eastAsian: "eastAsian";
         southAsian: "southAsian";
         middleEastern: "middleEastern";
+        african: "african";
+        latinAmerican: "latinAmerican";
+        indigenous: "indigenous";
     }>>;
     context: z.ZodOptional<z.ZodEnum<{
         general: "general";
@@ -27,7 +30,7 @@ export declare function getColorMeaning(input: GetColorMeaningInput): Promise<{
     meaningsByRegion?: undefined;
 } | {
     color: string;
-    region: "western" | "eastAsian" | "southAsian" | "middleEastern";
+    region: "western" | "eastAsian" | "southAsian" | "middleEastern" | "african" | "latinAmerican" | "indigenous";
     context: "general" | "business" | "wedding" | "mourning";
     meanings: string[];
     error?: undefined;
@@ -36,7 +39,7 @@ export declare function getColorMeaning(input: GetColorMeaningInput): Promise<{
     meaningsByRegion?: undefined;
 } | {
     color: string;
-    region: "western" | "eastAsian" | "southAsian" | "middleEastern";
+    region: "western" | "eastAsian" | "southAsian" | "middleEastern" | "african" | "latinAmerican" | "indigenous";
     meanings: Record<MeaningContext, string[]>;
     error?: undefined;
     availableColors?: undefined;

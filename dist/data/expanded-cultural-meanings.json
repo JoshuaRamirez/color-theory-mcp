@@ -1,0 +1,242 @@
+{
+    "red": {
+        "african": {
+            "general": ["vitality", "life force", "spiritual power", "political struggle", "bloodline and ancestry"],
+            "business": ["strength", "power", "used in national branding across many African nations"],
+            "wedding": ["fertility", "vitality", "sometimes worn by brides in West African ceremonies"],
+            "mourning": ["used in some Akan funeral rites", "sacrifice", "transition to ancestral realm"]
+        },
+        "latinAmerican": {
+            "general": ["passion", "revolution", "courage", "religious devotion", "life energy"],
+            "business": ["boldness", "urgency", "associated with socialist political movements"],
+            "wedding": ["passion", "sometimes used as accent color", "associated with love"],
+            "mourning": ["sacrifice", "martyrdom", "used in Day of the Dead altars"]
+        },
+        "indigenous": {
+            "general": ["life blood", "earth connection", "south direction in some medicine wheels", "war and courage"],
+            "business": ["rarely used in isolation", "strength when combined with earth tones"],
+            "wedding": ["vitality", "sometimes used in ceremonial regalia"],
+            "mourning": ["blood of ancestors", "transition", "used in some burial traditions"]
+        }
+    },
+    "blue": {
+        "african": {
+            "general": ["sky and water", "peace", "harmony", "spiritual healing", "love in some West African traditions"],
+            "business": ["trust", "stability", "used in corporate contexts similarly to Western usage"],
+            "wedding": ["fidelity", "peace", "sometimes used in Nigerian wedding attire"],
+            "mourning": ["serenity for the departed", "not a primary mourning color"]
+        },
+        "latinAmerican": {
+            "general": ["sky", "ocean", "the Virgin Mary", "trust", "tranquility", "hope"],
+            "business": ["reliability", "professionalism", "widely used in corporate branding"],
+            "wedding": ["devotion", "fidelity", "Marian association makes it auspicious"],
+            "mourning": ["heavenly peace", "not a primary mourning color"]
+        },
+        "indigenous": {
+            "general": ["sky", "water", "wisdom", "west direction in some medicine wheels", "spiritual intuition"],
+            "business": ["trust", "calm", "used respectfully in context"],
+            "wedding": ["sky blessings", "spiritual wisdom", "varies by nation"],
+            "mourning": ["western sky and passage", "used in some traditions for spiritual transition"]
+        }
+    },
+    "green": {
+        "african": {
+            "general": ["fertility", "growth", "land and agriculture", "prosperity", "Pan-African unity"],
+            "business": ["agriculture", "growth", "prosperity", "featured on many national flags"],
+            "wedding": ["fertility", "abundance", "new beginnings", "commonly used in West African weddings"],
+            "mourning": ["not a primary mourning color", "life continuing"]
+        },
+        "latinAmerican": {
+            "general": ["nature", "hope", "independence", "healing", "national identity in Mexico"],
+            "business": ["growth", "natural products", "environmental awareness"],
+            "wedding": ["hope for the future", "abundance", "sometimes used in tropical themes"],
+            "mourning": ["not typically used", "life and renewal"]
+        },
+        "indigenous": {
+            "general": ["earth and plant life", "healing", "north direction in some medicine wheels", "growth and renewal"],
+            "business": ["earth stewardship", "sustainability", "natural alignment"],
+            "wedding": ["earth blessings", "fertility of the land", "growth of the new family"],
+            "mourning": ["return to the earth", "cycle of renewal"]
+        }
+    },
+    "yellow": {
+        "african": {
+            "general": ["wealth", "gold", "fertility", "royalty in many kingdoms", "the sun and energy"],
+            "business": ["prosperity", "gold trade heritage", "associated with precious resources"],
+            "wedding": ["prosperity", "wealth blessings", "gold adornment is traditional in many regions"],
+            "mourning": ["not a primary mourning color", "sometimes used to honor a prosperous life"]
+        },
+        "latinAmerican": {
+            "general": ["sun", "warmth", "death and mourning in some contexts", "marigolds in Day of the Dead"],
+            "business": ["energy", "warmth", "attention-getting"],
+            "wedding": ["joy", "warmth", "sometimes associated with infidelity so used carefully"],
+            "mourning": ["marigold offerings for the dead", "guiding spirits home", "remembrance"]
+        },
+        "indigenous": {
+            "general": ["east direction in many medicine wheels", "sunrise", "new beginnings", "illumination"],
+            "business": ["dawn of new ventures", "clarity", "illumination"],
+            "wedding": ["sunrise blessings", "new chapter beginning", "spiritual illumination"],
+            "mourning": ["sunrise and the east", "souls traveling toward the light"]
+        }
+    },
+    "white": {
+        "african": {
+            "general": ["purity", "spirituality", "ancestral connection", "peace", "victory"],
+            "business": ["purity", "clarity", "sometimes associated with spiritual authority"],
+            "wedding": ["purity", "spiritual blessings", "increasingly common alongside traditional colors"],
+            "mourning": ["used in some mourning traditions", "spiritual passage", "ancestor world"]
+        },
+        "latinAmerican": {
+            "general": ["purity", "peace", "innocence", "the divine", "Catholic tradition"],
+            "business": ["clean", "professional", "honest"],
+            "wedding": ["traditional bridal color", "purity", "Virgin Mary association"],
+            "mourning": ["peace for the departed", "angels", "heavenly rest"]
+        },
+        "indigenous": {
+            "general": ["north direction in some medicine wheels", "winter", "snow", "wisdom of elders", "purity"],
+            "business": ["clarity", "truth", "clean intentions"],
+            "wedding": ["purity of intent", "wisdom", "elder blessings"],
+            "mourning": ["snow and north", "the great beyond", "used in some burial customs"]
+        }
+    },
+    "black": {
+        "african": {
+            "general": ["maturity", "spiritual energy", "ancestral power", "masculinity", "age and wisdom"],
+            "business": ["authority", "strength", "used in formal and powerful contexts"],
+            "wedding": ["maturity", "depth of commitment", "sometimes worn by elders at ceremonies"],
+            "mourning": ["mourning and grief in many regions", "connection to the departed", "solemnity"]
+        },
+        "latinAmerican": {
+            "general": ["mourning", "formality", "power", "elegance", "the underworld in pre-Columbian belief"],
+            "business": ["authority", "sophistication", "formal power"],
+            "wedding": ["not traditional for brides", "formal wear for men", "increasingly modern"],
+            "mourning": ["traditional mourning color", "Catholic funeral tradition", "grief and respect"]
+        },
+        "indigenous": {
+            "general": ["west direction in some medicine wheels", "introspection", "the void before creation", "deep knowledge"],
+            "business": ["authority", "depth of knowledge", "used with gravity"],
+            "wedding": ["not commonly used", "depth of commitment in some traditions"],
+            "mourning": ["passage to the spirit world", "the unknown", "used in some mourning face paint"]
+        }
+    },
+    "purple": {
+        "african": {
+            "general": ["royalty", "wealth", "femininity in some regions", "spiritual authority"],
+            "business": ["prestige", "leadership", "associated with chiefs and royalty"],
+            "wedding": ["royal status", "wealth", "used in ceremonial robes in some regions"],
+            "mourning": ["not a primary mourning color", "dignity and nobility"]
+        },
+        "latinAmerican": {
+            "general": ["penitence", "Lenten season", "mourning", "spirituality", "Catholic liturgy"],
+            "business": ["premium", "luxury", "used carefully due to mourning associations"],
+            "wedding": ["avoided by some due to mourning connotations", "used in religious ceremonies"],
+            "mourning": ["Lenten mourning", "used in Catholic funeral masses", "penitence and sorrow"]
+        },
+        "indigenous": {
+            "general": ["spiritual transformation", "healing energy", "vision and ceremony"],
+            "business": ["rarely used in isolation", "spiritual significance may limit commercial use"],
+            "wedding": ["spiritual blessings", "ceremonial significance varies by nation"],
+            "mourning": ["spiritual passage", "transformation between worlds"]
+        }
+    },
+    "orange": {
+        "african": {
+            "general": ["warmth", "community", "harvest", "earth and sunset"],
+            "business": ["approachability", "warmth", "community-oriented branding"],
+            "wedding": ["warmth of community", "celebration", "used in festive attire"],
+            "mourning": ["not a primary mourning color", "sunset and passage"]
+        },
+        "latinAmerican": {
+            "general": ["sun", "earth", "harvest", "Day of the Dead marigolds", "warmth"],
+            "business": ["friendly", "energetic", "approachable"],
+            "wedding": ["warmth", "festive energy", "tropical celebrations"],
+            "mourning": ["marigold association with Day of the Dead", "guiding spirits", "remembrance altars"]
+        },
+        "indigenous": {
+            "general": ["kinship", "warmth of fire", "community gathering", "autumn harvest"],
+            "business": ["community", "warmth", "gathering and collaboration"],
+            "wedding": ["fire and warmth of the hearth", "community celebration"],
+            "mourning": ["setting sun", "fire ceremonies for the departed"]
+        }
+    },
+    "pink": {
+        "african": {
+            "general": ["tenderness", "femininity", "youth", "less traditional than other colors"],
+            "business": ["youthful appeal", "feminine products", "modern branding"],
+            "wedding": ["romance", "youthful celebration", "modern influence"],
+            "mourning": ["not typically used"]
+        },
+        "latinAmerican": {
+            "general": ["femininity", "sweetness", "celebration", "quinceañera tradition"],
+            "business": ["feminine products", "youthful markets", "celebratory branding"],
+            "wedding": ["romance", "used in bridesmaids attire and decorations"],
+            "mourning": ["not typically used"]
+        },
+        "indigenous": {
+            "general": ["not a traditional ceremonial color", "modern adoption", "flowers and spring"],
+            "business": ["modern usage", "not tied to traditional significance"],
+            "wedding": ["wildflower symbolism in some nations", "modern celebrations"],
+            "mourning": ["not typically used"]
+        }
+    },
+    "brown": {
+        "african": {
+            "general": ["earth", "stability", "home", "the land and soil", "groundedness"],
+            "business": ["earthy products", "stability", "agricultural association"],
+            "wedding": ["earth connection", "traditional when combined with other colors"],
+            "mourning": ["earth and burial", "return to the ground", "sometimes used"]
+        },
+        "latinAmerican": {
+            "general": ["earth", "mestizo identity", "humility", "Franciscan spirituality"],
+            "business": ["earthy", "organic", "traditional and artisanal products"],
+            "wedding": ["rustic themes", "earth connection", "not a primary wedding color"],
+            "mourning": ["earth and burial", "humility before death"]
+        },
+        "indigenous": {
+            "general": ["Mother Earth", "grounding", "animals and hide", "sustenance and stability"],
+            "business": ["earth stewardship", "natural materials", "handcraft traditions"],
+            "wedding": ["earth blessings", "leather and hide ceremonial items", "groundedness"],
+            "mourning": ["return to the earth", "burial and soil", "the cycle of life"]
+        }
+    },
+    "gold": {
+        "african": {
+            "general": ["wealth", "royalty", "the sun", "divine kingship", "Ashanti gold tradition"],
+            "business": ["prestige", "success", "gold trade heritage", "high-status branding"],
+            "wedding": ["prosperity", "royal blessings", "essential in many West African ceremonies"],
+            "mourning": ["honoring a prosperous life", "not a primary mourning color"]
+        },
+        "latinAmerican": {
+            "general": ["wealth", "the sun", "pre-Columbian heritage", "divine power", "El Dorado legend"],
+            "business": ["luxury", "success", "premium status", "historical treasure association"],
+            "wedding": ["prosperity blessings", "luxury", "Catholic church ornamentation"],
+            "mourning": ["heavenly reward", "not a primary mourning color"]
+        },
+        "indigenous": {
+            "general": ["the sun", "sacred light", "corn and harvest", "spiritual illumination"],
+            "business": ["sacred value", "used respectfully", "not primarily commercial"],
+            "wedding": ["sun blessings", "harvest abundance", "golden eagle symbolism in some nations"],
+            "mourning": ["sun guiding the spirit", "not a primary mourning color"]
+        }
+    },
+    "silver": {
+        "african": {
+            "general": ["the moon", "femininity", "modernity", "lesser status than gold traditionally"],
+            "business": ["modern", "technology", "sleek and contemporary"],
+            "wedding": ["modern elegance", "moonlight blessings", "complementary to gold"],
+            "mourning": ["not a primary mourning color", "quiet dignity"]
+        },
+        "latinAmerican": {
+            "general": ["the moon", "wealth", "colonial mining heritage", "modernity", "elegance"],
+            "business": ["technology", "modernity", "sleek branding"],
+            "wedding": ["elegance", "moonlight", "used in decorations and jewelry"],
+            "mourning": ["not a primary mourning color", "quiet respect"]
+        },
+        "indigenous": {
+            "general": ["the moon", "water reflection", "feminine energy", "Navajo and Pueblo silverwork tradition"],
+            "business": ["craftsmanship", "artisanal quality", "silversmithing heritage in some nations"],
+            "wedding": ["moon blessings", "silver jewelry as ceremonial gifts", "feminine grace"],
+            "mourning": ["moonlight guiding spirits", "not a primary mourning color"]
+        }
+    }
+}

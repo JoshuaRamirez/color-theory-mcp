@@ -1,20 +1,29 @@
 import { Color } from '../domain/values/Color.js';
 /**
+ * Named color source.
+ */
+export type ColorSource = 'css' | 'xkcd';
+/**
  * Named color entry.
  */
 export interface NamedColor {
     name: string;
     hex: string;
     color: Color;
+    source?: ColorSource;
 }
 /**
- * Repository for CSS named colors.
+ * Repository for named colors (CSS + XKCD).
  */
 export declare class NamedColorsRepository {
     private readonly colors;
     private readonly colorsByHex;
-    constructor();
+    private readonly includeXkcd;
+    constructor(options?: {
+        includeXkcd?: boolean;
+    });
     private loadColors;
+    private addColor;
     /**
      * Gets a named color by name.
      */

@@ -10,6 +10,9 @@ export const ColorSpaceSchema = z.enum([
     'srgb',
     'linear-srgb',
     'display-p3',
+    'rec2020',
+    'prophoto-rgb',
+    'acescg',
     'xyz-d65',
     'xyz-d50',
     'lab',
@@ -70,6 +73,9 @@ export const CultureRegionSchema = z.enum([
     'eastAsian',
     'southAsian',
     'middleEastern',
+    'african',
+    'latinAmerican',
+    'indigenous',
 ]).describe('Cultural region');
 /**
  * Schema for meaning contexts.

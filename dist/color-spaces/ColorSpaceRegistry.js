@@ -11,6 +11,9 @@ import { HsvColorSpace } from './HsvColorSpace.js';
 import { HwbColorSpace } from './HwbColorSpace.js';
 import { DisplayP3ColorSpace } from './DisplayP3ColorSpace.js';
 import { CmykColorSpace } from './CmykColorSpace.js';
+import { Rec2020ColorSpace } from './Rec2020ColorSpace.js';
+import { ProPhotoRgbColorSpace } from './ProPhotoRgbColorSpace.js';
+import { ACEScgColorSpace } from './ACEScgColorSpace.js';
 /**
  * Registry for color space implementations.
  * Provides a central point for color space lookup.
@@ -44,6 +47,9 @@ export class ColorSpaceRegistry {
         registry.register(new HwbColorSpace());
         registry.register(new DisplayP3ColorSpace());
         registry.register(new CmykColorSpace());
+        registry.register(new Rec2020ColorSpace());
+        registry.register(new ProPhotoRgbColorSpace());
+        registry.register(new ACEScgColorSpace());
         return registry;
     }
 }

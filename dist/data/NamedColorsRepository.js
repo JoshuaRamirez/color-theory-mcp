@@ -1,25 +1,39 @@
 import { Color } from '../domain/values/Color.js';
 import cssColors from './css-colors.json' with { type: 'json' };
+import xkcdColors from './xkcd-colors.json' with { type: 'json' };
 /**
- * Repository for CSS named colors.
+ * Repository for named colors (CSS + XKCD).
  */
 export class NamedColorsRepository {
     colors = new Map();
     colorsByHex = new Map();
-    constructor() {
+    includeXkcd;
+    constructor(options) {
+        this.includeXkcd = options?.includeXkcd ?? false;
         this.loadColors();
     }
     loadColors() {
+        // Load CSS colors first (these take priority for name lookups)
         for (const [name, hex] of Object.entries(cssColors)) {
-            const color = Color.fromHex(hex);
-            const entry = { name, hex: hex.toLowerCase(), color };
-            this.colors.set(name.toLowerCase(), entry);
-            // Index by hex for reverse lookup
-            const hexKey = hex.toLowerCase();
-            const existing = this.colorsByHex.get(hexKey) ?? [];
-            existing.push(entry);
-            this.colorsByHex.set(hexKey, existing);
+            this.addColor(name, hex, 'css');
         }
+        // Load XKCD colors (only if enabled, skip duplicates)
+        if (this.includeXkcd) {
+            for (const [name, hex] of Object.entries(xkcdColors)) {
+                if (!this.colors.has(name.toLowerCase())) {
+                    this.addColor(name, hex, 'xkcd');
+                }
+            }
+        }
+    }
+    addColor(name, hex, source) {
+        const color = Color.fromHex(hex);
+        const entry = { name, hex: hex.toLowerCase(), color, source };
+        this.colors.set(name.toLowerCase(), entry);
+        const hexKey = hex.toLowerCase();
+        const existing = this.colorsByHex.get(hexKey) ?? [];
+        existing.push(entry);
+        this.colorsByHex.set(hexKey, existing);
     }
     /**
      * Gets a named color by name.

@@ -1,11 +1,29 @@
 import culturalMeanings from './cultural-meanings.json' with { type: 'json' };
+import expandedMeanings from './expanded-cultural-meanings.json' with { type: 'json' };
 /**
  * Repository for cultural color meanings.
  */
 export class CulturalMeaningsRepository {
     data;
     constructor() {
-        this.data = culturalMeanings;
+        // Merge base meanings with expanded regional meanings
+        const base = culturalMeanings;
+        const expanded = expandedMeanings;
+        const merged = {};
+        // Copy base data
+        for (const [color, regions] of Object.entries(base)) {
+            merged[color] = { ...regions };
+        }
+        // Merge expanded data
+        for (const [color, regions] of Object.entries(expanded)) {
+            if (!merged[color]) {
+                merged[color] = {};
+            }
+            for (const [region, contexts] of Object.entries(regions)) {
+                merged[color][region] = contexts;
+            }
+        }
+        this.data = merged;
     }
     /**
      * Gets meanings for a specific color.
@@ -50,7 +68,7 @@ export class CulturalMeaningsRepository {
             return [];
         }
         const results = [];
-        const regions = ['western', 'eastAsian', 'southAsian', 'middleEastern'];
+        const regions = ['western', 'eastAsian', 'southAsian', 'middleEastern', 'african', 'latinAmerican', 'indigenous'];
         for (const region of regions) {
             const meanings = colorData[region]?.[context];
             if (meanings) {

@@ -29,9 +29,12 @@ export async function validateGamut(input) {
             }
         });
     }
-    // Get the clamped version
+    // Get the clamped version (simple component clamping)
     const clamped = conversionService.clampToGamut(converted);
     const clampedSrgb = conversionService.convert(clamped, 'srgb');
+    // Get the perceptual gamut-mapped version (CSS Color 4 chroma reduction)
+    const mapped = conversionService.mapToGamut(color, input.targetGamut);
+    const mappedSrgb = conversionService.convert(mapped, 'srgb');
     // Original in sRGB for display
     const originalSrgb = conversionService.convert(color, 'srgb');
     return {
@@ -51,12 +54,19 @@ export async function validateGamut(input) {
                 outOfGamutComponents,
                 clampedVersion: {
                     hex: clampedSrgb.toHex(),
-                    note: 'This is the closest color within the target gamut',
+                    note: 'Simple component clamping (fast, may shift hue)',
+                },
+                mappedVersion: {
+                    hex: mappedSrgb.toHex(),
+                    note: 'Perceptual gamut mapping via Oklch chroma reduction (preserves hue and lightness)',
                 },
             },
         gamutInfo: {
             srgb: 'Standard web RGB color space',
             'display-p3': '25% larger than sRGB, used by Apple devices',
+            'rec2020': 'HDR/UHD color space, much wider than Display P3',
+            'prophoto-rgb': 'Very wide gamut for photography',
+            'acescg': 'Scene-referred, used in film/VFX',
             'linear-srgb': 'Linear light sRGB (no gamma)',
         },
     };

@@ -7,45 +7,81 @@ const pkg = require('../package.json');
 
 // Query tools
 import {
-  getColorInfo, getColorInfoSchema,
-  getColorName, getColorNameSchema,
-  getColorMeaning, getColorMeaningSchema,
-  listNamedColors, listNamedColorsSchema,
+  getColorInfo,
+  getColorInfoSchema,
+  getColorName,
+  getColorNameSchema,
+  getColorMeaning,
+  getColorMeaningSchema,
+  listNamedColors,
+  listNamedColorsSchema,
 } from './mcp/tools/query/index.js';
 
 // Convert tools
 import {
-  convertColor, convertColorSchema,
-  convertBatch, convertBatchSchema,
-  parseColorString, parseColorStringSchema,
+  convertColor,
+  convertColorSchema,
+  convertBatch,
+  convertBatchSchema,
+  parseColorString,
+  parseColorStringSchema,
 } from './mcp/tools/convert/index.js';
 
 // Calculate tools
 import {
-  calculateContrast, calculateContrastSchema,
-  calculateDeltaE, calculateDeltaESchema,
-  calculateLuminance, calculateLuminanceSchema,
-  mixColors, mixColorsSchema,
-  adjustColor, adjustColorSchema,
+  calculateContrast,
+  calculateContrastSchema,
+  calculateDeltaE,
+  calculateDeltaESchema,
+  calculateLuminance,
+  calculateLuminanceSchema,
+  mixColors,
+  mixColorsSchema,
+  adjustColor,
+  adjustColorSchema,
+  calculateAPCA,
+  calculateAPCASchema,
+  calculateTemperature,
+  calculateTemperatureSchema,
 } from './mcp/tools/calculate/index.js';
 
 // Generate tools
 import {
-  generateHarmony, generateHarmonySchema,
-  generatePalette, generatePaletteSchema,
-  generateGradient, generateGradientSchema,
-  generateAccessiblePalette, generateAccessiblePaletteSchema,
-  generateScale, generateScaleSchema,
+  generateHarmony,
+  generateHarmonySchema,
+  generatePalette,
+  generatePaletteSchema,
+  generateGradient,
+  generateGradientSchema,
+  generateAccessiblePalette,
+  generateAccessiblePaletteSchema,
+  generateScale,
+  generateScaleSchema,
+  generateDesignTokens,
+  generateDesignTokensSchema,
+  generateTheme,
+  generateThemeSchema,
+  generateAccessibleReport,
+  generateAccessibleReportSchema,
 } from './mcp/tools/generate/index.js';
 
 // Validate tools
 import {
-  validateWcagContrast, validateWcagContrastSchema,
-  validateColorBlindness, validateColorBlindnessSchema,
-  validateGamut, validateGamutSchema,
-  validatePrintSafe, validatePrintSafeSchema,
-  validatePaletteHarmony, validatePaletteHarmonySchema,
+  validateWcagContrast,
+  validateWcagContrastSchema,
+  validateColorBlindness,
+  validateColorBlindnessSchema,
+  validateGamut,
+  validateGamutSchema,
+  validatePrintSafe,
+  validatePrintSafeSchema,
+  validatePaletteHarmony,
+  validatePaletteHarmonySchema,
 } from './mcp/tools/validate/index.js';
+
+// MCP Resources and Prompts
+import { registerResources } from './mcp/resources/index.js';
+import { registerPrompts } from './mcp/prompts/index.js';
 
 const server = new McpServer({
   name: 'color-theory-mcp',
@@ -78,7 +114,7 @@ server.tool(
 
 server.tool(
   'get-color-meaning',
-  'Get cultural and psychological meanings of a color across different regions',
+  'Get cultural and psychological meanings of a color across 7 cultural regions',
   getColorMeaningSchema.shape,
   async (input) => {
     const result = await getColorMeaning(input);
@@ -102,7 +138,7 @@ server.tool(
 
 server.tool(
   'convert-color',
-  'Convert a color to a different color space (sRGB, Lab, Oklch, HSL, CMYK, etc.)',
+  'Convert a color to a different color space (sRGB, Lab, Oklch, HSL, CMYK, Rec2020, ProPhoto, ACEScg, etc.)',
   convertColorSchema.shape,
   async (input) => {
     const result = await convertColor(input);
@@ -131,15 +167,25 @@ server.tool(
 );
 
 // ============================================
-// Calculate Tools (5)
+// Calculate Tools (7)
 // ============================================
 
 server.tool(
   'calculate-contrast',
-  'Calculate WCAG contrast ratio between two colors',
+  'Calculate WCAG 2.x contrast ratio between two colors',
   calculateContrastSchema.shape,
   async (input) => {
     const result = await calculateContrast(input);
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  'calculate-apca-contrast',
+  'Calculate APCA (WCAG 3.0) perceptual lightness contrast between text and background colors',
+  calculateAPCASchema.shape,
+  async (input) => {
+    const result = await calculateAPCA(input);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
   }
 );
@@ -165,6 +211,16 @@ server.tool(
 );
 
 server.tool(
+  'calculate-temperature',
+  "Convert between color temperature (Kelvin) and color, or estimate a color's temperature",
+  calculateTemperatureSchema.shape,
+  async (input) => {
+    const result = await calculateTemperature(input);
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
   'mix-colors',
   'Mix two colors together with optional gradient generation',
   mixColorsSchema.shape,
@@ -185,7 +241,7 @@ server.tool(
 );
 
 // ============================================
-// Generate Tools (5)
+// Generate Tools (8)
 // ============================================
 
 server.tool(
@@ -234,6 +290,36 @@ server.tool(
   generateScaleSchema.shape,
   async (input) => {
     const result = await generateScale(input);
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  'generate-design-tokens',
+  'Export colors as W3C Design Tokens, CSS custom properties, or Tailwind config',
+  generateDesignTokensSchema.shape,
+  async (input) => {
+    const result = await generateDesignTokens(input);
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  'generate-theme',
+  'Generate a Material Design 3 theme with light/dark modes from a seed color',
+  generateThemeSchema.shape,
+  async (input) => {
+    const result = await generateTheme(input);
+    return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
+server.tool(
+  'generate-accessible-report',
+  'Comprehensive accessibility audit: WCAG, APCA, color blindness simulation, and pairwise distinguishability',
+  generateAccessibleReportSchema.shape,
+  async (input) => {
+    const result = await generateAccessibleReport(input);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
   }
 );
@@ -291,6 +377,13 @@ server.tool(
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
   }
 );
+
+// ============================================
+// Resources (4) and Prompts (4)
+// ============================================
+
+registerResources(server);
+registerPrompts(server);
 
 // ============================================
 // Start Server

@@ -29933,6 +29933,9 @@ var COLOR_SPACE_COMPONENTS = {
   "srgb": ["r", "g", "b"],
   "linear-srgb": ["r", "g", "b"],
   "display-p3": ["r", "g", "b"],
+  "rec2020": ["r", "g", "b"],
+  "prophoto-rgb": ["r", "g", "b"],
+  "acescg": ["r", "g", "b"],
   "xyz-d65": ["x", "y", "z"],
   "xyz-d50": ["x", "y", "z"],
   "lab": ["l", "a", "b"],
@@ -30244,23 +30247,834 @@ var css_colors_default = {
   yellowgreen: "#9acd32"
 };
 
+// src/data/xkcd-colors.json
+var xkcd_colors_default = {
+  acidgreen: "#8ffe09",
+  adobe: "#bd6c48",
+  algae: "#54ac68",
+  algaegreen: "#21c36f",
+  almostblack: "#070d0d",
+  amber: "#feb308",
+  amethyst: "#9b5fc0",
+  apple: "#6ecb3c",
+  applegreen: "#76cd26",
+  apricot: "#ffb16d",
+  aqua: "#13eac9",
+  aquablue: "#02d8e9",
+  aquagreen: "#12e193",
+  aquamarine: "#2ee8bb",
+  armygreen: "#4b5d16",
+  aubergine: "#3d0734",
+  auburn: "#9a3001",
+  avocado: "#90b134",
+  avocadogreen: "#87a922",
+  azure: "#069af3",
+  babyblue: "#a2cffe",
+  babypink: "#ffb7ce",
+  babypurple: "#ca9bf7",
+  banana: "#ffff7e",
+  bananayellow: "#fafe4b",
+  barbiepink: "#fe46a5",
+  barney: "#ac1db8",
+  barneyurple: "#a00498",
+  battleshipgrey: "#6b7c85",
+  berry: "#7e0044",
+  bile: "#b5c306",
+  black: "#000000",
+  bland: "#afa88b",
+  blood: "#770001",
+  bloodorange: "#fe4b03",
+  bloodred: "#980002",
+  blueberry: "#464196",
+  bluegreen: "#137e6d",
+  bluegrey: "#607c8e",
+  bluepurple: "#5729ce",
+  blueviolet: "#5d06e9",
+  blurple: "#5539cc",
+  blush: "#f29e8e",
+  blushpink: "#fe828c",
+  bordeaux: "#7b002c",
+  brick: "#a03623",
+  brickred: "#8f1402",
+  brightaqua: "#0bf9ea",
+  brightblue: "#0165fc",
+  brightcyan: "#41fdfe",
+  brightgreen: "#01ff07",
+  brightlavender: "#c760ff",
+  brightlilac: "#c95efb",
+  brightlime: "#87fd05",
+  brightlimegreen: "#65fe08",
+  brightmagenta: "#ff08e8",
+  brightorange: "#ff5b00",
+  brightpink: "#fe01b1",
+  brightpurple: "#be03fd",
+  brightred: "#ff000d",
+  brightskyblue: "#02ccfe",
+  brightteal: "#01f9c6",
+  brightturquoise: "#0ffef9",
+  brightviolet: "#ad0afd",
+  brightyellow: "#fffd01",
+  brightyellowgreen: "#9dff00",
+  bronze: "#a87900",
+  brown: "#653700",
+  brownish: "#9c6d57",
+  brownorange: "#b96902",
+  brownred: "#922b05",
+  brownyellow: "#b29705",
+  bubblegum: "#ff6cb5",
+  bubblegumpink: "#fe83cc",
+  buff: "#fef69e",
+  burgundy: "#610023",
+  burntorange: "#c04e01",
+  burntred: "#9f2305",
+  burntsienna: "#b04e0f",
+  burntumber: "#a0450e",
+  burntyellow: "#d5ab09",
+  butter: "#ffff81",
+  buttercup: "#fef200",
+  butterscotch: "#fdb147",
+  cadetblue: "#4e7496",
+  camel: "#c69f59",
+  camo: "#7f8f4e",
+  camogreen: "#526525",
+  camouflagegreen: "#4b6113",
+  canary: "#fdff63",
+  canaryyellow: "#fffe40",
+  candypink: "#ff63e9",
+  caramel: "#af6f09",
+  carmine: "#9d0216",
+  carnation: "#fd798f",
+  carnationpink: "#ff7fa7",
+  celadon: "#befdb7",
+  celery: "#c1fd95",
+  cement: "#a5a391",
+  cerise: "#de0c62",
+  cerulean: "#0485d1",
+  ceruleanblue: "#056eee",
+  charcoal: "#343837",
+  charcoalgrey: "#3c4142",
+  chartreuse: "#c1f80a",
+  cherry: "#cf0234",
+  cherryred: "#f7022a",
+  chestnut: "#742802",
+  chocolate: "#3d1c02",
+  chocolatebrown: "#411900",
+  cinnamon: "#ac4f06",
+  clay: "#b66a50",
+  claybrown: "#b2713d",
+  clearblue: "#247afd",
+  claret: "#680018",
+  cobalt: "#1e488f",
+  cobaltblue: "#030aa7",
+  cocoa: "#875f42",
+  coffee: "#a6814c",
+  coolblue: "#4984b8",
+  coolgreen: "#33b864",
+  coolgreyn: "#95a3a6",
+  copper: "#b66325",
+  coral: "#fc5a50",
+  coralpink: "#ff6163",
+  cornflower: "#6a79f7",
+  cornflowerblue: "#5170d7",
+  cranberry: "#9e003a",
+  cream: "#ffffc2",
+  creme: "#ffffb6",
+  crimson: "#8c000f",
+  custard: "#fffd78",
+  cyan: "#00ffff",
+  dandelion: "#fedf08",
+  dark: "#1b2431",
+  darkaqua: "#05696b",
+  darkaquamarine: "#017371",
+  darkbeige: "#ac9362",
+  darkblue: "#00035b",
+  darkbluegreen: "#005249",
+  darkbluegrey: "#1f3b4d",
+  darkbrown: "#341c02",
+  darkcoral: "#cf524e",
+  darkcream: "#fff39a",
+  darkcyan: "#0a888a",
+  darkforestgreen: "#002d04",
+  darkfuchsia: "#9d0759",
+  darkgold: "#b59410",
+  darkgrassgreen: "#388004",
+  darkgreen: "#033500",
+  darkgreenblue: "#1c6b72",
+  darkgrey: "#363737",
+  darkgreyblue: "#29465b",
+  darkhotpink: "#d90166",
+  darkindigo: "#1f0954",
+  darkishblue: "#0149fe",
+  darkishgreen: "#287c37",
+  darkishpink: "#da467d",
+  darkishpurple: "#751973",
+  darkishred: "#a90308",
+  darkkhaki: "#9b8f55",
+  darklavender: "#856798",
+  darklilac: "#9c6da5",
+  darklime: "#84b701",
+  darklimegreen: "#7ebd01",
+  darkmagenta: "#960056",
+  darkmaroon: "#3c0008",
+  darkmauve: "#874c62",
+  darkmint: "#48c072",
+  darkmintgreen: "#20c073",
+  darkmustard: "#a88905",
+  darknavy: "#000435",
+  darknavyblue: "#00022e",
+  darkolive: "#373e02",
+  darkolivegreen: "#3c4d03",
+  darkorange: "#c65102",
+  darkpastelgreen: "#56ae57",
+  darkpeach: "#de7e5d",
+  darkperiwinkle: "#665fd1",
+  darkpink: "#cb416b",
+  darkplum: "#3f012c",
+  darkpurple: "#35063e",
+  darkred: "#840000",
+  darkrose: "#b5485d",
+  darkroyalblue: "#02066f",
+  darksage: "#598556",
+  darksalmon: "#c85a53",
+  darksand: "#a88f59",
+  darkseafoam: "#1fb57a",
+  darkseafoamgreen: "#3eaf76",
+  darkseagreen: "#11875d",
+  darkskyblue: "#448ee4",
+  darkslateblue: "#214761",
+  darktaupe: "#7f684e",
+  darkteal: "#014d4e",
+  darkturquoise: "#045c5a",
+  darkviolet: "#34013f",
+  darkyellow: "#d5b60a",
+  darkyellowgreen: "#728f02",
+  deeppink: "#cb0162",
+  deeppurple: "#36013f",
+  deepred: "#9a0200",
+  deeprose: "#c74767",
+  deepskyblue: "#0d75f8",
+  deepteal: "#00555a",
+  deepturquoise: "#017374",
+  deepviolet: "#490648",
+  denim: "#3b638c",
+  denimblue: "#3b5b92",
+  desert: "#ccad60",
+  diarrhea: "#9f8303",
+  dirt: "#8a6e45",
+  dirtbrown: "#836539",
+  dirtyblue: "#3f829d",
+  dirtygreen: "#667e2c",
+  dirtyorange: "#c87606",
+  dirtypink: "#ca7b80",
+  dirtypurple: "#734a65",
+  dirtyyellow: "#cdc50a",
+  dodgerblue: "#3e82fc",
+  drab: "#828344",
+  drabgreen: "#749551",
+  driedblood: "#4b0101",
+  dullblue: "#49759c",
+  dullbrown: "#876e4b",
+  dullgreen: "#74a662",
+  dullorange: "#d8863b",
+  dullpink: "#d5869d",
+  dullpurple: "#84597e",
+  dullred: "#bb3f3f",
+  dullteal: "#5f9e8f",
+  dullyellow: "#eedc5b",
+  dusk: "#4e5481",
+  duskblue: "#26538d",
+  duskyblue: "#475f94",
+  duskypink: "#cc7a8b",
+  duskypurple: "#895b7b",
+  duskyrose: "#ba6873",
+  dust: "#b2996e",
+  dustyblue: "#5a86ad",
+  dustygreen: "#76a973",
+  dustylavender: "#ac86a8",
+  dustyorange: "#f0833a",
+  dustypink: "#d58a94",
+  dustypurple: "#825f87",
+  dustyred: "#b9484e",
+  dustyrose: "#c0737a",
+  dustyteal: "#4c9085",
+  earth: "#a2653e",
+  eastergreen: "#8cfd7e",
+  easterpurple: "#c071fe",
+  ecru: "#feffca",
+  eggplant: "#380835",
+  eggplantpurple: "#430541",
+  eggshell: "#ffffd4",
+  eggshellblue: "#c4fff7",
+  electricblue: "#0652ff",
+  electricgreen: "#21fc0d",
+  electriclime: "#a8ff04",
+  electricpink: "#ff0490",
+  electricpurple: "#aa23ff",
+  emerald: "#01a049",
+  emeraldgreen: "#028f1e",
+  evergreen: "#05472a",
+  fadedblue: "#658cbb",
+  fadedgreen: "#7bb274",
+  fadedorange: "#f0944d",
+  fadedpink: "#de9dac",
+  fadedpurple: "#916e99",
+  fadedred: "#d3494e",
+  fadedyellow: "#feff7f",
+  fawn: "#cfaf7b",
+  fern: "#63a950",
+  ferngreen: "#548d44",
+  fireenginered: "#fe0002",
+  flatblue: "#3c73a8",
+  flatgreen: "#699d4c",
+  fluorescentgreen: "#08ff08",
+  flurogreen: "#0aff02",
+  foamgreen: "#90fda9",
+  forest: "#0b5509",
+  forestgreen: "#06470c",
+  forrestgreen: "#154406",
+  frenchblue: "#436bad",
+  freshgreen: "#69d84f",
+  froggreen: "#58bc08",
+  fuchsia: "#ed0dd9",
+  gold: "#dbb40c",
+  golden: "#f5bf03",
+  goldenbrown: "#b27a01",
+  goldenrod: "#fac205",
+  goldenyellow: "#fce100",
+  grape: "#6c3461",
+  grapefruit: "#fd5956",
+  grapepurple: "#5d1451",
+  grass: "#5cac2d",
+  grassgreen: "#3f9b0b",
+  grassygreen: "#419c03",
+  green: "#15b01a",
+  greenapple: "#5edc1f",
+  greenblue: "#06b48b",
+  greenbrown: "#544e03",
+  greengrey: "#77926f",
+  greenteal: "#0cb577",
+  greenyellow: "#c6f808",
+  greenish: "#40a368",
+  greenishbeige: "#c9d179",
+  greenishblue: "#0b8b87",
+  greenishbrown: "#696112",
+  greenishcyan: "#2afeb7",
+  greenishgrey: "#96ae8d",
+  greenishtan: "#bccb7a",
+  greenishteal: "#32bf84",
+  greenishturquoise: "#00fbb0",
+  greenishyellow: "#cdfd02",
+  grey: "#929591",
+  greyblue: "#6b8ba4",
+  greybrown: "#7f7053",
+  greygreen: "#789b73",
+  greypink: "#c3909b",
+  greypurple: "#826d8c",
+  greyteal: "#5e9b8a",
+  greyish: "#a8a495",
+  greyishblue: "#5e819d",
+  greyishbrown: "#7a6a4f",
+  greyishgreen: "#82a67d",
+  greyishpink: "#c88d94",
+  greyishpurple: "#887191",
+  greyishteal: "#719f91",
+  grossgreen: "#a0bf16",
+  gunmetal: "#536267",
+  hazel: "#8e7618",
+  heather: "#a484ac",
+  heliotrope: "#d94ff5",
+  highlightergreen: "#1bfc06",
+  hospitalgreen: "#9be5aa",
+  hotgreen: "#25ff29",
+  hotmagenta: "#f504c9",
+  hotpink: "#ff028d",
+  hotpurple: "#cb00f5",
+  huntergreen: "#0b4008",
+  ice: "#d6fffa",
+  iceblue: "#d7fffe",
+  ickygreen: "#8fae22",
+  indianred: "#850e04",
+  indigo: "#380282",
+  indigoblue: "#3a18b1",
+  iris: "#6258c4",
+  irishgreen: "#019529",
+  ivory: "#ffffcb",
+  jade: "#1fa774",
+  jadegreen: "#2baf6a",
+  jean: "#507b9c",
+  junglegreen: "#048243",
+  kellygreen: "#02ab2e",
+  kermitgreen: "#5cb200",
+  keylime: "#aeff6e",
+  khaki: "#aaa662",
+  khakigreen: "#728639",
+  kiwi: "#9cef43",
+  kiwigreen: "#8ee53f",
+  lavender: "#c79fef",
+  lavenderblue: "#8b88f8",
+  lavenderpink: "#dd85d7",
+  lawngreen: "#4da409",
+  leaf: "#71aa34",
+  leafgreen: "#5ca904",
+  leafygreen: "#51b73b",
+  leather: "#ac7434",
+  lemon: "#fdff52",
+  lemongreen: "#adf802",
+  lemonlime: "#bffe28",
+  lemonyellow: "#fdff38",
+  lichen: "#8fb67b",
+  lightaqua: "#8cffdb",
+  lightaquamarine: "#7bfdc7",
+  lightbeige: "#fffeb6",
+  lightblue: "#95d0fc",
+  lightbluegreen: "#7efbb3",
+  lightbluegrey: "#b7c9e2",
+  lightbluishgreen: "#76fda8",
+  lightbluishpurple: "#a578d6",
+  lightbrightgreen: "#53fe5c",
+  lightbrown: "#ad8150",
+  lightburgundy: "#a8415b",
+  lightcyan: "#acfffc",
+  lighteggplant: "#894585",
+  lightforestgreen: "#4f9153",
+  lightgold: "#fddc5c",
+  lightgrassgreen: "#9af764",
+  lightgreen: "#96f97b",
+  lightgreenblue: "#56fca2",
+  lightgreenish: "#61e160",
+  lightgrey: "#d8dcd6",
+  lightgreyblue: "#9dbcd4",
+  lightgreygreen: "#b7e1a1",
+  lightgreyishblue: "#a0b7c4",
+  lightindigo: "#6d5acf",
+  lightkhaki: "#e6f2a2",
+  lightlavendar: "#efc0fe",
+  lightlavender: "#dfc5fe",
+  lightlilac: "#edc8ff",
+  lightlime: "#aefd6c",
+  lightlimegreen: "#b9ff66",
+  lightmagenta: "#fa5ff7",
+  lightmaroon: "#a24857",
+  lightmauve: "#c292a1",
+  lightmint: "#b6ffbb",
+  lightmintgreen: "#a6fbb2",
+  lightmossgreen: "#a6c875",
+  lightmustard: "#f7d560",
+  lightnavy: "#155084",
+  lightnavyblue: "#2e5a88",
+  lightneongreen: "#4efd54",
+  lightolive: "#acbf69",
+  lightolivegreen: "#a4be5c",
+  lightorange: "#fdaa48",
+  lightpastelgreen: "#b2fba5",
+  lightpeach: "#ffd8b1",
+  lightpeagreen: "#c4fe82",
+  lightperiwinkle: "#c1c6fc",
+  lightpink: "#ffd1df",
+  lightplum: "#9d5783",
+  lightpurple: "#bf77f6",
+  lightred: "#ff474c",
+  lightrose: "#ffc5cb",
+  lightroyalblue: "#3a2efe",
+  lightsage: "#bcecac",
+  lightsalmon: "#fea993",
+  lightsalmonpink: "#fe7b7c",
+  lightseafoam: "#a0febf",
+  lightseafoamgreen: "#a7ffb5",
+  lightseagreen: "#98f6b0",
+  lightskyblue: "#c6fcff",
+  lighttan: "#fbeeac",
+  lightteal: "#90e4c1",
+  lightturquoise: "#7ef4cc",
+  lighturple: "#b36ff6",
+  lightviolet: "#d6b4fc",
+  lightyellow: "#fffe7a",
+  lightyellowgreen: "#ccfd7f",
+  lightyellowishgreen: "#c2ff89",
+  lilac: "#cea2fd",
+  lime: "#aaff32",
+  limegreen: "#89fe05",
+  limeyellow: "#d0fe1d",
+  lipstick: "#d5174e",
+  lipstickred: "#c0022f",
+  magenta: "#c20078",
+  mahogany: "#4a0100",
+  maize: "#f4d054",
+  mango: "#ffa62b",
+  manilla: "#fffa86",
+  marigold: "#fcc006",
+  maroon: "#650021",
+  mauve: "#ae7181",
+  mediumblue: "#2c6fbb",
+  mediumgreen: "#39ad48",
+  mediumpurple: "#9e43a2",
+  melon: "#ff7855",
+  metallicblue: "#4f738e",
+  midnight: "#03012d",
+  midnightblue: "#020035",
+  midnightpurple: "#280137",
+  militarygreen: "#667c3e",
+  milkchocolate: "#7f4e1e",
+  mint: "#9ffeb0",
+  mintgreen: "#8fff9f",
+  mintygreen: "#0bf77d",
+  mocha: "#9d7651",
+  moss: "#769958",
+  mossgreen: "#658b38",
+  mossygreen: "#638b27",
+  mud: "#735c12",
+  mudbrown: "#60460f",
+  mudgreen: "#606602",
+  muddybrown: "#886806",
+  muddygreen: "#657432",
+  muddyyellow: "#bfac05",
+  mulberry: "#920a4e",
+  murkygreen: "#6c7a0e",
+  mushroom: "#ba9e88",
+  mustard: "#ceb301",
+  mustardyellow: "#d2bd0a",
+  mutedblue: "#3b719f",
+  mutedgreen: "#5fa052",
+  mutedpink: "#d1768f",
+  mutedpurple: "#805b87",
+  nastygreen: "#70b23f",
+  navy: "#01153e",
+  navyblue: "#001146",
+  navygreen: "#35530a",
+  neonblue: "#04d9ff",
+  neongreen: "#0cff0c",
+  neonpink: "#fe019a",
+  neonpurple: "#bc13fe",
+  neonred: "#ff073a",
+  neonyellow: "#cfff04",
+  nickel: "#5a7d8b",
+  nightblue: "#040348",
+  ocean: "#017b92",
+  oceanblue: "#03719c",
+  oceangreen: "#3d9973",
+  ocher: "#bf9b0c",
+  ochre: "#bf9005",
+  offwhite: "#ffffe4",
+  offyellow: "#f1f33f",
+  oldpink: "#c77986",
+  oldrose: "#c87f89",
+  olive: "#6e750e",
+  olivebrown: "#645403",
+  olivedrab: "#6f7632",
+  olivegreen: "#677a04",
+  oliveyellow: "#c2b709",
+  orange: "#f97306",
+  orangebrown: "#be6400",
+  orangepink: "#ff6f52",
+  orangered: "#fe420f",
+  orangeyellow: "#ffad01",
+  orchid: "#c875c4",
+  pale: "#fff9d0",
+  paleaqua: "#b8ffeb",
+  palebrown: "#b1916e",
+  palecyan: "#b7fffa",
+  palegold: "#fdde6c",
+  palegreen: "#c7fdb5",
+  palelavender: "#eecffe",
+  palelilac: "#e4cbff",
+  palelime: "#befd73",
+  palelimegreen: "#b1ff3c",
+  palemagenta: "#d767ad",
+  palemauve: "#fed0fc",
+  paleolive: "#b9cc81",
+  paleolivegreen: "#b1d27b",
+  paleorange: "#ffa756",
+  palepeach: "#ffe5ad",
+  palepink: "#ffcfdc",
+  palepurple: "#b790d4",
+  palered: "#d9544d",
+  palerose: "#fdc1c5",
+  palesalmon: "#ffb19a",
+  paleskyblue: "#bdf6fe",
+  paleteal: "#82cbb2",
+  paleturquoise: "#a5fbd5",
+  paleviolet: "#ceaefa",
+  paleyellow: "#ffff84",
+  parchment: "#fefcaf",
+  pastelblue: "#a2bffe",
+  pastelgreen: "#b0ff9d",
+  pastelorange: "#ff964f",
+  pastelpink: "#ffbacd",
+  pastelpurple: "#caa0ff",
+  pastelred: "#db5856",
+  pastelyellow: "#fffe71",
+  pea: "#a4bf20",
+  peagreen: "#8eab12",
+  peach: "#ffb07c",
+  peachypink: "#ff9a8a",
+  peacockblue: "#016795",
+  pear: "#cbf85f",
+  periwinkle: "#8e82fe",
+  periwinkleblue: "#8f99fb",
+  petrol: "#005f6a",
+  pigpink: "#e78ea5",
+  pine: "#2b5d34",
+  pinegreen: "#0a481e",
+  pink: "#ff81c0",
+  pinkish: "#d46a7e",
+  pinkishbrown: "#b17261",
+  pinkishgrey: "#c8aca9",
+  pinkishorange: "#ff724c",
+  pinkishpurple: "#d648d7",
+  pinkishred: "#f10c45",
+  pinkishtan: "#d99b82",
+  pinkpurple: "#db4bda",
+  pinkred: "#f5054f",
+  pinky: "#fc86aa",
+  pinkypurple: "#c94cbe",
+  pinkyred: "#fc2647",
+  pissyellow: "#ddd618",
+  pistachio: "#c0fa8b",
+  plum: "#580f41",
+  plumpurple: "#4e0550",
+  poisongreen: "#40fd14",
+  poo: "#8f7303",
+  poobrown: "#885f01",
+  powderblue: "#b1d1fc",
+  powderpink: "#ffb2d0",
+  primaryblue: "#0804f9",
+  prussianblue: "#004577",
+  puce: "#a57e52",
+  puke: "#a5a502",
+  pukebrown: "#947706",
+  pukegreen: "#9aae07",
+  pukeyellow: "#c2be0e",
+  pumpkin: "#e17701",
+  pumpkinorange: "#fb7d07",
+  pureblue: "#0203e2",
+  purple: "#7e1e9c",
+  purpleblue: "#632de9",
+  purplebrown: "#673a3f",
+  purplegrey: "#866f85",
+  purplepink: "#e03fd8",
+  purplered: "#990147",
+  purplish: "#94568c",
+  purplishblue: "#601ef9",
+  purplishbrown: "#6b4247",
+  purplishgrey: "#7a687f",
+  purplishpink: "#ce5dae",
+  purplishred: "#b0054b",
+  purply: "#983fb2",
+  purplyblue: "#661aee",
+  purplypink: "#f075e6",
+  putty: "#beae8a",
+  racinggreen: "#014600",
+  radioactivegreen: "#2cfa1f",
+  raspberry: "#b00149",
+  rawsienna: "#9a6200",
+  rawumber: "#a75e09",
+  red: "#e50000",
+  redbrown: "#8b2e16",
+  redorange: "#fd3c06",
+  redpink: "#fa2a55",
+  redpurple: "#820747",
+  redviolet: "#9e0168",
+  reddish: "#c44240",
+  reddishbrown: "#7f2b0a",
+  reddishorange: "#f8481c",
+  reddishpink: "#fe2c54",
+  reddishpurple: "#910951",
+  reddybrown: "#6e1005",
+  richblue: "#021bf9",
+  richpurple: "#720058",
+  robinseggblue: "#98eff9",
+  robineggblue: "#8af1fe",
+  rosa: "#fe86a4",
+  rose: "#cf6275",
+  rosepink: "#f7879a",
+  rosered: "#be013c",
+  rosypink: "#f6688e",
+  rouge: "#ab1239",
+  royal: "#0c1793",
+  royalblue: "#0504aa",
+  royalpurple: "#4b006e",
+  ruby: "#ca0147",
+  russet: "#a13905",
+  rust: "#a83c09",
+  rustbrown: "#8b3103",
+  rustorange: "#c45508",
+  rustred: "#aa2704",
+  rustyorange: "#cd5909",
+  rustyred: "#af2f0d",
+  saffron: "#feb209",
+  sage: "#87ae73",
+  sagegreen: "#88b378",
+  salmon: "#ff796c",
+  salmonpink: "#fe7b7c",
+  sand: "#e2ca76",
+  sandbrown: "#cba560",
+  sandstone: "#c9ae74",
+  sandy: "#f1da7a",
+  sandybrown: "#c4a661",
+  sandyyellow: "#fdee73",
+  sapgreen: "#5c8b15",
+  sapphire: "#2138ab",
+  scarlet: "#be0119",
+  sea: "#3c9992",
+  seablue: "#047495",
+  seafoam: "#80f9ad",
+  seafoamblue: "#78d1b6",
+  seafoamgreen: "#7af9ab",
+  seagreen: "#53fca1",
+  seaweed: "#18d17b",
+  seaweedgreen: "#35ad6b",
+  shamrock: "#01b44c",
+  shamrockgreen: "#02c14d",
+  shit: "#7f5f00",
+  shitbrown: "#7b5804",
+  shitgreen: "#758000",
+  silver: "#c5c9c7",
+  sky: "#82cafc",
+  skyblue: "#75bbfd",
+  slate: "#516572",
+  slateblue: "#5b7c99",
+  slategreen: "#658d6d",
+  slategrey: "#59656d",
+  slimegreen: "#99cc04",
+  snot: "#acbb0d",
+  snotgreen: "#9dc100",
+  softblue: "#6488ea",
+  softgreen: "#6fc276",
+  softorange: "#ffab4a",
+  softpink: "#fdb0c0",
+  softpurple: "#a66fb5",
+  spearmint: "#1ef876",
+  springgreen: "#a9f971",
+  spruce: "#0a5f38",
+  squash: "#f2ab15",
+  steel: "#738595",
+  steelblue: "#5a7d9a",
+  steelgrey: "#6f828a",
+  stone: "#ada587",
+  stormyblue: "#507b9c",
+  straw: "#fcf679",
+  strawberry: "#fb2943",
+  strongblue: "#0c06f7",
+  strongpink: "#ff0789",
+  sunflower: "#ffc512",
+  sunflowyellow: "#ffda03",
+  sunnyyellow: "#fff917",
+  sunshineyellow: "#fffd37",
+  swamp: "#698339",
+  swampgreen: "#748500",
+  tan: "#d1b26f",
+  tanbrown: "#ab7e4c",
+  tangerine: "#ff9408",
+  tangreen: "#a9be70",
+  taupe: "#b9a281",
+  tea: "#65ab7c",
+  teagreen: "#bdf8a3",
+  teal: "#029386",
+  tealblue: "#01889f",
+  tealgreen: "#25a36f",
+  terracota: "#cb6843",
+  terracotta: "#c9643b",
+  tiffanyblue: "#7bf2da",
+  tomato: "#ef4026",
+  tomatored: "#ec2d01",
+  topaz: "#13bbaf",
+  toxicgreen: "#61de2a",
+  trueblue: "#010fcc",
+  truegreen: "#089404",
+  turquoise: "#06c2ac",
+  turquoiseblue: "#06b1c4",
+  turquoisegreen: "#04f489",
+  turtlegreen: "#75b84f",
+  twilight: "#4e518b",
+  twilightblue: "#0a437a",
+  uglyblue: "#31668a",
+  uglygreen: "#7a9703",
+  uglypink: "#cd7584",
+  uglypurple: "#a442a0",
+  uglyyellow: "#d0c101",
+  ultramarine: "#2000b1",
+  ultramarineblue: "#1805db",
+  umber: "#b26400",
+  velvet: "#750851",
+  vermillion: "#f4320c",
+  verydarkblue: "#000133",
+  verydarkbrown: "#1d0200",
+  verydarkgreen: "#062e03",
+  verydarkpurple: "#2a0134",
+  verypaleblue: "#d6fffe",
+  verypalegreen: "#cffdbc",
+  vibrantblue: "#0339f8",
+  vibrantgreen: "#0add08",
+  vibrantpurple: "#ad03de",
+  violet: "#9a0eea",
+  violetblue: "#510ac9",
+  violetpink: "#fb5ffc",
+  violetred: "#a50055",
+  viridian: "#1e9167",
+  vividblue: "#152eff",
+  vividgreen: "#2fef10",
+  vividpurple: "#9900fa",
+  vomit: "#a2a415",
+  vomitgreen: "#89a203",
+  vomityellow: "#c7c10c",
+  warmblue: "#4b57db",
+  warmbrown: "#964e02",
+  warmgrey: "#978a84",
+  warmpink: "#fb5581",
+  warmpurple: "#952e8f",
+  washedoutgreen: "#bcf5a6",
+  waterblue: "#0e87cc",
+  watermelon: "#fd4659",
+  wheat: "#fbdd7e",
+  white: "#ffffff",
+  windowsblue: "#3778bf",
+  wine: "#80013f",
+  winered: "#7b0323",
+  wintergreen: "#20f986",
+  wisteria: "#a87dc2",
+  yellow: "#ffff14",
+  yellowbrown: "#b79400",
+  yellowgreen: "#c0fb2d",
+  yellowish: "#faee66",
+  yellowishbrown: "#9b7a01",
+  yellowishgreen: "#b0dd16",
+  yellowishorange: "#ffab0f",
+  yellowishtan: "#fcfc81",
+  yellowochre: "#cb7723",
+  yelloworange: "#fcb001",
+  yellowtan: "#ffe36e",
+  yellowygreen: "#bff128"
+};
+
 // src/data/NamedColorsRepository.ts
 var NamedColorsRepository = class {
   colors = /* @__PURE__ */ new Map();
   colorsByHex = /* @__PURE__ */ new Map();
-  constructor() {
+  includeXkcd;
+  constructor(options) {
+    this.includeXkcd = options?.includeXkcd ?? false;
     this.loadColors();
   }
   loadColors() {
     for (const [name, hex3] of Object.entries(css_colors_default)) {
-      const color = Color.fromHex(hex3);
-      const entry = { name, hex: hex3.toLowerCase(), color };
-      this.colors.set(name.toLowerCase(), entry);
-      const hexKey = hex3.toLowerCase();
-      const existing = this.colorsByHex.get(hexKey) ?? [];
-      existing.push(entry);
-      this.colorsByHex.set(hexKey, existing);
+      this.addColor(name, hex3, "css");
     }
+    if (this.includeXkcd) {
+      for (const [name, hex3] of Object.entries(xkcd_colors_default)) {
+        if (!this.colors.has(name.toLowerCase())) {
+          this.addColor(name, hex3, "xkcd");
+        }
+      }
+    }
+  }
+  addColor(name, hex3, source) {
+    const color = Color.fromHex(hex3);
+    const entry = { name, hex: hex3.toLowerCase(), color, source };
+    this.colors.set(name.toLowerCase(), entry);
+    const hexKey = hex3.toLowerCase();
+    const existing = this.colorsByHex.get(hexKey) ?? [];
+    existing.push(entry);
+    this.colorsByHex.set(hexKey, existing);
   }
   /**
    * Gets a named color by name.
@@ -31178,6 +31992,174 @@ var CmykColorSpace = class {
   }
 };
 
+// src/color-spaces/Rec2020ColorSpace.ts
+var REC2020_ALPHA = 1.09929682680944;
+var REC2020_BETA = 0.018053968510807;
+var REC2020_TO_XYZ_D65 = Matrix3x3.create([
+  [0.636958, 0.1446169, 0.168881],
+  [0.2627002, 0.6779981, 0.0593017],
+  [0, 0.0280727, 1.0609851]
+]);
+var XYZ_D65_TO_REC2020 = Matrix3x3.create([
+  [1.7166512, -0.3556708, -0.2533663],
+  [-0.6666844, 1.6164812, 0.0157685],
+  [0.0176399, -0.0427706, 0.9421031]
+]);
+function rec2020ToLinear(value) {
+  if (value >= REC2020_BETA * 4.5) {
+    return Math.pow((value + REC2020_ALPHA - 1) / REC2020_ALPHA, 1 / 0.45);
+  }
+  return value / 4.5;
+}
+function linearToRec2020(value) {
+  if (value >= REC2020_BETA) {
+    return REC2020_ALPHA * Math.pow(value, 0.45) - (REC2020_ALPHA - 1);
+  }
+  return 4.5 * value;
+}
+var Rec2020ColorSpace = class {
+  type = "rec2020";
+  componentCount = 3;
+  componentNames = ["Red", "Green", "Blue"];
+  toXyzD65(color) {
+    if (color.space !== "rec2020") {
+      throw new Error(`Expected rec2020 color, got ${color.space}`);
+    }
+    const [r, g, b] = color.components;
+    const linearRgb = [
+      rec2020ToLinear(r),
+      rec2020ToLinear(g),
+      rec2020ToLinear(b)
+    ];
+    const xyz = REC2020_TO_XYZ_D65.multiplyVector(linearRgb);
+    return Color.create("xyz-d65", xyz, color.alpha);
+  }
+  fromXyzD65(color) {
+    if (color.space !== "xyz-d65") {
+      throw new Error(`Expected xyz-d65 color, got ${color.space}`);
+    }
+    const xyz = color.components;
+    const linearRgb = XYZ_D65_TO_REC2020.multiplyVector(xyz);
+    const encoded = [
+      linearToRec2020(linearRgb[0]),
+      linearToRec2020(linearRgb[1]),
+      linearToRec2020(linearRgb[2])
+    ];
+    return Color.create("rec2020", encoded, color.alpha);
+  }
+  isInGamut(components) {
+    return components.every((c) => c >= 0 && c <= 1);
+  }
+  clampToGamut(components) {
+    return components.map((c) => Math.max(0, Math.min(1, c)));
+  }
+};
+
+// src/color-spaces/ProPhotoRgbColorSpace.ts
+var PROPHOTO_GAMMA = 1.8;
+var PROPHOTO_CUTOFF = 1 / 512;
+var PROPHOTO_TO_XYZ_D50 = Matrix3x3.create([
+  [0.7977604, 0.1351917, 0.0313534],
+  [0.2880711, 0.7118432, 857e-7],
+  [0, 0, 0.8251046]
+]);
+var XYZ_D50_TO_PROPHOTO = Matrix3x3.create([
+  [1.3457989, -0.2555801, -0.0511557],
+  [-0.5459137, 1.5081673, 0.0205351],
+  [0, 0, 1.2118128]
+]);
+function proPhotoToLinear(value) {
+  if (value >= 16 * PROPHOTO_CUTOFF) {
+    return Math.pow(value, PROPHOTO_GAMMA);
+  }
+  return value / 16;
+}
+function linearToProPhoto(value) {
+  if (value >= PROPHOTO_CUTOFF) {
+    return Math.pow(value, 1 / PROPHOTO_GAMMA);
+  }
+  return 16 * value;
+}
+var ProPhotoRgbColorSpace = class {
+  type = "prophoto-rgb";
+  componentCount = 3;
+  componentNames = ["Red", "Green", "Blue"];
+  toXyzD65(color) {
+    if (color.space !== "prophoto-rgb") {
+      throw new Error(`Expected prophoto-rgb color, got ${color.space}`);
+    }
+    const [r, g, b] = color.components;
+    const linearRgb = [
+      proPhotoToLinear(r),
+      proPhotoToLinear(g),
+      proPhotoToLinear(b)
+    ];
+    const xyzD50 = PROPHOTO_TO_XYZ_D50.multiplyVector(linearRgb);
+    const xyzD65 = XYZ_D50_TO_D65.multiplyVector(xyzD50);
+    return Color.create("xyz-d65", xyzD65, color.alpha);
+  }
+  fromXyzD65(color) {
+    if (color.space !== "xyz-d65") {
+      throw new Error(`Expected xyz-d65 color, got ${color.space}`);
+    }
+    const xyz = color.components;
+    const xyzD50 = XYZ_D65_TO_D50.multiplyVector(xyz);
+    const linearRgb = XYZ_D50_TO_PROPHOTO.multiplyVector(xyzD50);
+    const encoded = [
+      linearToProPhoto(linearRgb[0]),
+      linearToProPhoto(linearRgb[1]),
+      linearToProPhoto(linearRgb[2])
+    ];
+    return Color.create("prophoto-rgb", encoded, color.alpha);
+  }
+  isInGamut(components) {
+    return components.every((c) => c >= 0 && c <= 1);
+  }
+  clampToGamut(components) {
+    return components.map((c) => Math.max(0, Math.min(1, c)));
+  }
+};
+
+// src/color-spaces/ACEScgColorSpace.ts
+var HALF_FLOAT_MAX = 65504;
+var ACESCG_TO_XYZ_D65 = Matrix3x3.create([
+  [0.6624542, 0.1340042, 0.1561877],
+  [0.2722287, 0.6740818, 0.0536895],
+  [-55746e-7, 40607e-7, 1.0103391]
+]);
+var XYZ_D65_TO_ACESCG = Matrix3x3.create([
+  [1.6410234, -0.3248033, -0.2364247],
+  [-0.6636629, 1.6153316, 0.0167563],
+  [0.0117219, -82844e-7, 0.9883948]
+]);
+var ACEScgColorSpace = class {
+  type = "acescg";
+  componentCount = 3;
+  componentNames = ["Red", "Green", "Blue"];
+  toXyzD65(color) {
+    if (color.space !== "acescg") {
+      throw new Error(`Expected acescg color, got ${color.space}`);
+    }
+    const rgb = color.components;
+    const xyz = ACESCG_TO_XYZ_D65.multiplyVector(rgb);
+    return Color.create("xyz-d65", xyz, color.alpha);
+  }
+  fromXyzD65(color) {
+    if (color.space !== "xyz-d65") {
+      throw new Error(`Expected xyz-d65 color, got ${color.space}`);
+    }
+    const xyz = color.components;
+    const rgb = XYZ_D65_TO_ACESCG.multiplyVector(xyz);
+    return Color.create("acescg", rgb, color.alpha);
+  }
+  isInGamut(components) {
+    return components.every((c) => c >= 0 && c <= HALF_FLOAT_MAX);
+  }
+  clampToGamut(components) {
+    return components.map((c) => Math.max(0, Math.min(1, c)));
+  }
+};
+
 // src/color-spaces/ColorSpaceRegistry.ts
 var ColorSpaceRegistry = class _ColorSpaceRegistry {
   spaces = /* @__PURE__ */ new Map();
@@ -31208,6 +32190,9 @@ var ColorSpaceRegistry = class _ColorSpaceRegistry {
     registry2.register(new HwbColorSpace());
     registry2.register(new DisplayP3ColorSpace());
     registry2.register(new CmykColorSpace());
+    registry2.register(new Rec2020ColorSpace());
+    registry2.register(new ProPhotoRgbColorSpace());
+    registry2.register(new ACEScgColorSpace());
     return registry2;
   }
 };
@@ -31256,6 +32241,7 @@ var ConversionService = class {
   }
   /**
    * Clamps a color to the gamut of its color space.
+   * Uses simple component clamping (fast but may desaturate).
    */
   clampToGamut(color) {
     const colorSpace = this.registry.get(color.space);
@@ -31264,6 +32250,51 @@ var ConversionService = class {
     }
     const clamped = colorSpace.clampToGamut(color.components);
     return color.withComponents(clamped);
+  }
+  /**
+   * Maps a color into the gamut of a target space using perceptual
+   * chroma reduction in Oklch. Based on CSS Color Level 4 §13.2.
+   *
+   * Instead of naively clamping RGB components (which shifts hue and
+   * lightness), this holds Oklch hue and lightness constant while
+   * binary-searching for the maximum chroma that still fits inside
+   * the target gamut. The result is the closest perceptually uniform
+   * in-gamut color.
+   *
+   * @param color - Any color in any supported space
+   * @param targetSpace - The destination gamut (default: color's own space)
+   * @param epsilon - Chroma convergence threshold (default 0.002)
+   * @returns A color in targetSpace that is within gamut
+   */
+  mapToGamut(color, targetSpace, epsilon = 2e-3) {
+    const destination = targetSpace ?? color.space;
+    const destSpace = this.registry.get(destination);
+    if (!destSpace) {
+      throw new Error(`Unknown color space: ${destination}`);
+    }
+    const converted = this.convert(color, destination);
+    if (destSpace.isInGamut(converted.components)) {
+      return converted;
+    }
+    const oklch = this.convert(color, "oklch");
+    const [L, , H] = oklch.components;
+    if (oklch.components[1] <= 0) {
+      return this.clampToGamut(this.convert(oklch, destination));
+    }
+    let low = 0;
+    let high = oklch.components[1];
+    while (high - low > epsilon) {
+      const mid = (low + high) / 2;
+      const candidate = Color.create("oklch", [L, mid, H], color.alpha);
+      const inDest = this.convert(candidate, destination);
+      if (destSpace.isInGamut(inDest.components)) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    const mapped = Color.create("oklch", [L, low, H], color.alpha);
+    return this.convert(mapped, destination);
   }
   /**
    * Lists all available color spaces.
@@ -31821,6 +32852,9 @@ var ColorSpaceSchema = external_exports3.enum([
   "srgb",
   "linear-srgb",
   "display-p3",
+  "rec2020",
+  "prophoto-rgb",
+  "acescg",
   "xyz-d65",
   "xyz-d50",
   "lab",
@@ -31862,7 +32896,10 @@ var CultureRegionSchema = external_exports3.enum([
   "western",
   "eastAsian",
   "southAsian",
-  "middleEastern"
+  "middleEastern",
+  "african",
+  "latinAmerican",
+  "indigenous"
 ]).describe("Cultural region");
 var MeaningContextSchema = external_exports3.enum([
   "general",
@@ -32161,11 +33198,269 @@ var cultural_meanings_default = {
   }
 };
 
+// src/data/expanded-cultural-meanings.json
+var expanded_cultural_meanings_default = {
+  red: {
+    african: {
+      general: ["vitality", "life force", "spiritual power", "political struggle", "bloodline and ancestry"],
+      business: ["strength", "power", "used in national branding across many African nations"],
+      wedding: ["fertility", "vitality", "sometimes worn by brides in West African ceremonies"],
+      mourning: ["used in some Akan funeral rites", "sacrifice", "transition to ancestral realm"]
+    },
+    latinAmerican: {
+      general: ["passion", "revolution", "courage", "religious devotion", "life energy"],
+      business: ["boldness", "urgency", "associated with socialist political movements"],
+      wedding: ["passion", "sometimes used as accent color", "associated with love"],
+      mourning: ["sacrifice", "martyrdom", "used in Day of the Dead altars"]
+    },
+    indigenous: {
+      general: ["life blood", "earth connection", "south direction in some medicine wheels", "war and courage"],
+      business: ["rarely used in isolation", "strength when combined with earth tones"],
+      wedding: ["vitality", "sometimes used in ceremonial regalia"],
+      mourning: ["blood of ancestors", "transition", "used in some burial traditions"]
+    }
+  },
+  blue: {
+    african: {
+      general: ["sky and water", "peace", "harmony", "spiritual healing", "love in some West African traditions"],
+      business: ["trust", "stability", "used in corporate contexts similarly to Western usage"],
+      wedding: ["fidelity", "peace", "sometimes used in Nigerian wedding attire"],
+      mourning: ["serenity for the departed", "not a primary mourning color"]
+    },
+    latinAmerican: {
+      general: ["sky", "ocean", "the Virgin Mary", "trust", "tranquility", "hope"],
+      business: ["reliability", "professionalism", "widely used in corporate branding"],
+      wedding: ["devotion", "fidelity", "Marian association makes it auspicious"],
+      mourning: ["heavenly peace", "not a primary mourning color"]
+    },
+    indigenous: {
+      general: ["sky", "water", "wisdom", "west direction in some medicine wheels", "spiritual intuition"],
+      business: ["trust", "calm", "used respectfully in context"],
+      wedding: ["sky blessings", "spiritual wisdom", "varies by nation"],
+      mourning: ["western sky and passage", "used in some traditions for spiritual transition"]
+    }
+  },
+  green: {
+    african: {
+      general: ["fertility", "growth", "land and agriculture", "prosperity", "Pan-African unity"],
+      business: ["agriculture", "growth", "prosperity", "featured on many national flags"],
+      wedding: ["fertility", "abundance", "new beginnings", "commonly used in West African weddings"],
+      mourning: ["not a primary mourning color", "life continuing"]
+    },
+    latinAmerican: {
+      general: ["nature", "hope", "independence", "healing", "national identity in Mexico"],
+      business: ["growth", "natural products", "environmental awareness"],
+      wedding: ["hope for the future", "abundance", "sometimes used in tropical themes"],
+      mourning: ["not typically used", "life and renewal"]
+    },
+    indigenous: {
+      general: ["earth and plant life", "healing", "north direction in some medicine wheels", "growth and renewal"],
+      business: ["earth stewardship", "sustainability", "natural alignment"],
+      wedding: ["earth blessings", "fertility of the land", "growth of the new family"],
+      mourning: ["return to the earth", "cycle of renewal"]
+    }
+  },
+  yellow: {
+    african: {
+      general: ["wealth", "gold", "fertility", "royalty in many kingdoms", "the sun and energy"],
+      business: ["prosperity", "gold trade heritage", "associated with precious resources"],
+      wedding: ["prosperity", "wealth blessings", "gold adornment is traditional in many regions"],
+      mourning: ["not a primary mourning color", "sometimes used to honor a prosperous life"]
+    },
+    latinAmerican: {
+      general: ["sun", "warmth", "death and mourning in some contexts", "marigolds in Day of the Dead"],
+      business: ["energy", "warmth", "attention-getting"],
+      wedding: ["joy", "warmth", "sometimes associated with infidelity so used carefully"],
+      mourning: ["marigold offerings for the dead", "guiding spirits home", "remembrance"]
+    },
+    indigenous: {
+      general: ["east direction in many medicine wheels", "sunrise", "new beginnings", "illumination"],
+      business: ["dawn of new ventures", "clarity", "illumination"],
+      wedding: ["sunrise blessings", "new chapter beginning", "spiritual illumination"],
+      mourning: ["sunrise and the east", "souls traveling toward the light"]
+    }
+  },
+  white: {
+    african: {
+      general: ["purity", "spirituality", "ancestral connection", "peace", "victory"],
+      business: ["purity", "clarity", "sometimes associated with spiritual authority"],
+      wedding: ["purity", "spiritual blessings", "increasingly common alongside traditional colors"],
+      mourning: ["used in some mourning traditions", "spiritual passage", "ancestor world"]
+    },
+    latinAmerican: {
+      general: ["purity", "peace", "innocence", "the divine", "Catholic tradition"],
+      business: ["clean", "professional", "honest"],
+      wedding: ["traditional bridal color", "purity", "Virgin Mary association"],
+      mourning: ["peace for the departed", "angels", "heavenly rest"]
+    },
+    indigenous: {
+      general: ["north direction in some medicine wheels", "winter", "snow", "wisdom of elders", "purity"],
+      business: ["clarity", "truth", "clean intentions"],
+      wedding: ["purity of intent", "wisdom", "elder blessings"],
+      mourning: ["snow and north", "the great beyond", "used in some burial customs"]
+    }
+  },
+  black: {
+    african: {
+      general: ["maturity", "spiritual energy", "ancestral power", "masculinity", "age and wisdom"],
+      business: ["authority", "strength", "used in formal and powerful contexts"],
+      wedding: ["maturity", "depth of commitment", "sometimes worn by elders at ceremonies"],
+      mourning: ["mourning and grief in many regions", "connection to the departed", "solemnity"]
+    },
+    latinAmerican: {
+      general: ["mourning", "formality", "power", "elegance", "the underworld in pre-Columbian belief"],
+      business: ["authority", "sophistication", "formal power"],
+      wedding: ["not traditional for brides", "formal wear for men", "increasingly modern"],
+      mourning: ["traditional mourning color", "Catholic funeral tradition", "grief and respect"]
+    },
+    indigenous: {
+      general: ["west direction in some medicine wheels", "introspection", "the void before creation", "deep knowledge"],
+      business: ["authority", "depth of knowledge", "used with gravity"],
+      wedding: ["not commonly used", "depth of commitment in some traditions"],
+      mourning: ["passage to the spirit world", "the unknown", "used in some mourning face paint"]
+    }
+  },
+  purple: {
+    african: {
+      general: ["royalty", "wealth", "femininity in some regions", "spiritual authority"],
+      business: ["prestige", "leadership", "associated with chiefs and royalty"],
+      wedding: ["royal status", "wealth", "used in ceremonial robes in some regions"],
+      mourning: ["not a primary mourning color", "dignity and nobility"]
+    },
+    latinAmerican: {
+      general: ["penitence", "Lenten season", "mourning", "spirituality", "Catholic liturgy"],
+      business: ["premium", "luxury", "used carefully due to mourning associations"],
+      wedding: ["avoided by some due to mourning connotations", "used in religious ceremonies"],
+      mourning: ["Lenten mourning", "used in Catholic funeral masses", "penitence and sorrow"]
+    },
+    indigenous: {
+      general: ["spiritual transformation", "healing energy", "vision and ceremony"],
+      business: ["rarely used in isolation", "spiritual significance may limit commercial use"],
+      wedding: ["spiritual blessings", "ceremonial significance varies by nation"],
+      mourning: ["spiritual passage", "transformation between worlds"]
+    }
+  },
+  orange: {
+    african: {
+      general: ["warmth", "community", "harvest", "earth and sunset"],
+      business: ["approachability", "warmth", "community-oriented branding"],
+      wedding: ["warmth of community", "celebration", "used in festive attire"],
+      mourning: ["not a primary mourning color", "sunset and passage"]
+    },
+    latinAmerican: {
+      general: ["sun", "earth", "harvest", "Day of the Dead marigolds", "warmth"],
+      business: ["friendly", "energetic", "approachable"],
+      wedding: ["warmth", "festive energy", "tropical celebrations"],
+      mourning: ["marigold association with Day of the Dead", "guiding spirits", "remembrance altars"]
+    },
+    indigenous: {
+      general: ["kinship", "warmth of fire", "community gathering", "autumn harvest"],
+      business: ["community", "warmth", "gathering and collaboration"],
+      wedding: ["fire and warmth of the hearth", "community celebration"],
+      mourning: ["setting sun", "fire ceremonies for the departed"]
+    }
+  },
+  pink: {
+    african: {
+      general: ["tenderness", "femininity", "youth", "less traditional than other colors"],
+      business: ["youthful appeal", "feminine products", "modern branding"],
+      wedding: ["romance", "youthful celebration", "modern influence"],
+      mourning: ["not typically used"]
+    },
+    latinAmerican: {
+      general: ["femininity", "sweetness", "celebration", "quincea\xF1era tradition"],
+      business: ["feminine products", "youthful markets", "celebratory branding"],
+      wedding: ["romance", "used in bridesmaids attire and decorations"],
+      mourning: ["not typically used"]
+    },
+    indigenous: {
+      general: ["not a traditional ceremonial color", "modern adoption", "flowers and spring"],
+      business: ["modern usage", "not tied to traditional significance"],
+      wedding: ["wildflower symbolism in some nations", "modern celebrations"],
+      mourning: ["not typically used"]
+    }
+  },
+  brown: {
+    african: {
+      general: ["earth", "stability", "home", "the land and soil", "groundedness"],
+      business: ["earthy products", "stability", "agricultural association"],
+      wedding: ["earth connection", "traditional when combined with other colors"],
+      mourning: ["earth and burial", "return to the ground", "sometimes used"]
+    },
+    latinAmerican: {
+      general: ["earth", "mestizo identity", "humility", "Franciscan spirituality"],
+      business: ["earthy", "organic", "traditional and artisanal products"],
+      wedding: ["rustic themes", "earth connection", "not a primary wedding color"],
+      mourning: ["earth and burial", "humility before death"]
+    },
+    indigenous: {
+      general: ["Mother Earth", "grounding", "animals and hide", "sustenance and stability"],
+      business: ["earth stewardship", "natural materials", "handcraft traditions"],
+      wedding: ["earth blessings", "leather and hide ceremonial items", "groundedness"],
+      mourning: ["return to the earth", "burial and soil", "the cycle of life"]
+    }
+  },
+  gold: {
+    african: {
+      general: ["wealth", "royalty", "the sun", "divine kingship", "Ashanti gold tradition"],
+      business: ["prestige", "success", "gold trade heritage", "high-status branding"],
+      wedding: ["prosperity", "royal blessings", "essential in many West African ceremonies"],
+      mourning: ["honoring a prosperous life", "not a primary mourning color"]
+    },
+    latinAmerican: {
+      general: ["wealth", "the sun", "pre-Columbian heritage", "divine power", "El Dorado legend"],
+      business: ["luxury", "success", "premium status", "historical treasure association"],
+      wedding: ["prosperity blessings", "luxury", "Catholic church ornamentation"],
+      mourning: ["heavenly reward", "not a primary mourning color"]
+    },
+    indigenous: {
+      general: ["the sun", "sacred light", "corn and harvest", "spiritual illumination"],
+      business: ["sacred value", "used respectfully", "not primarily commercial"],
+      wedding: ["sun blessings", "harvest abundance", "golden eagle symbolism in some nations"],
+      mourning: ["sun guiding the spirit", "not a primary mourning color"]
+    }
+  },
+  silver: {
+    african: {
+      general: ["the moon", "femininity", "modernity", "lesser status than gold traditionally"],
+      business: ["modern", "technology", "sleek and contemporary"],
+      wedding: ["modern elegance", "moonlight blessings", "complementary to gold"],
+      mourning: ["not a primary mourning color", "quiet dignity"]
+    },
+    latinAmerican: {
+      general: ["the moon", "wealth", "colonial mining heritage", "modernity", "elegance"],
+      business: ["technology", "modernity", "sleek branding"],
+      wedding: ["elegance", "moonlight", "used in decorations and jewelry"],
+      mourning: ["not a primary mourning color", "quiet respect"]
+    },
+    indigenous: {
+      general: ["the moon", "water reflection", "feminine energy", "Navajo and Pueblo silverwork tradition"],
+      business: ["craftsmanship", "artisanal quality", "silversmithing heritage in some nations"],
+      wedding: ["moon blessings", "silver jewelry as ceremonial gifts", "feminine grace"],
+      mourning: ["moonlight guiding spirits", "not a primary mourning color"]
+    }
+  }
+};
+
 // src/data/CulturalMeaningsRepository.ts
 var CulturalMeaningsRepository = class {
   data;
   constructor() {
-    this.data = cultural_meanings_default;
+    const base = cultural_meanings_default;
+    const expanded = expanded_cultural_meanings_default;
+    const merged = {};
+    for (const [color, regions] of Object.entries(base)) {
+      merged[color] = { ...regions };
+    }
+    for (const [color, regions] of Object.entries(expanded)) {
+      if (!merged[color]) {
+        merged[color] = {};
+      }
+      for (const [region, contexts] of Object.entries(regions)) {
+        merged[color][region] = contexts;
+      }
+    }
+    this.data = merged;
   }
   /**
    * Gets meanings for a specific color.
@@ -32210,7 +33505,7 @@ var CulturalMeaningsRepository = class {
       return [];
     }
     const results = [];
-    const regions = ["western", "eastAsian", "southAsian", "middleEastern"];
+    const regions = ["western", "eastAsian", "southAsian", "middleEastern", "african", "latinAmerican", "indigenous"];
     for (const region of regions) {
       const meanings = colorData[region]?.[context];
       if (meanings) {
@@ -33162,9 +34457,439 @@ async function adjustColor(input) {
   };
 }
 
+// src/services/APCAService.ts
+var conversionService18 = new ConversionService();
+var APCA_COEFFICIENTS = {
+  R: 0.2126729,
+  G: 0.7151522,
+  B: 0.072175
+};
+var SOFT_CLAMP = {
+  THRESHOLD: 0.022,
+  EXPONENT: 1.414
+};
+var POWER_CURVES = {
+  NORMAL: { BG: 0.56, TEXT: 0.57 },
+  REVERSE: { BG: 0.65, TEXT: 0.62 },
+  SCALE: 1.14
+};
+var OUTPUT_CLAMP = {
+  THRESHOLD: 0.1,
+  OFFSET: 0.027
+};
+var APCA_THRESHOLDS = {
+  BODY_TEXT: 75,
+  LARGE_TEXT: 60,
+  NON_TEXT: 45,
+  SPOT_TEXT: 30,
+  NON_CONTENT: 15
+};
+var DEFAULT_TARGET_LC = 75;
+var MAX_BINARY_SEARCH_ITERATIONS = 25;
+var APCAService = class {
+  /**
+   * Calculates the APCA luminance (Y) for a color.
+   * Linearizes sRGB components and applies the APCA luminance coefficients.
+   */
+  calculateY(color) {
+    const srgbColor = conversionService18.convert(color, "srgb");
+    const [r, g, b] = srgbColor.components;
+    const rLin = srgbToLinear(r);
+    const gLin = srgbToLinear(g);
+    const bLin = srgbToLinear(b);
+    return APCA_COEFFICIENTS.R * rLin + APCA_COEFFICIENTS.G * gLin + APCA_COEFFICIENTS.B * bLin;
+  }
+  /**
+   * Applies the APCA soft-clamp pre-processing to a Y (luminance) value.
+   * Negative values are floored to zero. Values below the soft-clamp threshold
+   * are boosted by a power-curve offset to prevent artifacts in the SAPC calculation.
+   */
+  softClampY(y) {
+    if (y < 0) {
+      return 0;
+    }
+    if (y > SOFT_CLAMP.THRESHOLD) {
+      return y;
+    }
+    return y + Math.pow(SOFT_CLAMP.THRESHOLD - y, SOFT_CLAMP.EXPONENT);
+  }
+  /**
+   * Produces a human-readable interpretation string for a given absolute Lc value.
+   */
+  interpretLc(absLc) {
+    if (absLc >= 90) {
+      return "Preferred for body text";
+    }
+    if (absLc >= APCA_THRESHOLDS.BODY_TEXT) {
+      return "Minimum for body text";
+    }
+    if (absLc >= APCA_THRESHOLDS.LARGE_TEXT) {
+      return "Minimum for large text (24px+)";
+    }
+    if (absLc >= APCA_THRESHOLDS.NON_TEXT) {
+      return "Minimum for non-text elements and large bold text";
+    }
+    if (absLc >= APCA_THRESHOLDS.SPOT_TEXT) {
+      return "Minimum for spot text and placeholders";
+    }
+    if (absLc >= APCA_THRESHOLDS.NON_CONTENT) {
+      return "Minimum for non-content borders and dividers only";
+    }
+    return "Not suitable for any visible content";
+  }
+  /**
+   * Calculates the APCA lightness contrast (Lc) between a text color and background color.
+   *
+   * The algorithm:
+   * 1. Converts both colors to sRGB, linearizes, and computes luminance (Y).
+   * 2. Applies soft-clamp pre-processing to both Y values.
+   * 3. Determines polarity (normal = dark-on-light, reverse = light-on-dark).
+   * 4. Applies asymmetric power curves to compute raw SAPC.
+   * 5. Applies output clamp and scales to the 0-100+ Lc range.
+   *
+   * @param textColor - The foreground/text color
+   * @param backgroundColor - The background color
+   * @returns Full APCA result with Lc, polarity, and threshold compliance
+   */
+  calculateAPCA(textColor, backgroundColor) {
+    const yTextRaw = this.calculateY(textColor);
+    const yBgRaw = this.calculateY(backgroundColor);
+    const yText = this.softClampY(yTextRaw);
+    const yBg = this.softClampY(yBgRaw);
+    let sapc;
+    let polarity;
+    if (yBg > yText) {
+      polarity = "normal";
+      sapc = (Math.pow(yBg, POWER_CURVES.NORMAL.BG) - Math.pow(yText, POWER_CURVES.NORMAL.TEXT)) * POWER_CURVES.SCALE;
+    } else {
+      polarity = "reverse";
+      sapc = (Math.pow(yBg, POWER_CURVES.REVERSE.BG) - Math.pow(yText, POWER_CURVES.REVERSE.TEXT)) * POWER_CURVES.SCALE;
+    }
+    let lc;
+    if (Math.abs(sapc) < OUTPUT_CLAMP.THRESHOLD) {
+      lc = 0;
+    } else if (sapc > 0) {
+      lc = sapc - OUTPUT_CLAMP.OFFSET;
+    } else {
+      lc = sapc + OUTPUT_CLAMP.OFFSET;
+    }
+    lc = lc * 100;
+    const absLc = Math.abs(lc);
+    return {
+      Lc: lc,
+      absLc,
+      polarity,
+      textLuminance: yText,
+      backgroundLuminance: yBg,
+      interpretation: this.interpretLc(absLc),
+      meetsMinimum: {
+        bodyText: absLc >= APCA_THRESHOLDS.BODY_TEXT,
+        largeText: absLc >= APCA_THRESHOLDS.LARGE_TEXT,
+        nonText: absLc >= APCA_THRESHOLDS.NON_TEXT,
+        spotText: absLc >= APCA_THRESHOLDS.SPOT_TEXT
+      }
+    };
+  }
+  /**
+   * Suggests either black or white text for the given background,
+   * choosing whichever yields a higher absolute Lc value.
+   *
+   * @param backgroundColor - The background color to evaluate against
+   * @param targetLc - Optional minimum Lc target (informational; the method
+   *   always returns the better of black or white regardless)
+   * @returns Black (#000000) or white (#FFFFFF)
+   */
+  suggestTextColor(backgroundColor, _targetLc) {
+    const black = Color.fromHex("#000000");
+    const white = Color.fromHex("#FFFFFF");
+    const blackResult = this.calculateAPCA(black, backgroundColor);
+    const whiteResult = this.calculateAPCA(white, backgroundColor);
+    if (whiteResult.absLc >= blackResult.absLc) {
+      return white;
+    }
+    return black;
+  }
+  /**
+   * Adjusts a text color's lightness to meet a target APCA Lc value
+   * against the given background. Uses binary search in Oklch lightness space
+   * for perceptually uniform adjustments.
+   *
+   * If the text color already meets the target, it is returned unchanged.
+   * The search direction (lighter or darker) is determined by the background
+   * luminance: for dark backgrounds the text is lightened, for light backgrounds
+   * it is darkened.
+   *
+   * @param textColor - The text color to adjust
+   * @param backgroundColor - The background to measure against
+   * @param targetLc - The desired absolute Lc value (default: 75, minimum for body text)
+   * @returns An adjusted color in the same color space as the input text color
+   */
+  adjustForAPCA(textColor, backgroundColor, targetLc = DEFAULT_TARGET_LC) {
+    const currentResult = this.calculateAPCA(textColor, backgroundColor);
+    if (currentResult.absLc >= targetLc) {
+      return textColor;
+    }
+    const oklchColor = conversionService18.convert(textColor, "oklch");
+    const bgY = this.calculateY(backgroundColor);
+    const [, chroma, hue] = oklchColor.components;
+    const shouldLighten = bgY < 0.5;
+    let low = shouldLighten ? oklchColor.components[0] : 0;
+    let high = shouldLighten ? 1 : oklchColor.components[0];
+    for (let i = 0; i < MAX_BINARY_SEARCH_ITERATIONS; i++) {
+      const mid = (low + high) / 2;
+      const candidate = Color.create("oklch", [mid, chroma, hue], textColor.alpha);
+      const candidateResult = this.calculateAPCA(candidate, backgroundColor);
+      if (candidateResult.absLc >= targetLc) {
+        if (shouldLighten) {
+          high = mid;
+        } else {
+          low = mid;
+        }
+      } else {
+        if (shouldLighten) {
+          low = mid;
+        } else {
+          high = mid;
+        }
+      }
+    }
+    const finalLightness = (low + high) / 2;
+    const adjustedOklch = Color.create("oklch", [finalLightness, chroma, hue], textColor.alpha);
+    return conversionService18.convert(adjustedOklch, textColor.space);
+  }
+};
+
+// src/mcp/tools/calculate/calculateAPCA.ts
+var apcaService = new APCAService();
+var calculateAPCASchema = external_exports3.object({
+  textColor: external_exports3.string().describe("Text/foreground color"),
+  backgroundColor: external_exports3.string().describe("Background color")
+});
+async function calculateAPCA(input) {
+  const text = parseColor(input.textColor);
+  const bg = parseColor(input.backgroundColor);
+  const result = apcaService.calculateAPCA(text, bg);
+  return {
+    textColor: input.textColor,
+    backgroundColor: input.backgroundColor,
+    Lc: Math.round(result.Lc * 100) / 100,
+    absoluteLc: Math.round(result.absLc * 100) / 100,
+    polarity: result.polarity,
+    interpretation: result.interpretation,
+    passes: result.meetsMinimum,
+    note: "APCA is designed for WCAG 3.0. Lc values indicate lightness contrast; 75+ recommended for body text."
+  };
+}
+
+// src/services/TemperatureService.ts
+var conversionService19 = new ConversionService();
+var MIN_KELVIN = 1e3;
+var MAX_KELVIN = 4e4;
+var TEMPERATURE_BANDS = [
+  { maxKelvin: 2e3, description: "Candlelight", category: "warm" },
+  { maxKelvin: 3e3, description: "Warm white (tungsten-like)", category: "warm" },
+  { maxKelvin: 4e3, description: "Warm white (halogen)", category: "warm" },
+  { maxKelvin: 5e3, description: "Neutral white (fluorescent)", category: "neutral" },
+  { maxKelvin: 6e3, description: "Daylight (noon sun)", category: "daylight" },
+  { maxKelvin: 7500, description: "Cool daylight (overcast)", category: "cool" },
+  { maxKelvin: 1e4, description: "Blue sky", category: "cool" },
+  { maxKelvin: Infinity, description: "Deep blue sky", category: "cool" }
+];
+var TemperatureService = class {
+  /**
+   * Converts a Kelvin color temperature to its corresponding sRGB color.
+   *
+   * Uses the Tanner Helland algorithm, a fast polynomial/logarithmic
+   * approximation of the Planckian (blackbody) radiation spectrum.
+   *
+   * @param kelvin - Color temperature in Kelvin (clamped to 1000-40000)
+   * @returns TemperatureInfo with the hex color, RGB components, and description
+   */
+  kelvinToColor(kelvin) {
+    const clampedKelvin = Math.max(MIN_KELVIN, Math.min(MAX_KELVIN, kelvin));
+    const temp = clampedKelvin / 100;
+    let r;
+    let g;
+    let b;
+    if (temp <= 66) {
+      r = 255;
+      g = 99.4708025861 * Math.log(temp) - 161.1195681661;
+      b = temp <= 19 ? 0 : 138.5177312231 * Math.log(temp - 10) - 305.0447927307;
+    } else {
+      r = 329.698727446 * Math.pow(temp - 60, -0.1332047592);
+      g = 288.1221695283 * Math.pow(temp - 60, -0.0755148492);
+      b = 255;
+    }
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    const rInt = Math.round(r);
+    const gInt = Math.round(g);
+    const bInt = Math.round(b);
+    const color = Color.create("srgb", [r / 255, g / 255, b / 255], 1);
+    const clamped = conversionService19.clampToGamut(color);
+    const hex3 = clamped.toHex();
+    const { description, category } = this.describeTemperature(clampedKelvin);
+    return {
+      kelvin: clampedKelvin,
+      color: { hex: hex3, rgb: { r: rInt, g: gInt, b: bInt } },
+      description,
+      category
+    };
+  }
+  /**
+   * Estimates the correlated color temperature (CCT) of a color.
+   *
+   * Converts the color to CIE XYZ-D65, derives xy chromaticity,
+   * then applies McCamy's cubic approximation formula for CCT.
+   *
+   * Planckian locus proximity is checked in CIE 1960 uv space:
+   * a deltaUV below 0.02 indicates the color is close to a
+   * blackbody radiator.
+   *
+   * @param color - Any Color instance
+   * @returns ColorTemperatureResult with estimated Kelvin, chromaticity, and classification
+   */
+  colorToTemperature(color) {
+    const xyz = conversionService19.convert(color, "xyz-d65");
+    const [X, Y, Z] = xyz.components;
+    const sum = X + Y + Z;
+    if (sum === 0) {
+      return {
+        estimatedKelvin: 0,
+        chromaticity: { x: 0, y: 0 },
+        isOnPlanckianLocus: false,
+        description: "No measurable color temperature (black)",
+        category: "neutral"
+      };
+    }
+    const x = X / sum;
+    const y = Y / sum;
+    const n = (x - 0.332) / (0.1858 - y);
+    const cct = 449 * Math.pow(n, 3) + 3525 * Math.pow(n, 2) + 6823.3 * n + 5520.33;
+    const isOnLocus = this.isNearPlanckianLocus(x, y, cct);
+    const reportedKelvin = Math.round(Math.max(MIN_KELVIN, Math.min(MAX_KELVIN, cct)));
+    const { description, category } = this.describeTemperature(reportedKelvin);
+    return {
+      estimatedKelvin: reportedKelvin,
+      chromaticity: { x, y },
+      isOnPlanckianLocus: isOnLocus,
+      description,
+      category
+    };
+  }
+  /**
+   * Generates a series of TemperatureInfo samples between two Kelvin values.
+   *
+   * @param startKelvin - Starting temperature (inclusive)
+   * @param endKelvin - Ending temperature (inclusive)
+   * @param steps - Number of evenly-spaced samples (minimum 2)
+   * @returns Array of TemperatureInfo from startKelvin to endKelvin
+   */
+  generateTemperatureGradient(startKelvin, endKelvin, steps) {
+    if (steps < 2) {
+      throw new Error("Temperature gradient must have at least 2 steps");
+    }
+    const results = [];
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const kelvin = startKelvin + (endKelvin - startKelvin) * t;
+      results.push(this.kelvinToColor(kelvin));
+    }
+    return results;
+  }
+  /**
+   * Returns a human-readable description and category for a Kelvin value.
+   */
+  describeTemperature(kelvin) {
+    for (const band of TEMPERATURE_BANDS) {
+      if (kelvin < band.maxKelvin) {
+        return { description: band.description, category: band.category };
+      }
+    }
+    const last = TEMPERATURE_BANDS[TEMPERATURE_BANDS.length - 1];
+    return { description: last.description, category: last.category };
+  }
+  /**
+   * Checks whether a chromaticity coordinate (in CIE xy) lies near the
+   * Planckian locus by comparing it against the expected blackbody
+   * chromaticity at the given CCT in CIE 1960 uv space.
+   *
+   * The threshold is deltaUV < 0.02, which is the standard tolerance
+   * used in lighting engineering for "on-locus" determination.
+   *
+   * @param x - CIE x chromaticity of the test color
+   * @param y - CIE y chromaticity of the test color
+   * @param cct - Estimated correlated color temperature
+   * @returns True if the color is within 0.02 deltaUV of the Planckian locus
+   */
+  isNearPlanckianLocus(x, y, cct) {
+    const denominator = -2 * x + 12 * y + 3;
+    if (denominator === 0) {
+      return false;
+    }
+    const uTest = 4 * x / denominator;
+    const vTest = 6 * y / denominator;
+    const planckianUV = this.planckianLocusUV(cct);
+    const du = uTest - planckianUV.u;
+    const dv = vTest - planckianUV.v;
+    const deltaUV = Math.sqrt(du * du + dv * dv);
+    return deltaUV < 0.02;
+  }
+  /**
+   * Approximates the CIE 1960 uv coordinates on the Planckian locus
+   * at a given color temperature using Krystek's rational polynomial
+   * approximation. Accurate to ~1e-5 for 1000K-15000K; reasonable
+   * extrapolation beyond that range.
+   */
+  planckianLocusUV(kelvin) {
+    const T = kelvin;
+    const T2 = T * T;
+    const u = (0.860117757 + 154118254e-12 * T + 128641212e-15 * T2) / (1 + 842420235e-12 * T + 708145163e-15 * T2);
+    const v = (0.317398726 + 422806245e-13 * T + 420481691e-16 * T2) / (1 - 289741816e-13 * T + 161456053e-15 * T2);
+    return { u, v };
+  }
+};
+
+// src/mcp/tools/calculate/calculateTemperature.ts
+var temperatureService = new TemperatureService();
+var calculateTemperatureSchema = external_exports3.object({
+  color: external_exports3.string().optional().describe("A color to estimate the correlated color temperature of"),
+  kelvin: external_exports3.number().optional().describe("A Kelvin value to convert to its corresponding sRGB color")
+}).refine(
+  (data) => data.color !== void 0 || data.kelvin !== void 0,
+  { message: 'At least one of "color" or "kelvin" must be provided' }
+);
+async function calculateTemperature(input) {
+  const result = {};
+  if (input.kelvin !== void 0) {
+    const kelvinResult = temperatureService.kelvinToColor(input.kelvin);
+    result.kelvinToColor = {
+      inputKelvin: input.kelvin,
+      kelvin: kelvinResult.kelvin,
+      color: kelvinResult.color,
+      description: kelvinResult.description,
+      category: kelvinResult.category
+    };
+  }
+  if (input.color !== void 0) {
+    const parsedColor = parseColor(input.color);
+    const tempResult = temperatureService.colorToTemperature(parsedColor);
+    result.colorToTemperature = {
+      inputColor: input.color,
+      estimatedKelvin: tempResult.estimatedKelvin,
+      chromaticity: tempResult.chromaticity,
+      isOnPlanckianLocus: tempResult.isOnPlanckianLocus,
+      description: tempResult.description,
+      category: tempResult.category
+    };
+  }
+  return result;
+}
+
 // src/mcp/tools/generate/generateHarmony.ts
 var paletteService3 = new PaletteService();
-var conversionService18 = new ConversionService();
+var conversionService20 = new ConversionService();
 var harmonyRegistry = HarmonyRegistry.createDefault();
 var generateHarmonySchema = external_exports3.object({
   baseColor: external_exports3.string().describe("Base color for harmony generation"),
@@ -33183,10 +34908,10 @@ async function generateHarmony(input) {
     }
   );
   const algorithm = harmonyRegistry.get(input.harmonyType);
-  const baseSrgb = conversionService18.convert(baseColor, "srgb");
+  const baseSrgb = conversionService20.convert(baseColor, "srgb");
   const colors = palette.colors.map((color, index) => {
-    const srgb = conversionService18.convert(color, "srgb");
-    const oklch = conversionService18.convert(color, "oklch");
+    const srgb = conversionService20.convert(color, "srgb");
+    const oklch = conversionService20.convert(color, "oklch");
     const [, , h] = oklch.components;
     return {
       index,
@@ -33232,7 +34957,7 @@ function getUsageTips(harmonyType) {
 
 // src/mcp/tools/generate/generatePalette.ts
 var paletteService4 = new PaletteService();
-var conversionService19 = new ConversionService();
+var conversionService21 = new ConversionService();
 var generatePaletteSchema = external_exports3.object({
   baseColor: external_exports3.string().describe("Primary brand color"),
   style: external_exports3.enum(["minimal", "vibrant", "muted", "professional"]).optional().default("professional").describe("Palette style"),
@@ -33266,7 +34991,7 @@ async function generatePalette(input) {
     if (Object.keys(adjustments).length > 0) {
       adjusted = paletteService4.adjustColor(color, adjustments);
     }
-    const srgb = conversionService19.convert(adjusted, "srgb");
+    const srgb = conversionService21.convert(adjusted, "srgb");
     return {
       role: getRoleForIndex(index, harmony.colors.length),
       hex: srgb.toHex()
@@ -33274,7 +34999,7 @@ async function generatePalette(input) {
   });
   let neutrals;
   if (input.includeNeutrals) {
-    const baseOklch = conversionService19.convert(baseColor, "oklch");
+    const baseOklch = conversionService21.convert(baseColor, "oklch");
     const [, , h] = baseOklch.components;
     neutrals = [
       { role: "background", hex: "#FFFFFF" },
@@ -33285,9 +35010,9 @@ async function generatePalette(input) {
     ];
     neutrals = neutrals.map((n) => {
       const color = parseColor(n.hex);
-      const oklch = conversionService19.convert(color, "oklch");
+      const oklch = conversionService21.convert(color, "oklch");
       const [l, ,] = oklch.components;
-      const tinted = conversionService19.convert(
+      const tinted = conversionService21.convert(
         color.withComponents([l, 5e-3, h]),
         "srgb"
       );
@@ -33301,9 +35026,9 @@ async function generatePalette(input) {
   const scale = paletteService4.generateScale(baseColor);
   const scaleColors = [...scale.steps.entries()].map(([step, color]) => ({
     step,
-    hex: conversionService19.convert(color, "srgb").toHex()
+    hex: conversionService21.convert(color, "srgb").toHex()
   }));
-  const baseSrgb = conversionService19.convert(baseColor, "srgb");
+  const baseSrgb = conversionService21.convert(baseColor, "srgb");
   return {
     baseColor: {
       input: input.baseColor,
@@ -33333,7 +35058,7 @@ function getRoleForIndex(index, _total) {
 
 // src/mcp/tools/generate/generateGradient.ts
 var paletteService5 = new PaletteService();
-var conversionService20 = new ConversionService();
+var conversionService22 = new ConversionService();
 var generateGradientSchema = external_exports3.object({
   startColor: external_exports3.string().describe("Starting color of the gradient"),
   endColor: external_exports3.string().describe("Ending color of the gradient"),
@@ -33348,10 +35073,10 @@ async function generateGradient(input) {
     endColor,
     input.steps
   );
-  const startSrgb = conversionService20.convert(startColor, "srgb");
-  const endSrgb = conversionService20.convert(endColor, "srgb");
+  const startSrgb = conversionService22.convert(startColor, "srgb");
+  const endSrgb = conversionService22.convert(endColor, "srgb");
   const stops = gradientColors.map((color, index) => {
-    const srgb = conversionService20.convert(color, "srgb");
+    const srgb = conversionService22.convert(color, "srgb");
     const position = Math.round(index / (input.steps - 1) * 100);
     return {
       index,
@@ -33387,7 +35112,7 @@ async function generateGradient(input) {
 
 // src/mcp/tools/generate/generateAccessiblePalette.ts
 var contrastService4 = new ContrastService();
-var conversionService21 = new ConversionService();
+var conversionService23 = new ConversionService();
 var generateAccessiblePaletteSchema = external_exports3.object({
   colors: external_exports3.array(external_exports3.string()).describe("Array of colors to make accessible"),
   backgroundColor: external_exports3.string().describe("Background color to ensure contrast against"),
@@ -33395,10 +35120,10 @@ var generateAccessiblePaletteSchema = external_exports3.object({
 });
 async function generateAccessiblePalette(input) {
   const background = parseColor(input.backgroundColor);
-  const bgSrgb = conversionService21.convert(background, "srgb");
+  const bgSrgb = conversionService23.convert(background, "srgb");
   const results = input.colors.map((colorStr) => {
     const original = parseColor(colorStr);
-    const originalSrgb = conversionService21.convert(original, "srgb");
+    const originalSrgb = conversionService23.convert(original, "srgb");
     const originalContrast = contrastService4.checkContrast(original, background);
     const meetsTarget = input.level === "AAA" ? originalContrast.passes.AAA.normal : originalContrast.passes.AA.normal;
     if (meetsTarget) {
@@ -33419,10 +35144,10 @@ async function generateAccessiblePalette(input) {
       input.level,
       "normal"
     );
-    const adjustedSrgb = conversionService21.convert(adjusted2, "srgb");
+    const adjustedSrgb = conversionService23.convert(adjusted2, "srgb");
     const adjustedContrast = contrastService4.checkContrast(adjusted2, background);
-    const originalOklch = conversionService21.convert(original, "oklch");
-    const adjustedOklch = conversionService21.convert(adjusted2, "oklch");
+    const originalOklch = conversionService23.convert(original, "oklch");
+    const adjustedOklch = conversionService23.convert(adjusted2, "oklch");
     const [origL] = originalOklch.components;
     const [adjL] = adjustedOklch.components;
     return {
@@ -33461,7 +35186,7 @@ async function generateAccessiblePalette(input) {
 
 // src/mcp/tools/generate/generateScale.ts
 var paletteService6 = new PaletteService();
-var conversionService22 = new ConversionService();
+var conversionService24 = new ConversionService();
 var generateScaleSchema = external_exports3.object({
   baseColor: external_exports3.string().describe("Base color to generate scale from"),
   steps: external_exports3.array(external_exports3.number()).optional().describe("Custom scale steps (default: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950)")
@@ -33472,10 +35197,10 @@ async function generateScale(input) {
     baseColor,
     input.steps ? { steps: input.steps } : void 0
   );
-  const baseSrgb = conversionService22.convert(baseColor, "srgb");
+  const baseSrgb = conversionService24.convert(baseColor, "srgb");
   const scaleColors = [...scale.steps.entries()].map(([step, color]) => {
-    const srgb = conversionService22.convert(color, "srgb");
-    const oklch = conversionService22.convert(color, "oklch");
+    const srgb = conversionService24.convert(color, "srgb");
+    const oklch = conversionService24.convert(color, "oklch");
     const [l, c, h] = oklch.components;
     return {
       step,
@@ -33517,77 +35242,274 @@ async function generateScale(input) {
   };
 }
 
-// src/mcp/tools/validate/validateWcagContrast.ts
-var contrastService5 = new ContrastService();
-var conversionService23 = new ConversionService();
-var validateWcagContrastSchema = external_exports3.object({
-  foreground: external_exports3.string().describe("Foreground (text) color"),
-  background: external_exports3.string().describe("Background color"),
-  level: WCAGLevelSchema.optional().default("AA").describe("WCAG conformance level to check"),
-  textSize: TextSizeSchema.optional().default("normal").describe("Text size category")
+// src/mcp/tools/generate/generateDesignTokens.ts
+var conversionService25 = new ConversionService();
+var generateDesignTokensSchema = external_exports3.object({
+  colors: external_exports3.array(external_exports3.object({
+    name: external_exports3.string().describe('Token name, e.g., "primary-500"'),
+    value: external_exports3.string().describe("Color value as hex or CSS name")
+  })).describe("Colors to include as design tokens"),
+  prefix: external_exports3.string().optional().default("color").describe("Token name prefix"),
+  format: external_exports3.enum(["w3c", "css-variables", "tailwind"]).optional().default("w3c").describe("Output format")
 });
-async function validateWcagContrast(input) {
-  const foreground = parseColor(input.foreground);
-  const background = parseColor(input.background);
-  const result = contrastService5.checkContrast(foreground, background);
-  const passes = contrastService5.meetsWCAG(
-    foreground,
-    background,
-    input.level,
-    input.textSize
-  );
-  const threshold = contrastService5.getThreshold(
-    input.level,
-    input.textSize
-  );
-  const fgSrgb = conversionService23.convert(foreground, "srgb");
-  const bgSrgb = conversionService23.convert(background, "srgb");
-  let suggestion;
-  if (!passes) {
-    const adjusted = contrastService5.adjustForContrast(
-      foreground,
-      background,
-      input.level,
-      input.textSize
-    );
-    const adjustedSrgb = conversionService23.convert(adjusted, "srgb");
-    const adjustedContrast = contrastService5.calculateContrastRatio(adjusted, background);
-    suggestion = {
-      hex: adjustedSrgb.toHex(),
-      contrast: Math.round(adjustedContrast * 100) / 100
+async function generateDesignTokens(input) {
+  const prefix = input.prefix ?? "color";
+  const format = input.format ?? "w3c";
+  const resolvedColors = input.colors.map((entry) => {
+    const parsed = parseColor(entry.value);
+    const srgb = conversionService25.convert(parsed, "srgb");
+    const clamped = conversionService25.clampToGamut(srgb);
+    return {
+      name: entry.name,
+      hex: clamped.toHex()
+    };
+  });
+  if (format === "w3c") {
+    return buildW3CTokens(resolvedColors, prefix);
+  }
+  if (format === "css-variables") {
+    return buildCSSVariables(resolvedColors, prefix);
+  }
+  return buildTailwindConfig(resolvedColors);
+}
+function buildW3CTokens(colors, prefix) {
+  const tokenGroup = {};
+  for (const color of colors) {
+    tokenGroup[color.name] = {
+      $type: "color",
+      $value: color.hex
     };
   }
   return {
-    valid: passes,
-    foreground: {
-      input: input.foreground,
-      hex: fgSrgb.toHex()
-    },
-    background: {
-      input: input.background,
-      hex: bgSrgb.toHex()
-    },
-    contrast: {
-      ratio: Math.round(result.ratio * 100) / 100,
-      ratioString: result.ratioString
-    },
-    requirement: {
-      level: input.level,
-      textSize: input.textSize,
-      minimumRatio: threshold
-    },
-    result: passes ? `\u2713 Passes WCAG ${input.level} for ${input.textSize} text` : `\u2717 Fails WCAG ${input.level} for ${input.textSize} text`,
-    suggestion: suggestion ? {
-      message: "Suggested accessible foreground color:",
-      ...suggestion
-    } : void 0,
-    allLevels: {
-      "AA-normal": result.passes.AA.normal,
-      "AA-large": result.passes.AA.large,
-      "AAA-normal": result.passes.AAA.normal,
-      "AAA-large": result.passes.AAA.large
+    format: "w3c",
+    tokens: {
+      $schema: "https://design-tokens.github.io/community-group/format/",
+      [prefix]: tokenGroup
     }
   };
+}
+function buildCSSVariables(colors, prefix) {
+  const lines = colors.map(
+    (color) => `  --${prefix}-${color.name}: ${color.hex};`
+  );
+  const css = `:root {
+${lines.join("\n")}
+}`;
+  return {
+    format: "css-variables",
+    css
+  };
+}
+function buildTailwindConfig(colors) {
+  const colorMap = {};
+  for (const color of colors) {
+    colorMap[color.name] = color.hex;
+  }
+  return {
+    format: "tailwind",
+    tailwind: {
+      colors: colorMap
+    }
+  };
+}
+
+// src/services/ThemeService.ts
+var conversionService26 = new ConversionService();
+var TONAL_STEPS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100];
+var ThemeService = class {
+  /**
+   * Generates a complete Material Design 3 theme from a seed color.
+   *
+   * @param seedColor - Any Color instance; will be converted to Oklch internally
+   * @returns A MaterialTheme with light/dark color roles and all six tonal palettes
+   */
+  generateTheme(seedColor) {
+    const oklch = conversionService26.convert(seedColor, "oklch");
+    const [, seedChroma, seedHue] = oklch.components;
+    const primaryPalette = this.generateTonalPalette(seedHue, seedChroma);
+    const secondaryPalette = this.generateTonalPalette(seedHue, seedChroma * 0.33);
+    const tertiaryHue = ((seedHue + 60) % 360 + 360) % 360;
+    const tertiaryPalette = this.generateTonalPalette(tertiaryHue, seedChroma * 0.5);
+    const neutralPalette = this.generateTonalPalette(seedHue, seedChroma * 0.04);
+    const neutralVariantPalette = this.generateTonalPalette(seedHue, seedChroma * 0.08);
+    const errorPalette = this.generateTonalPalette(25, 0.18);
+    const seedSrgb = conversionService26.convert(seedColor, "srgb");
+    const clampedSeed = conversionService26.clampToGamut(seedSrgb);
+    const seedHex = clampedSeed.toHex();
+    const light = this.extractLightTheme(
+      primaryPalette,
+      secondaryPalette,
+      tertiaryPalette,
+      neutralPalette,
+      neutralVariantPalette,
+      errorPalette
+    );
+    const dark = this.extractDarkTheme(
+      primaryPalette,
+      secondaryPalette,
+      tertiaryPalette,
+      neutralPalette,
+      neutralVariantPalette,
+      errorPalette
+    );
+    return {
+      seed: seedHex,
+      light,
+      dark,
+      palettes: {
+        primary: primaryPalette,
+        secondary: secondaryPalette,
+        tertiary: tertiaryPalette,
+        neutral: neutralPalette,
+        neutralVariant: neutralVariantPalette,
+        error: errorPalette
+      }
+    };
+  }
+  /**
+   * Generates a tonal palette: 13 tones (0-100) for a given hue and chroma.
+   *
+   * Each tone T maps to Oklch lightness L = T/100 while preserving
+   * the supplied hue and chroma. The resulting Color objects are stored
+   * in sRGB with gamut clamping applied.
+   *
+   * @param hue - Oklch hue in degrees (0-360)
+   * @param chroma - Oklch chroma (0-0.4 typical range)
+   * @returns TonalPalette with a Map from tone value to sRGB Color
+   */
+  generateTonalPalette(hue, chroma) {
+    const tones = /* @__PURE__ */ new Map();
+    for (const tone of TONAL_STEPS) {
+      const L = tone / 100;
+      const oklchColor = Color.create("oklch", [L, chroma, hue], 1);
+      const srgbColor = conversionService26.convert(oklchColor, "srgb");
+      const clamped = conversionService26.clampToGamut(srgbColor);
+      tones.set(tone, clamped);
+    }
+    return { hue, chroma, tones };
+  }
+  /**
+   * Converts an Oklch specification (hue, chroma, tone) to an sRGB hex string.
+   * Out-of-gamut colors are clamped to the sRGB boundary.
+   */
+  toneToHex(hue, chroma, tone) {
+    const L = tone / 100;
+    const oklchColor = Color.create("oklch", [L, chroma, hue], 1);
+    const srgbColor = conversionService26.convert(oklchColor, "srgb");
+    const clamped = conversionService26.clampToGamut(srgbColor);
+    return clamped.toHex();
+  }
+  /**
+   * Helper to retrieve a hex color at a given tone from a pre-built TonalPalette.
+   */
+  paletteHex(palette, tone) {
+    const color = palette.tones.get(tone);
+    if (!color) {
+      return this.toneToHex(palette.hue, palette.chroma, tone);
+    }
+    return color.toHex();
+  }
+  /**
+   * Extracts the light theme color roles from the six tonal palettes.
+   */
+  extractLightTheme(primary, secondary, tertiary, neutral, neutralVariant, error48) {
+    return {
+      primary: this.paletteHex(primary, 40),
+      onPrimary: this.paletteHex(primary, 100),
+      primaryContainer: this.paletteHex(primary, 90),
+      onPrimaryContainer: this.paletteHex(primary, 10),
+      secondary: this.paletteHex(secondary, 40),
+      onSecondary: this.paletteHex(secondary, 100),
+      secondaryContainer: this.paletteHex(secondary, 90),
+      onSecondaryContainer: this.paletteHex(secondary, 10),
+      tertiary: this.paletteHex(tertiary, 40),
+      onTertiary: this.paletteHex(tertiary, 100),
+      tertiaryContainer: this.paletteHex(tertiary, 90),
+      onTertiaryContainer: this.paletteHex(tertiary, 10),
+      error: this.paletteHex(error48, 40),
+      onError: this.paletteHex(error48, 100),
+      errorContainer: this.paletteHex(error48, 90),
+      onErrorContainer: this.paletteHex(error48, 10),
+      background: this.paletteHex(neutral, 99),
+      onBackground: this.paletteHex(neutral, 10),
+      surface: this.paletteHex(neutral, 99),
+      onSurface: this.paletteHex(neutral, 10),
+      surfaceVariant: this.paletteHex(neutralVariant, 90),
+      onSurfaceVariant: this.paletteHex(neutralVariant, 30),
+      outline: this.paletteHex(neutralVariant, 50),
+      outlineVariant: this.paletteHex(neutralVariant, 80)
+    };
+  }
+  /**
+   * Extracts the dark theme color roles from the six tonal palettes.
+   * Dark theme inverts the tone mappings relative to the light theme.
+   */
+  extractDarkTheme(primary, secondary, tertiary, neutral, neutralVariant, error48) {
+    return {
+      primary: this.paletteHex(primary, 80),
+      onPrimary: this.paletteHex(primary, 20),
+      primaryContainer: this.paletteHex(primary, 30),
+      onPrimaryContainer: this.paletteHex(primary, 90),
+      secondary: this.paletteHex(secondary, 80),
+      onSecondary: this.paletteHex(secondary, 20),
+      secondaryContainer: this.paletteHex(secondary, 30),
+      onSecondaryContainer: this.paletteHex(secondary, 90),
+      tertiary: this.paletteHex(tertiary, 80),
+      onTertiary: this.paletteHex(tertiary, 20),
+      tertiaryContainer: this.paletteHex(tertiary, 30),
+      onTertiaryContainer: this.paletteHex(tertiary, 90),
+      error: this.paletteHex(error48, 80),
+      onError: this.paletteHex(error48, 20),
+      errorContainer: this.paletteHex(error48, 30),
+      onErrorContainer: this.paletteHex(error48, 90),
+      background: this.paletteHex(neutral, 10),
+      onBackground: this.paletteHex(neutral, 90),
+      surface: this.paletteHex(neutral, 10),
+      onSurface: this.paletteHex(neutral, 90),
+      surfaceVariant: this.paletteHex(neutralVariant, 30),
+      onSurfaceVariant: this.paletteHex(neutralVariant, 80),
+      outline: this.paletteHex(neutralVariant, 60),
+      outlineVariant: this.paletteHex(neutralVariant, 30)
+    };
+  }
+};
+
+// src/mcp/tools/generate/generateTheme.ts
+var themeService = new ThemeService();
+var generateThemeSchema = external_exports3.object({
+  seedColor: external_exports3.string().describe("Seed color for theme generation"),
+  mode: external_exports3.enum(["light", "dark", "both"]).optional().default("both").describe("Theme mode to generate")
+});
+async function generateTheme(input) {
+  const seedColor = parseColor(input.seedColor);
+  const mode = input.mode ?? "both";
+  const theme = themeService.generateTheme(seedColor);
+  const result = {
+    seed: theme.seed,
+    mode
+  };
+  if (mode === "light" || mode === "both") {
+    result.light = theme.light;
+  }
+  if (mode === "dark" || mode === "both") {
+    result.dark = theme.dark;
+  }
+  result.palettes = serializePalettes(theme.palettes);
+  return result;
+}
+function serializePalettes(palettes) {
+  const serialized = {};
+  for (const [name, palette] of Object.entries(palettes)) {
+    serialized[name] = serializeTonalPalette(palette);
+  }
+  return serialized;
+}
+function serializeTonalPalette(palette) {
+  const toneMap = {};
+  for (const [tone, color] of palette.tones.entries()) {
+    toneMap[tone] = color.toHex();
+  }
+  return toneMap;
 }
 
 // src/strategies/cvd/MachadoMatrices.ts
@@ -33784,11 +35706,11 @@ function getMatrixForSeverity(matrices, severity) {
 }
 
 // src/strategies/cvd/CVDSimulators.ts
-var conversionService24 = new ConversionService();
+var conversionService27 = new ConversionService();
 var MachadoCVDSimulator = class {
   simulate(color, options) {
     const severity = options?.severity ?? 1;
-    const srgbColor = conversionService24.convert(color, "srgb");
+    const srgbColor = conversionService27.convert(color, "srgb");
     const [r, g, b] = srgbColor.components;
     const linearRgb = removeGamma([r, g, b]);
     const matrix = getMatrixForSeverity(this.matrices, severity);
@@ -33800,7 +35722,7 @@ var MachadoCVDSimulator = class {
     ];
     const gammaApplied = applyGamma(clamped);
     const resultSrgb = Color.create("srgb", gammaApplied, color.alpha);
-    return conversionService24.convert(resultSrgb, color.space);
+    return conversionService27.convert(resultSrgb, color.space);
   }
   simulateBatch(colors, options) {
     return colors.map((color) => this.simulate(color, options));
@@ -33894,11 +35816,11 @@ var AchromatopsiaSimulator = class {
     prevalence: { male: 3e-5, female: 3e-5 }
   };
   simulate(color, _options) {
-    const srgbColor = conversionService24.convert(color, "srgb");
+    const srgbColor = conversionService27.convert(color, "srgb");
     const [r, g, b] = srgbColor.components;
     const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     const resultSrgb = Color.create("srgb", [gray, gray, gray], color.alpha);
-    return conversionService24.convert(resultSrgb, color.space);
+    return conversionService27.convert(resultSrgb, color.space);
   }
   simulateBatch(colors, options) {
     return colors.map((color) => this.simulate(color, options));
@@ -33915,14 +35837,14 @@ var AchromatomalySimulator = class {
   };
   simulate(color, options) {
     const severity = options?.severity ?? 0.5;
-    const srgbColor = conversionService24.convert(color, "srgb");
+    const srgbColor = conversionService27.convert(color, "srgb");
     const [r, g, b] = srgbColor.components;
     const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     const resultR = r * (1 - severity) + gray * severity;
     const resultG = g * (1 - severity) + gray * severity;
     const resultB = b * (1 - severity) + gray * severity;
     const resultSrgb = Color.create("srgb", [resultR, resultG, resultB], color.alpha);
-    return conversionService24.convert(resultSrgb, color.space);
+    return conversionService27.convert(resultSrgb, color.space);
   }
   simulateBatch(colors, options) {
     return colors.map((color) => this.simulate(color, options));
@@ -33961,10 +35883,205 @@ var CVDSimulatorRegistry = class _CVDSimulatorRegistry {
   }
 };
 
-// src/mcp/tools/validate/validateColorBlindness.ts
+// src/mcp/tools/generate/generateAccessibleReport.ts
+var contrastService5 = new ContrastService();
+var apcaService2 = new APCAService();
+var conversionService28 = new ConversionService();
 var cvdRegistry = CVDSimulatorRegistry.createDefault();
-var conversionService25 = new ConversionService();
 var deltaERegistry3 = DeltaERegistry.createDefault();
+var generateAccessibleReportSchema = external_exports3.object({
+  colors: external_exports3.array(external_exports3.string()).describe("Colors to audit"),
+  backgroundColor: external_exports3.string().describe("Background color"),
+  includeAPCA: external_exports3.boolean().optional().default(true).describe("Include APCA analysis"),
+  includeCVD: external_exports3.boolean().optional().default(true).describe("Include color vision deficiency simulation")
+});
+async function generateAccessibleReport(input) {
+  const includeAPCA = input.includeAPCA ?? true;
+  const includeCVD = input.includeCVD ?? true;
+  const bgColor = parseColor(input.backgroundColor);
+  const bgSrgb = conversionService28.convert(bgColor, "srgb");
+  const bgClamped = conversionService28.clampToGamut(bgSrgb);
+  const parsedColors = input.colors.map((colorStr) => {
+    const parsed = parseColor(colorStr);
+    const srgb = conversionService28.convert(parsed, "srgb");
+    return conversionService28.clampToGamut(srgb);
+  });
+  let wcagAAPassCount = 0;
+  let wcagAAAPassCount = 0;
+  let apcaBodyTextPassCount = 0;
+  const colorResults = parsedColors.map((color, index) => {
+    const hex3 = color.toHex();
+    const wcagResult = contrastService5.checkContrast(color, bgClamped);
+    if (wcagResult.passes.AA.normal) {
+      wcagAAPassCount++;
+    }
+    if (wcagResult.passes.AAA.normal) {
+      wcagAAAPassCount++;
+    }
+    const colorEntry = {
+      input: input.colors[index],
+      hex: hex3,
+      wcag: {
+        ratio: Math.round(wcagResult.ratio * 100) / 100,
+        AA: {
+          normal: wcagResult.passes.AA.normal,
+          large: wcagResult.passes.AA.large
+        },
+        AAA: {
+          normal: wcagResult.passes.AAA.normal,
+          large: wcagResult.passes.AAA.large
+        }
+      }
+    };
+    if (includeAPCA) {
+      const apcaResult = apcaService2.calculateAPCA(color, bgClamped);
+      if (apcaResult.meetsMinimum.bodyText) {
+        apcaBodyTextPassCount++;
+      }
+      colorEntry.apca = {
+        Lc: Math.round(apcaResult.Lc * 100) / 100,
+        passes: {
+          bodyText: apcaResult.meetsMinimum.bodyText,
+          largeText: apcaResult.meetsMinimum.largeText
+        }
+      };
+    }
+    if (includeCVD) {
+      const cvdEntries = {};
+      const deltaEStrategy2 = deltaERegistry3.get("CIEDE2000");
+      for (const cvdType of cvdRegistry.list()) {
+        const simulator = cvdRegistry.get(cvdType);
+        if (!simulator) {
+          continue;
+        }
+        const simulated = simulator.simulate(color);
+        const simSrgb = conversionService28.convert(simulated, "srgb");
+        const simClamped = conversionService28.clampToGamut(simSrgb);
+        const deltaE = deltaEStrategy2 ? deltaEStrategy2.calculate(color, simClamped) : 0;
+        cvdEntries[cvdType] = {
+          simulatedHex: simClamped.toHex(),
+          deltaEFromOriginal: Math.round(deltaE * 100) / 100
+        };
+      }
+      colorEntry.cvd = cvdEntries;
+    }
+    return colorEntry;
+  });
+  const deltaEStrategy = deltaERegistry3.get("CIEDE2000");
+  const pairwiseResults = [];
+  let allDistinguishable = true;
+  if (deltaEStrategy && parsedColors.length > 1) {
+    for (let i = 0; i < parsedColors.length; i++) {
+      for (let j = i + 1; j < parsedColors.length; j++) {
+        const dE = deltaEStrategy.calculate(parsedColors[i], parsedColors[j]);
+        const rounded = Math.round(dE * 100) / 100;
+        const distinguishable = rounded > 10;
+        if (!distinguishable) {
+          allDistinguishable = false;
+        }
+        pairwiseResults.push({
+          color1: parsedColors[i].toHex(),
+          color2: parsedColors[j].toHex(),
+          deltaE: rounded,
+          distinguishable
+        });
+      }
+    }
+  }
+  const summary = {
+    totalColors: parsedColors.length,
+    wcagAAPass: wcagAAPassCount,
+    wcagAAAPass: wcagAAAPassCount,
+    distinguishable: allDistinguishable
+  };
+  if (includeAPCA) {
+    summary.apcaBodyTextPass = apcaBodyTextPassCount;
+  }
+  return {
+    background: { hex: bgClamped.toHex() },
+    summary,
+    colors: colorResults,
+    pairwiseDistinguishability: pairwiseResults.length > 0 ? pairwiseResults : void 0
+  };
+}
+
+// src/mcp/tools/validate/validateWcagContrast.ts
+var contrastService6 = new ContrastService();
+var conversionService29 = new ConversionService();
+var validateWcagContrastSchema = external_exports3.object({
+  foreground: external_exports3.string().describe("Foreground (text) color"),
+  background: external_exports3.string().describe("Background color"),
+  level: WCAGLevelSchema.optional().default("AA").describe("WCAG conformance level to check"),
+  textSize: TextSizeSchema.optional().default("normal").describe("Text size category")
+});
+async function validateWcagContrast(input) {
+  const foreground = parseColor(input.foreground);
+  const background = parseColor(input.background);
+  const result = contrastService6.checkContrast(foreground, background);
+  const passes = contrastService6.meetsWCAG(
+    foreground,
+    background,
+    input.level,
+    input.textSize
+  );
+  const threshold = contrastService6.getThreshold(
+    input.level,
+    input.textSize
+  );
+  const fgSrgb = conversionService29.convert(foreground, "srgb");
+  const bgSrgb = conversionService29.convert(background, "srgb");
+  let suggestion;
+  if (!passes) {
+    const adjusted = contrastService6.adjustForContrast(
+      foreground,
+      background,
+      input.level,
+      input.textSize
+    );
+    const adjustedSrgb = conversionService29.convert(adjusted, "srgb");
+    const adjustedContrast = contrastService6.calculateContrastRatio(adjusted, background);
+    suggestion = {
+      hex: adjustedSrgb.toHex(),
+      contrast: Math.round(adjustedContrast * 100) / 100
+    };
+  }
+  return {
+    valid: passes,
+    foreground: {
+      input: input.foreground,
+      hex: fgSrgb.toHex()
+    },
+    background: {
+      input: input.background,
+      hex: bgSrgb.toHex()
+    },
+    contrast: {
+      ratio: Math.round(result.ratio * 100) / 100,
+      ratioString: result.ratioString
+    },
+    requirement: {
+      level: input.level,
+      textSize: input.textSize,
+      minimumRatio: threshold
+    },
+    result: passes ? `\u2713 Passes WCAG ${input.level} for ${input.textSize} text` : `\u2717 Fails WCAG ${input.level} for ${input.textSize} text`,
+    suggestion: suggestion ? {
+      message: "Suggested accessible foreground color:",
+      ...suggestion
+    } : void 0,
+    allLevels: {
+      "AA-normal": result.passes.AA.normal,
+      "AA-large": result.passes.AA.large,
+      "AAA-normal": result.passes.AAA.normal,
+      "AAA-large": result.passes.AAA.large
+    }
+  };
+}
+
+// src/mcp/tools/validate/validateColorBlindness.ts
+var cvdRegistry2 = CVDSimulatorRegistry.createDefault();
+var conversionService30 = new ConversionService();
+var deltaERegistry4 = DeltaERegistry.createDefault();
 var validateColorBlindnessSchema = external_exports3.object({
   colors: external_exports3.array(external_exports3.string()).describe("Array of colors to check"),
   cvdType: CVDTypeSchema.optional().describe("Specific CVD type to simulate (default: all common types)"),
@@ -33977,14 +36094,14 @@ async function validateColorBlindness(input) {
   }));
   const cvdTypes = input.cvdType ? [input.cvdType] : ["protanopia", "deuteranopia", "tritanopia"];
   const results = {};
-  const deltaE = deltaERegistry3.getDefault();
+  const deltaE = deltaERegistry4.getDefault();
   for (const cvdType of cvdTypes) {
-    const simulator = cvdRegistry.get(cvdType);
+    const simulator = cvdRegistry2.get(cvdType);
     if (!simulator) continue;
     const simulatedColors = colors.map((c) => {
       const simulated = simulator.simulate(c.color, { severity: input.severity });
-      const originalSrgb = conversionService25.convert(c.color, "srgb");
-      const simulatedSrgb = conversionService25.convert(simulated, "srgb");
+      const originalSrgb = conversionService30.convert(c.color, "srgb");
+      const simulatedSrgb = conversionService30.convert(simulated, "srgb");
       const difference = deltaE.calculate(c.color, simulated);
       return {
         input: c.input,
@@ -34039,15 +36156,15 @@ function getPerceptualChangeDescription(deltaE) {
 }
 
 // src/mcp/tools/validate/validateGamut.ts
-var conversionService26 = new ConversionService();
+var conversionService31 = new ConversionService();
 var validateGamutSchema = external_exports3.object({
   color: external_exports3.string().describe("Color to check"),
   targetGamut: ColorSpaceSchema.optional().default("srgb").describe("Target color space gamut to check against")
 });
 async function validateGamut(input) {
   const color = parseColor(input.color);
-  const inGamut = conversionService26.isInGamut(color, input.targetGamut);
-  const converted = conversionService26.convert(color, input.targetGamut);
+  const inGamut = conversionService31.isInGamut(color, input.targetGamut);
+  const converted = conversionService31.convert(color, input.targetGamut);
   const components = converted.components;
   const outOfGamutComponents = [];
   if (["srgb", "linear-srgb", "display-p3"].includes(input.targetGamut)) {
@@ -34061,9 +36178,11 @@ async function validateGamut(input) {
       }
     });
   }
-  const clamped = conversionService26.clampToGamut(converted);
-  const clampedSrgb = conversionService26.convert(clamped, "srgb");
-  const originalSrgb = conversionService26.convert(color, "srgb");
+  const clamped = conversionService31.clampToGamut(converted);
+  const clampedSrgb = conversionService31.convert(clamped, "srgb");
+  const mapped = conversionService31.mapToGamut(color, input.targetGamut);
+  const mappedSrgb = conversionService31.convert(mapped, "srgb");
+  const originalSrgb = conversionService31.convert(color, "srgb");
   return {
     input: input.color,
     targetGamut: input.targetGamut,
@@ -34079,27 +36198,34 @@ async function validateGamut(input) {
       outOfGamutComponents,
       clampedVersion: {
         hex: clampedSrgb.toHex(),
-        note: "This is the closest color within the target gamut"
+        note: "Simple component clamping (fast, may shift hue)"
+      },
+      mappedVersion: {
+        hex: mappedSrgb.toHex(),
+        note: "Perceptual gamut mapping via Oklch chroma reduction (preserves hue and lightness)"
       }
     },
     gamutInfo: {
       srgb: "Standard web RGB color space",
       "display-p3": "25% larger than sRGB, used by Apple devices",
+      "rec2020": "HDR/UHD color space, much wider than Display P3",
+      "prophoto-rgb": "Very wide gamut for photography",
+      "acescg": "Scene-referred, used in film/VFX",
       "linear-srgb": "Linear light sRGB (no gamma)"
     }
   };
 }
 
 // src/mcp/tools/validate/validatePrintSafe.ts
-var conversionService27 = new ConversionService();
+var conversionService32 = new ConversionService();
 var validatePrintSafeSchema = external_exports3.object({
   color: external_exports3.string().describe("Color to check for print safety")
 });
 async function validatePrintSafe(input) {
   const color = parseColor(input.color);
-  const cmyk = conversionService27.convert(color, "cmyk");
+  const cmyk = conversionService32.convert(color, "cmyk");
   const [c, m, y, k] = cmyk.components;
-  const srgb = conversionService27.convert(color, "srgb");
+  const srgb = conversionService32.convert(color, "srgb");
   const issues = [];
   const warnings = [];
   const totalInk = (c + m + y + k) * 100;
@@ -34119,7 +36245,7 @@ async function validatePrintSafe(input) {
   if (c + m + y + k < 0.05) {
     warnings.push("Very light color may appear as white when printed");
   }
-  const hsl = conversionService27.convert(color, "hsl");
+  const hsl = conversionService32.convert(color, "hsl");
   const [_h, s, l] = hsl.components;
   if (s > 0.9 && l > 0.5) {
     warnings.push("Highly saturated bright colors may appear duller in print than on screen");
@@ -34152,16 +36278,16 @@ async function validatePrintSafe(input) {
 }
 
 // src/mcp/tools/validate/validatePaletteHarmony.ts
-var conversionService28 = new ConversionService();
-var deltaERegistry4 = DeltaERegistry.createDefault();
+var conversionService33 = new ConversionService();
+var deltaERegistry5 = DeltaERegistry.createDefault();
 var validatePaletteHarmonySchema = external_exports3.object({
   colors: external_exports3.array(external_exports3.string()).min(2).describe("Array of colors in the palette")
 });
 async function validatePaletteHarmony(input) {
   const colors = input.colors.map((c) => parseColor(c));
-  const deltaE = deltaERegistry4.getDefault();
+  const deltaE = deltaERegistry5.getDefault();
   const hues = colors.map((c) => {
-    const oklch = conversionService28.convert(c, "oklch");
+    const oklch = conversionService33.convert(c, "oklch");
     return oklch.components[2];
   });
   const hueAngles = hues.map((h, i) => {
@@ -34183,8 +36309,8 @@ async function validatePaletteHarmony(input) {
   }
   const harmonyScore = calculateHarmonyScore(hues, pairwiseDeltaE);
   const colorInfo = colors.map((c, i) => {
-    const srgb = conversionService28.convert(c, "srgb");
-    const oklch = conversionService28.convert(c, "oklch");
+    const srgb = conversionService33.convert(c, "srgb");
+    const oklch = conversionService33.convert(c, "oklch");
     const [l, chroma, h] = oklch.components;
     return {
       index: i,
@@ -34303,6 +36429,226 @@ function getHarmonyDescription(type) {
   return descriptions[type] ?? descriptions["unknown"];
 }
 
+// src/mcp/resources/index.ts
+var cssColors = new NamedColorsRepository();
+var xkcdColors = new NamedColorsRepository({ includeXkcd: true });
+var culturalMeanings2 = new CulturalMeaningsRepository();
+function registerResources(server2) {
+  server2.resource(
+    "named-colors-css",
+    "color://named-colors/css",
+    {
+      description: "147 CSS named colors with hex values",
+      mimeType: "application/json"
+    },
+    async () => {
+      const colors = cssColors.listAll().map((c) => ({
+        name: c.name,
+        hex: c.hex
+      }));
+      return {
+        contents: [{
+          uri: "color://named-colors/css",
+          text: JSON.stringify({ count: colors.length, colors }, null, 2),
+          mimeType: "application/json"
+        }]
+      };
+    }
+  );
+  server2.resource(
+    "named-colors-xkcd",
+    "color://named-colors/xkcd",
+    {
+      description: "795+ XKCD survey colors with hex values (includes CSS colors)",
+      mimeType: "application/json"
+    },
+    async () => {
+      const colors = xkcdColors.listAll().map((c) => ({
+        name: c.name,
+        hex: c.hex,
+        source: c.source
+      }));
+      return {
+        contents: [{
+          uri: "color://named-colors/xkcd",
+          text: JSON.stringify({ count: colors.length, colors }, null, 2),
+          mimeType: "application/json"
+        }]
+      };
+    }
+  );
+  server2.resource(
+    "color-spaces",
+    "color://color-spaces",
+    {
+      description: "Available color spaces with component info and ranges",
+      mimeType: "application/json"
+    },
+    async () => {
+      const registry2 = ColorSpaceRegistry.createDefault();
+      const spaces = registry2.list().map((type) => {
+        const space = registry2.get(type);
+        return {
+          type: space.type,
+          components: space.componentNames,
+          componentCount: space.componentCount
+        };
+      });
+      return {
+        contents: [{
+          uri: "color://color-spaces",
+          text: JSON.stringify({ count: spaces.length, spaces }, null, 2),
+          mimeType: "application/json"
+        }]
+      };
+    }
+  );
+  server2.resource(
+    "cultural-meanings",
+    "color://cultural-meanings",
+    {
+      description: "Color meanings across 7 cultural regions",
+      mimeType: "application/json"
+    },
+    async () => {
+      const colors = culturalMeanings2.listColors();
+      const data = colors.map((name) => ({
+        color: name,
+        meanings: culturalMeanings2.getByColor(name)
+      }));
+      return {
+        contents: [{
+          uri: "color://cultural-meanings",
+          text: JSON.stringify({ count: colors.length, regions: ["western", "eastAsian", "southAsian", "middleEastern", "african", "latinAmerican", "indigenous"], colors: data }, null, 2),
+          mimeType: "application/json"
+        }]
+      };
+    }
+  );
+}
+
+// src/mcp/prompts/index.ts
+function registerPrompts(server2) {
+  server2.prompt(
+    "design-system",
+    "Generate a complete design system color palette from a brand color",
+    { brandColor: external_exports3.string().describe("Primary brand color (hex or CSS name)") },
+    async ({ brandColor }) => ({
+      messages: [{
+        role: "user",
+        content: {
+          type: "text",
+          text: `Create a complete design system color palette based on the brand color "${brandColor}".
+
+Use these tools in sequence:
+1. **get-color-info** on "${brandColor}" to understand the base color
+2. **generate-theme** with seedColor="${brandColor}" to get Material Design 3 light/dark themes
+3. **generate-scale** to create a Tailwind-style 50-950 scale for the primary color
+4. **generate-harmony** with type "split-complementary" for accent colors
+5. **generate-accessible-palette** to ensure all generated colors meet WCAG AA on white and dark backgrounds
+6. **generate-design-tokens** to export the final palette in W3C Design Token format
+
+Present the results as a structured design system with:
+- Primary, secondary, and accent color families
+- Light and dark theme variants
+- Accessibility validation for all foreground/background combinations
+- Exportable design tokens`
+        }
+      }]
+    })
+  );
+  server2.prompt(
+    "accessibility-audit",
+    "Comprehensive accessibility audit of a color palette",
+    {
+      colors: external_exports3.string().describe("Comma-separated list of colors to audit"),
+      background: external_exports3.string().optional().default("#ffffff").describe("Background color")
+    },
+    async ({ colors, background }) => ({
+      messages: [{
+        role: "user",
+        content: {
+          type: "text",
+          text: `Perform a comprehensive accessibility audit on these colors: ${colors}
+Against background: ${background}
+
+Use these tools:
+1. **generate-accessible-report** with all colors against the background (includeAPCA=true, includeCVD=true)
+2. **calculate-apca-contrast** for each color pair to get WCAG 3.0 contrast values
+3. **validate-color-blindness** for each color to check all 8 CVD types
+4. **validate-palette-harmony** to check distinguishability
+
+Report:
+- Which colors pass WCAG 2.x AA and AAA
+- Which colors pass APCA thresholds for body text (Lc\u226575)
+- How colors appear under each color vision deficiency
+- Whether all colors are sufficiently distinguishable (Delta-E > 10)
+- Specific recommendations for any failing colors`
+        }
+      }]
+    })
+  );
+  server2.prompt(
+    "color-temperature",
+    "Explore color temperature and lighting conditions",
+    {
+      scenario: external_exports3.string().optional().default("interior-design").describe("Scenario: interior-design, photography, web-design")
+    },
+    async ({ scenario }) => ({
+      messages: [{
+        role: "user",
+        content: {
+          type: "text",
+          text: `Help me understand and work with color temperature for ${scenario}.
+
+Use these tools:
+1. **calculate-temperature** with kelvin values for common light sources:
+   - 2700K (warm incandescent)
+   - 3500K (halogen)
+   - 5000K (noon daylight)
+   - 6500K (overcast/D65 standard)
+   - 9000K (blue sky)
+2. Show the color each temperature produces and how it affects perceived colors
+3. Generate a temperature gradient from 2000K to 10000K using **calculate-temperature**
+
+Explain how color temperature affects:
+- ${scenario === "interior-design" ? "Room mood and paint color selection" : ""}
+- ${scenario === "photography" ? "White balance and color grading" : ""}
+- ${scenario === "web-design" ? "Screen calibration and design for different displays" : ""}`
+        }
+      }]
+    })
+  );
+  server2.prompt(
+    "cultural-analysis",
+    "Analyze colors for cultural appropriateness across regions",
+    {
+      colors: external_exports3.string().describe("Comma-separated colors to analyze"),
+      purpose: external_exports3.string().optional().default("general").describe("Purpose: general, business, wedding, mourning")
+    },
+    async ({ colors, purpose }) => ({
+      messages: [{
+        role: "user",
+        content: {
+          type: "text",
+          text: `Analyze the cultural meanings of these colors: ${colors}
+Purpose: ${purpose}
+
+Use these tools:
+1. **get-color-meaning** for each color across all 7 cultural regions
+2. **get-color-info** for each color to understand its properties
+
+Create a cross-cultural comparison matrix showing:
+- How each color is perceived in each region for the "${purpose}" context
+- Potential cultural conflicts or sensitivities
+- Recommendations for global-safe color choices
+- Alternative colors where cultural conflicts exist`
+        }
+      }]
+    })
+  );
+}
+
 // src/index.ts
 var require2 = createRequire(import.meta.url);
 var pkg = require2("../package.json");
@@ -34330,7 +36676,7 @@ server.tool(
 );
 server.tool(
   "get-color-meaning",
-  "Get cultural and psychological meanings of a color across different regions",
+  "Get cultural and psychological meanings of a color across 7 cultural regions",
   getColorMeaningSchema.shape,
   async (input) => {
     const result = await getColorMeaning(input);
@@ -34348,7 +36694,7 @@ server.tool(
 );
 server.tool(
   "convert-color",
-  "Convert a color to a different color space (sRGB, Lab, Oklch, HSL, CMYK, etc.)",
+  "Convert a color to a different color space (sRGB, Lab, Oklch, HSL, CMYK, Rec2020, ProPhoto, ACEScg, etc.)",
   convertColorSchema.shape,
   async (input) => {
     const result = await convertColor(input);
@@ -34375,10 +36721,19 @@ server.tool(
 );
 server.tool(
   "calculate-contrast",
-  "Calculate WCAG contrast ratio between two colors",
+  "Calculate WCAG 2.x contrast ratio between two colors",
   calculateContrastSchema.shape,
   async (input) => {
     const result = await calculateContrast(input);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+server.tool(
+  "calculate-apca-contrast",
+  "Calculate APCA (WCAG 3.0) perceptual lightness contrast between text and background colors",
+  calculateAPCASchema.shape,
+  async (input) => {
+    const result = await calculateAPCA(input);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   }
 );
@@ -34397,6 +36752,15 @@ server.tool(
   calculateLuminanceSchema.shape,
   async (input) => {
     const result = await calculateLuminance(input);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+server.tool(
+  "calculate-temperature",
+  "Convert between color temperature (Kelvin) and color, or estimate a color's temperature",
+  calculateTemperatureSchema.shape,
+  async (input) => {
+    const result = await calculateTemperature(input);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   }
 );
@@ -34464,6 +36828,33 @@ server.tool(
   }
 );
 server.tool(
+  "generate-design-tokens",
+  "Export colors as W3C Design Tokens, CSS custom properties, or Tailwind config",
+  generateDesignTokensSchema.shape,
+  async (input) => {
+    const result = await generateDesignTokens(input);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+server.tool(
+  "generate-theme",
+  "Generate a Material Design 3 theme with light/dark modes from a seed color",
+  generateThemeSchema.shape,
+  async (input) => {
+    const result = await generateTheme(input);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+server.tool(
+  "generate-accessible-report",
+  "Comprehensive accessibility audit: WCAG, APCA, color blindness simulation, and pairwise distinguishability",
+  generateAccessibleReportSchema.shape,
+  async (input) => {
+    const result = await generateAccessibleReport(input);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+server.tool(
   "validate-wcag-contrast",
   "Check if a color combination meets WCAG accessibility requirements",
   validateWcagContrastSchema.shape,
@@ -34508,6 +36899,8 @@ server.tool(
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   }
 );
+registerResources(server);
+registerPrompts(server);
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

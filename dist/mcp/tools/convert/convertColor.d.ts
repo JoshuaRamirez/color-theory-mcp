@@ -5,6 +5,9 @@ export declare const convertColorSchema: z.ZodObject<{
         srgb: "srgb";
         "linear-srgb": "linear-srgb";
         "display-p3": "display-p3";
+        rec2020: "rec2020";
+        "prophoto-rgb": "prophoto-rgb";
+        acescg: "acescg";
         "xyz-d65": "xyz-d65";
         "xyz-d50": "xyz-d50";
         lab: "lab";
@@ -20,7 +23,7 @@ export declare const convertColorSchema: z.ZodObject<{
 export type ConvertColorInput = z.infer<typeof convertColorSchema>;
 export declare function convertColor(input: ConvertColorInput): Promise<{
     input: string;
-    targetSpace: "srgb" | "linear-srgb" | "display-p3" | "xyz-d65" | "xyz-d50" | "lab" | "lch" | "oklab" | "oklch" | "hsl" | "hsv" | "hwb" | "cmyk";
+    targetSpace: "srgb" | "linear-srgb" | "display-p3" | "rec2020" | "prophoto-rgb" | "acescg" | "xyz-d65" | "xyz-d50" | "lab" | "lch" | "oklab" | "oklch" | "hsl" | "hsv" | "hwb" | "cmyk";
     components: Record<string, number>;
     rawComponents: number[];
     alpha: number;

@@ -1,7 +1,7 @@
 /**
  * Culture regions supported.
  */
-export type CultureRegion = 'western' | 'eastAsian' | 'southAsian' | 'middleEastern';
+export type CultureRegion = 'western' | 'eastAsian' | 'southAsian' | 'middleEastern' | 'african' | 'latinAmerican' | 'indigenous';
 /**
  * Context types for color meanings.
  */

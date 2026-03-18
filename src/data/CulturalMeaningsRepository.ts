@@ -1,9 +1,17 @@
 import culturalMeanings from './cultural-meanings.json' with { type: 'json' };
+import expandedMeanings from './expanded-cultural-meanings.json' with { type: 'json' };
 
 /**
  * Culture regions supported.
  */
-export type CultureRegion = 'western' | 'eastAsian' | 'southAsian' | 'middleEastern';
+export type CultureRegion =
+  | 'western'
+  | 'eastAsian'
+  | 'southAsian'
+  | 'middleEastern'
+  | 'african'
+  | 'latinAmerican'
+  | 'indigenous';
 
 /**
  * Context types for color meanings.
@@ -35,7 +43,27 @@ export class CulturalMeaningsRepository {
   private readonly data: Record<string, Record<CultureRegion, Record<MeaningContext, string[]>>>;
 
   constructor() {
-    this.data = culturalMeanings as typeof this.data;
+    // Merge base meanings with expanded regional meanings
+    const base = culturalMeanings as Record<string, Record<string, Record<string, string[]>>>;
+    const expanded = expandedMeanings as Record<string, Record<string, Record<string, string[]>>>;
+    const merged: Record<string, Record<string, Record<string, string[]>>> = {};
+
+    // Copy base data
+    for (const [color, regions] of Object.entries(base)) {
+      merged[color] = { ...regions };
+    }
+
+    // Merge expanded data
+    for (const [color, regions] of Object.entries(expanded)) {
+      if (!merged[color]) {
+        merged[color] = {};
+      }
+      for (const [region, contexts] of Object.entries(regions)) {
+        merged[color]![region] = contexts;
+      }
+    }
+
+    this.data = merged as typeof this.data;
   }
 
   /**
@@ -98,7 +126,15 @@ export class CulturalMeaningsRepository {
     }
 
     const results: { region: CultureRegion; meanings: string[] }[] = [];
-    const regions: CultureRegion[] = ['western', 'eastAsian', 'southAsian', 'middleEastern'];
+    const regions: CultureRegion[] = [
+      'western',
+      'eastAsian',
+      'southAsian',
+      'middleEastern',
+      'african',
+      'latinAmerican',
+      'indigenous',
+    ];
 
     for (const region of regions) {
       const meanings = colorData[region]?.[context];
@@ -120,8 +156,8 @@ export class CulturalMeaningsRepository {
     for (const [color, regions] of Object.entries(this.data)) {
       for (const [region, contexts] of Object.entries(regions)) {
         for (const [context, meanings] of Object.entries(contexts)) {
-          const matchingMeanings = (meanings as string[]).filter(
-            m => m.toLowerCase().includes(lowerKeyword)
+          const matchingMeanings = (meanings as string[]).filter((m) =>
+            m.toLowerCase().includes(lowerKeyword)
           );
           if (matchingMeanings.length > 0) {
             results.push({
