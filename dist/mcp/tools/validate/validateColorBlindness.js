@@ -4,6 +4,7 @@ import { CVDTypeSchema } from '../schemas.js';
 import { CVDSimulatorRegistry } from '../../../strategies/cvd/CVDSimulatorRegistry.js';
 import { ConversionService } from '../../../services/ConversionService.js';
 import { DeltaERegistry } from '../../../strategies/delta-e/DeltaERegistry.js';
+import { daltonize } from '../../../strategies/cvd/Daltonizer.js';
 const cvdRegistry = CVDSimulatorRegistry.createDefault();
 const conversionService = new ConversionService();
 const deltaERegistry = DeltaERegistry.createDefault();
@@ -60,11 +61,23 @@ export async function validateColorBlindness(input) {
                 }
             }
         }
+        // Daltonize confusable pairs for correction suggestions
+        const corrections = confusablePairs.length > 0
+            ? colors.map(c => {
+                const result = daltonize(c.color, cvdType, { severity: input.severity });
+                const correctedSrgb = conversionService.convert(result.corrected, 'srgb');
+                return {
+                    original: c.input,
+                    corrected: correctedSrgb.toHex(),
+                };
+            })
+            : undefined;
         results[cvdType] = {
             info: simulator.info,
             colors: simulatedColors,
             confusablePairs: confusablePairs.length > 0 ? confusablePairs : undefined,
             hasConfusablePairs: confusablePairs.length > 0,
+            corrections: corrections,
         };
     }
     // Overall assessment
@@ -79,7 +92,7 @@ export async function validateColorBlindness(input) {
                 ? 'Some color pairs may be confusable for people with color vision deficiencies'
                 : 'Colors appear distinguishable across simulated CVD types',
             recommendation: hasAnyConfusable
-                ? 'Consider using additional visual cues (patterns, labels, icons) alongside color'
+                ? 'Consider using the corrected colors or adding visual cues (patterns, labels, icons) alongside color'
                 : undefined,
         },
     };

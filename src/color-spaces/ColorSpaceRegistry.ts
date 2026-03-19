@@ -17,6 +17,8 @@ import { CmykColorSpace } from './CmykColorSpace.js';
 import { Rec2020ColorSpace } from './Rec2020ColorSpace.js';
 import { ProPhotoRgbColorSpace } from './ProPhotoRgbColorSpace.js';
 import { ACEScgColorSpace } from './ACEScgColorSpace.js';
+import { Cam16ColorSpace } from './Cam16ColorSpace.js';
+import { HctColorSpace } from './HctColorSpace.js';
 
 /**
  * Registry for color space implementations.
@@ -59,6 +61,8 @@ export class ColorSpaceRegistry implements IColorSpaceRegistry {
     registry.register(new Rec2020ColorSpace());
     registry.register(new ProPhotoRgbColorSpace());
     registry.register(new ACEScgColorSpace());
+    registry.register(new Cam16ColorSpace());
+    registry.register(new HctColorSpace());
 
     return registry;
   }

@@ -28,6 +28,18 @@ export async function parseColorString(input: ParseColorStringInput) {
       detectedFormat = 'rgb';
     } else if (trimmed.startsWith('hsl')) {
       detectedFormat = 'hsl';
+    } else if (trimmed.startsWith('oklch')) {
+      detectedFormat = 'oklch';
+    } else if (trimmed.startsWith('oklab')) {
+      detectedFormat = 'oklab';
+    } else if (trimmed.startsWith('lab')) {
+      detectedFormat = 'lab';
+    } else if (trimmed.startsWith('lch')) {
+      detectedFormat = 'lch';
+    } else if (trimmed.startsWith('hwb')) {
+      detectedFormat = 'hwb';
+    } else if (trimmed.startsWith('color')) {
+      detectedFormat = 'color-function';
     } else if (namedColors.getByName(trimmed)) {
       detectedFormat = 'named';
     } else {
@@ -40,16 +52,15 @@ export async function parseColorString(input: ParseColorStringInput) {
       detectedFormat,
       parsed: {
         space: color.space,
-        components: color.components.map(c => Math.round(c * 10000) / 10000),
+        components: color.components.map((c) => Math.round(c * 10000) / 10000),
         alpha: color.alpha,
       },
       normalized: {
         hex: srgb.toHex(),
         rgb: { r, g, b },
         rgbString: `rgb(${r}, ${g}, ${b})`,
-        rgbaString: srgb.alpha < 1
-          ? `rgba(${r}, ${g}, ${b}, ${srgb.alpha})`
-          : `rgb(${r}, ${g}, ${b})`,
+        rgbaString:
+          srgb.alpha < 1 ? `rgba(${r}, ${g}, ${b}, ${srgb.alpha})` : `rgb(${r}, ${g}, ${b})`,
       },
     };
   } catch (error) {
@@ -66,6 +77,12 @@ export async function parseColorString(input: ParseColorStringInput) {
         'rgba(r, g, b, a)',
         'hsl(h, s%, l%)',
         'hsla(h, s%, l%, a)',
+        'oklch(L C H)',
+        'oklab(L a b)',
+        'lab(L a b)',
+        'lch(L C H)',
+        'hwb(H W B)',
+        'color(space c1 c2 c3)',
         'Named colors (red, blue, etc.)',
       ],
     };

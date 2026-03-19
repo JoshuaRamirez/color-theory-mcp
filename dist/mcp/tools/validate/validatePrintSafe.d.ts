@@ -21,6 +21,16 @@ export declare function validatePrintSafe(input: ValidatePrintSafeInput): Promis
         warnings: string[] | undefined;
     };
     recommendations: string[];
+    gamutMapping: {
+        hex: string;
+        cmyk: {
+            c: number;
+            m: number;
+            y: number;
+            k: number;
+        };
+        note: string;
+    } | undefined;
     note: string;
 }>;
 //# sourceMappingURL=validatePrintSafe.d.ts.map

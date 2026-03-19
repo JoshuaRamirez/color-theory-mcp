@@ -12,7 +12,7 @@ export type WCAGLevel = 'AA' | 'AAA';
 /**
  * Text size categories for WCAG.
  */
-export type TextSize = 'normal' | 'large';
+export type TextSize = 'normal' | 'large' | 'ui' | 'graphics';
 
 /**
  * Result of a WCAG contrast check.
@@ -21,8 +21,8 @@ export interface ContrastResult {
   ratio: number;
   ratioString: string;
   passes: {
-    AA: { normal: boolean; large: boolean };
-    AAA: { normal: boolean; large: boolean };
+    AA: { normal: boolean; large: boolean; ui: boolean; graphics: boolean };
+    AAA: { normal: boolean; large: boolean; ui: boolean; graphics: boolean };
   };
   foregroundLuminance: number;
   backgroundLuminance: number;
@@ -32,8 +32,8 @@ export interface ContrastResult {
  * WCAG contrast thresholds.
  */
 const WCAG_THRESHOLDS = {
-  AA: { normal: 4.5, large: 3.0 },
-  AAA: { normal: 7.0, large: 4.5 },
+  AA: { normal: 4.5, large: 3.0, ui: 3.0, graphics: 3.0 },
+  AAA: { normal: 7.0, large: 4.5, ui: 4.5, graphics: 4.5 }, // AAA doesn't strictly define UI/graphics, using 4.5 as best practice
 } as const;
 
 /**
@@ -92,10 +92,14 @@ export class ContrastService {
         AA: {
           normal: ratio >= WCAG_THRESHOLDS.AA.normal,
           large: ratio >= WCAG_THRESHOLDS.AA.large,
+          ui: ratio >= WCAG_THRESHOLDS.AA.ui,
+          graphics: ratio >= WCAG_THRESHOLDS.AA.graphics,
         },
         AAA: {
           normal: ratio >= WCAG_THRESHOLDS.AAA.normal,
           large: ratio >= WCAG_THRESHOLDS.AAA.large,
+          ui: ratio >= WCAG_THRESHOLDS.AAA.ui,
+          graphics: ratio >= WCAG_THRESHOLDS.AAA.graphics,
         },
       },
       foregroundLuminance: fgLum,
@@ -106,12 +110,7 @@ export class ContrastService {
   /**
    * Checks if a color combination meets a specific WCAG level.
    */
-  meetsWCAG(
-    foreground: Color,
-    background: Color,
-    level: WCAGLevel,
-    textSize: TextSize
-  ): boolean {
+  meetsWCAG(foreground: Color, background: Color, level: WCAGLevel, textSize: TextSize): boolean {
     const ratio = this.calculateContrastRatio(foreground, background);
     const threshold = WCAG_THRESHOLDS[level][textSize];
     return ratio >= threshold;

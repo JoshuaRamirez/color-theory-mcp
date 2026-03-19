@@ -10,7 +10,10 @@ const deltaERegistry = DeltaERegistry.createDefault();
 
 export const getColorNameSchema = z.object({
   color: z.string().describe('Color value (hex, RGB, or named color)'),
-  includeAlternatives: z.boolean().optional().default(false)
+  includeAlternatives: z
+    .boolean()
+    .optional()
+    .default(false)
     .describe('Include alternative similar named colors'),
 });
 
@@ -28,9 +31,11 @@ export async function getColorName(input: GetColorNameInput) {
       exactMatch: true,
       name: exactMatch[0]!.name,
       hex: exactMatch[0]!.hex,
-      alternatives: exactMatch.length > 1
-        ? exactMatch.slice(1).map(c => ({ name: c.name, hex: c.hex }))
-        : undefined,
+      confidence: 1.0,
+      alternatives:
+        exactMatch.length > 1
+          ? exactMatch.slice(1).map((c) => ({ name: c.name, hex: c.hex }))
+          : undefined,
     };
   }
 
@@ -47,7 +52,7 @@ export async function getColorName(input: GetColorNameInput) {
 
   if (input.includeAlternatives) {
     const allColors = namedColors.listAll();
-    const withDistances = allColors.map(c => ({
+    const withDistances = allColors.map((c) => ({
       name: c.name,
       hex: c.hex,
       deltaE: deltaE.calculate(srgb, c.color),
@@ -57,18 +62,24 @@ export async function getColorName(input: GetColorNameInput) {
     alternatives = withDistances
       .sort((a, b) => a.deltaE - b.deltaE)
       .slice(1, 6)
-      .map(c => ({
+      .map((c) => ({
         name: c.name,
         hex: c.hex,
         deltaE: Math.round(c.deltaE * 100) / 100,
       }));
   }
 
+  // Convert Delta-E to 0-1 confidence score
+  // DeltaE 0 = perfect match (confidence 1.0)
+  // DeltaE 5+ = poor match (confidence ~0.0)
+  const confidence = Math.max(0, Math.min(1, 1 - difference / 5));
+
   return {
     input: input.color,
     exactMatch: false,
     name: closest.name,
     hex: closest.hex,
+    confidence: Math.round(confidence * 100) / 100,
     difference: {
       deltaE: Math.round(difference * 100) / 100,
       description: interpretation.description,

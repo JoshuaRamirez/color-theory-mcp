@@ -11,8 +11,10 @@ const conversionService = new ConversionService();
 export const calculateDeltaESchema = z.object({
   color1: z.string().describe('First color'),
   color2: z.string().describe('Second color'),
-  method: DeltaEMethodSchema.optional().default('CIEDE2000')
-    .describe('Delta-E calculation method'),
+  method: DeltaEMethodSchema.optional().default('CIEDE2000').describe('Delta-E calculation method'),
+  kL: z.number().optional().describe('CIEDE2000 lightness weight (default 1, textiles use 2)'),
+  kC: z.number().optional().describe('CIEDE2000 chroma weight (default 1)'),
+  kH: z.number().optional().describe('CIEDE2000 hue weight (default 1)'),
 });
 
 export type CalculateDeltaEInput = z.infer<typeof calculateDeltaESchema>;
@@ -26,7 +28,12 @@ export async function calculateDeltaE(input: CalculateDeltaEInput) {
     throw new Error(`Unknown Delta-E method: ${input.method}`);
   }
 
-  const deltaE = strategy.calculate(color1, color2);
+  const deltaE = strategy.calculate(color1, color2, {
+    application: undefined,
+    kL: input.kL,
+    kC: input.kC,
+    kH: input.kH,
+  });
   const interpretation = strategy.interpret(deltaE);
 
   // Convert to sRGB for display

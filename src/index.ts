@@ -138,7 +138,7 @@ server.tool(
 
 server.tool(
   'convert-color',
-  'Convert a color to a different color space (sRGB, Lab, Oklch, HSL, CMYK, Rec2020, ProPhoto, ACEScg, etc.)',
+  'Convert a color to any space (sRGB, Lab, Oklch, CMYK, CAM16, HCT, etc.) with gamut mapping',
   convertColorSchema.shape,
   async (input) => {
     const result = await convertColor(input);
@@ -158,7 +158,7 @@ server.tool(
 
 server.tool(
   'parse-color-string',
-  'Parse any CSS color string and return normalized values',
+  'Parse any CSS Color 4 string (hex, rgb, hsl, oklch, lab, etc.) and return normalized values',
   parseColorStringSchema.shape,
   async (input) => {
     const result = await parseColorString(input);
@@ -222,7 +222,7 @@ server.tool(
 
 server.tool(
   'mix-colors',
-  'Mix two colors together with optional gradient generation',
+  'Mix two colors together with optional blend modes (multiply, screen, etc.) and gradient generation',
   mixColorsSchema.shape,
   async (input) => {
     const result = await mixColors(input);
@@ -266,7 +266,7 @@ server.tool(
 
 server.tool(
   'generate-gradient',
-  'Generate a smooth color gradient between two colors',
+  'Generate a smooth color gradient with configurable interpolation space, easing, and hue strategy',
   generateGradientSchema.shape,
   async (input) => {
     const result = await generateGradient(input);
@@ -296,7 +296,7 @@ server.tool(
 
 server.tool(
   'generate-design-tokens',
-  'Export colors as W3C Design Tokens, CSS custom properties, or Tailwind config',
+  'Export colors as W3C Design Tokens, CSS, Tailwind, iOS (Swift), Android (XML), SCSS, or Figma JSON',
   generateDesignTokensSchema.shape,
   async (input) => {
     const result = await generateDesignTokens(input);
@@ -306,7 +306,7 @@ server.tool(
 
 server.tool(
   'generate-theme',
-  'Generate a Material Design 3 theme with light/dark modes from a seed color',
+  'Generate a Material Design 3 theme (HCT-based) with light/dark modes from a seed color',
   generateThemeSchema.shape,
   async (input) => {
     const result = await generateTheme(input);
@@ -330,7 +330,7 @@ server.tool(
 
 server.tool(
   'validate-wcag-contrast',
-  'Check if a color combination meets WCAG accessibility requirements',
+  'Check WCAG 2.2 and APCA accessibility requirements for text and UI components',
   validateWcagContrastSchema.shape,
   async (input) => {
     const result = await validateWcagContrast(input);
@@ -340,7 +340,7 @@ server.tool(
 
 server.tool(
   'validate-color-blindness',
-  'Simulate how colors appear to people with color vision deficiencies',
+  'Simulate CVD and suggest Daltonized (corrected) colors for accessibility',
   validateColorBlindnessSchema.shape,
   async (input) => {
     const result = await validateColorBlindness(input);

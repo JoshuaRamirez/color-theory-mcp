@@ -6,6 +6,11 @@ import { Color } from '../../domain/values/Color.js';
  * - RGB: rgb(r, g, b), rgba(r, g, b, a)
  * - HSL: hsl(h, s%, l%), hsla(h, s%, l%, a)
  * - Named colors: red, blue, etc.
+ * - CSS Color Level 4:
+ *   - color(display-p3 R G B), color(srgb R G B), etc.
+ *   - oklch(L C H), oklab(L a b)
+ *   - lab(L a b), lch(L C H)
+ *   - hwb(H W B)
  */
 export declare function parseColor(input: string): Color;
 /**

@@ -14,16 +14,16 @@ const conversionService = new ConversionService();
 export class CIEDE2000Strategy {
     method = 'CIEDE2000';
     description = 'CIEDE2000 color difference (current CIE standard)';
-    calculate(color1, color2, _options) {
+    calculate(color1, color2, options) {
         // Convert both colors to Lab
         const lab1 = conversionService.convert(color1, 'lab');
         const lab2 = conversionService.convert(color2, 'lab');
         const [L1, a1, b1] = lab1.components;
         const [L2, a2, b2] = lab2.components;
         // Parametric weighting factors (all 1 for standard use)
-        const kL = 1;
-        const kC = 1;
-        const kH = 1;
+        const kL = options?.kL ?? 1;
+        const kC = options?.kC ?? 1;
+        const kH = options?.kH ?? 1;
         // Step 1: Calculate C'i and h'i
         const C1 = Math.sqrt(a1 * a1 + b1 * b1);
         const C2 = Math.sqrt(a2 * a2 + b2 * b2);

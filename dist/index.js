@@ -96,7 +96,7 @@ server.tool('generate-palette', 'Generate a complete design system palette from 
     const result = await generatePalette(input);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
 });
-server.tool('generate-gradient', 'Generate a smooth color gradient between two colors', generateGradientSchema.shape, async (input) => {
+server.tool('generate-gradient', 'Generate a smooth color gradient between two or more colors with configurable interpolation space', generateGradientSchema.shape, async (input) => {
     const result = await generateGradient(input);
     return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
 });

@@ -1,0 +1,10 @@
+feat: Release v1.1.0 - Advanced Color Science & Production Assets
+
+- Added CAM16 and HCT color spaces for accurate perceptual modeling.
+- Implemented 12 blend modes (multiply, screen, overlay, etc.) and subtractive mixing.
+- Enhanced gradient generation with multi-stop easing and custom hue interpolation.
+- Added APCA (Lc) contrast and Daltonization (CVD correction) support.
+- Updated generate-design-tokens to export iOS Swift, Android XML, SCSS, and Figma JSON.
+- Upgraded ThemeService to use HCT engine for Material Design 3 fidelity.
+- Added Oklch binary-search gamut mapping.
+- Updated documentation and tool descriptions.

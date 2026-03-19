@@ -5,9 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-03-19
 
-## [1.0.0] - 2026-02-04
+### Added
+
+- **New Color Spaces**
+  - **CAM16**: Advanced Color Appearance Model (J, C, h) for accurate perceptual modeling.
+  - **HCT**: Google's Material Design 3 color space (Hue, Chroma, Tone), bridging CAM16 and design utility.
+
+- **Advanced Mixing & Blending**
+  - **Blend Modes**: Added 12 compositing modes (multiply, screen, overlay, soft-light, etc.) to `mix-colors`.
+  - **Subtractive Mixing**: Pigment-like mixing simulation for realistic paint/ink blending.
+  - **Interpolation Strategies**: CSS Color 4 hue interpolation methods (shorter, longer, increasing, decreasing).
+
+- **Accessibility Enhancements**
+  - **APCA Support**: Added Advanced Perceptual Contrast Algorithm (Lc value) to `validate-wcag-contrast` and `get-color-info`.
+  - **Daltonization**: `validate-color-blindness` now suggests corrected colors for CVD users.
+  - **WCAG 2.2**: Added non-text contrast checks (3:1) for UI components and graphics.
+
+- **Production-Ready Generation**
+  - **Multi-Platform Tokens**: `generate-design-tokens` now exports to **iOS (Swift)**, **Android (XML)**, **SCSS**, and **Figma JSON**.
+  - **Material 3 Themes**: `generate-theme` upgraded to use HCT engine for official Material Design fidelity.
+  - **Advanced Gradients**: Multi-stop gradients with easing functions (linear, ease-in, ease-out) in `generate-gradient`.
+
+- **Parsing & Math**
+  - **Universal Parsing**: Full CSS Color 4 support (oklch, lab, color(display-p3), hwb).
+  - **Gamut Mapping**: Implemented Oklch binary-search gamut mapping for high-quality reduction.
+  - **Chromatic Adaptation**: Verified Bradford transform for accurate D50/D65 illuminant handling.
+
+## [1.0.1] - 2026-02-04
 
 ### Added
 

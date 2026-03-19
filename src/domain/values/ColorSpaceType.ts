@@ -24,7 +24,9 @@ export type ColorSpaceType =
   | 'hsl'
   | 'hsv'
   | 'hwb'
-  | 'cmyk';
+  | 'cmyk'
+  | 'cam16'
+  | 'hct';
 
 export const COLOR_SPACE_COMPONENTS: Record<ColorSpaceType, readonly string[]> = {
   srgb: ['r', 'g', 'b'],
@@ -43,6 +45,8 @@ export const COLOR_SPACE_COMPONENTS: Record<ColorSpaceType, readonly string[]> =
   hsv: ['h', 's', 'v'],
   hwb: ['h', 'w', 'b'],
   cmyk: ['c', 'm', 'y', 'k'],
+  cam16: ['J', 'C', 'h'],
+  hct: ['H', 'C', 'T'],
 } as const;
 
 export const COLOR_SPACE_RANGES: Record<ColorSpaceType, readonly { min: number; max: number }[]> = {
@@ -126,6 +130,16 @@ export const COLOR_SPACE_RANGES: Record<ColorSpaceType, readonly { min: number; 
     { min: 0, max: 1 },
     { min: 0, max: 1 },
     { min: 0, max: 1 },
+  ],
+  cam16: [
+    { min: 0, max: 100 },
+    { min: 0, max: 150 },
+    { min: 0, max: 360 },
+  ],
+  hct: [
+    { min: 0, max: 360 },
+    { min: 0, max: 150 },
+    { min: 0, max: 100 },
   ],
 } as const;
 

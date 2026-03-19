@@ -29958,7 +29958,9 @@ var ColorError = class extends Error {
 var ColorParseError = class extends ColorError {
   input;
   constructor(input, reason) {
-    super(reason ? `Unable to parse color "${input}": ${reason}` : `Unable to parse color: ${input}`);
+    super(
+      reason ? `Unable to parse color "${input}": ${reason}` : `Unable to parse color: ${input}`
+    );
     this.name = "ColorParseError";
     this.input = input;
   }
@@ -30074,11 +30076,7 @@ var Color = class _Color {
       throw new ColorSpaceMismatchError("srgb", this.space);
     }
     const [r, g, b] = this.components;
-    return [
-      Math.round(r * 255),
-      Math.round(g * 255),
-      Math.round(b * 255)
-    ];
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
   }
   /**
    * Returns CSS color string representation.
@@ -30116,9 +30114,7 @@ var Color = class _Color {
     if (this.space !== other.space) return false;
     if (Math.abs(this.alpha - other.alpha) > tolerance) return false;
     if (this.components.length !== other.components.length) return false;
-    return this.components.every(
-      (c, i) => Math.abs(c - (other.components[i] ?? 0)) <= tolerance
-    );
+    return this.components.every((c, i) => Math.abs(c - (other.components[i] ?? 0)) <= tolerance);
   }
   /**
    * Returns a plain object representation.
@@ -31284,14 +31280,14 @@ var conversionService = new ConversionService();
 var CIEDE2000Strategy = class {
   method = "CIEDE2000";
   description = "CIEDE2000 color difference (current CIE standard)";
-  calculate(color1, color2, _options) {
+  calculate(color1, color2, options) {
     const lab1 = conversionService.convert(color1, "lab");
     const lab2 = conversionService.convert(color2, "lab");
     const [L1, a1, b1] = lab1.components;
     const [L2, a2, b2] = lab2.components;
-    const kL = 1;
-    const kC = 1;
-    const kH = 1;
+    const kL = options?.kL ?? 1;
+    const kC = options?.kC ?? 1;
+    const kH = options?.kH ?? 1;
     const C1 = Math.sqrt(a1 * a1 + b1 * b1);
     const C2 = Math.sqrt(a2 * a2 + b2 * b2);
     const Cbar = (C1 + C2) / 2;
@@ -32444,6 +32440,30 @@ var NamedColorsRepository = class {
 
 // src/mcp/tools/parseColor.ts
 var namedColors = new NamedColorsRepository();
+function parseNumOrPercent(val, maxForPercent) {
+  if (val.endsWith("%")) {
+    return parseFloat(val) / 100 * maxForPercent;
+  }
+  return parseFloat(val);
+}
+function parseDegrees(val) {
+  const cleaned = val.endsWith("deg") ? val.slice(0, -3) : val;
+  return parseFloat(cleaned);
+}
+function parseAlpha(val) {
+  if (!val) return 1;
+  if (val.endsWith("%")) {
+    return parseFloat(val) / 100;
+  }
+  return parseFloat(val);
+}
+var COLOR_FUNCTION_SPACE_MAP = {
+  "srgb": "srgb",
+  "display-p3": "display-p3",
+  "rec2020": "rec2020",
+  "prophoto-rgb": "prophoto-rgb",
+  "xyz-d65": "xyz-d65"
+};
 function parseColor(input) {
   const trimmed = input.trim().toLowerCase();
   if (trimmed.startsWith("#")) {
@@ -32453,7 +32473,9 @@ function parseColor(input) {
   if (namedColor) {
     return namedColor.color;
   }
-  const rgbMatch = trimmed.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+  const rgbMatch = trimmed.match(
+    /^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/
+  );
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1], 10);
     const g = parseInt(rgbMatch[2], 10);
@@ -32461,13 +32483,80 @@ function parseColor(input) {
     const a = rgbMatch[4] ? parseFloat(rgbMatch[4]) : 1;
     return Color.fromRgb(r, g, b, a);
   }
-  const hslMatch = trimmed.match(/^hsla?\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+)\s*)?\)$/);
+  const hslMatch = trimmed.match(
+    /^hsla?\s*\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*(?:,\s*([\d.]+)\s*)?\)$/
+  );
   if (hslMatch) {
     const h = parseFloat(hslMatch[1]);
     const s = parseFloat(hslMatch[2]) / 100;
     const l = parseFloat(hslMatch[3]) / 100;
     const a = hslMatch[4] ? parseFloat(hslMatch[4]) : 1;
     return Color.create("hsl", [h, s, l], a);
+  }
+  const colorFnMatch = trimmed.match(
+    /^color\(\s*([\w-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)\s*(?:\/\s*([\d.]+%?))?\)$/
+  );
+  if (colorFnMatch) {
+    const spaceName = colorFnMatch[1];
+    const mappedSpace = COLOR_FUNCTION_SPACE_MAP[spaceName];
+    if (!mappedSpace) {
+      throw new ColorParseError(input, `Unsupported color space in color() function: "${spaceName}"`);
+    }
+    const c1 = parseFloat(colorFnMatch[2]);
+    const c2 = parseFloat(colorFnMatch[3]);
+    const c3 = parseFloat(colorFnMatch[4]);
+    const a = parseAlpha(colorFnMatch[5]);
+    return Color.create(mappedSpace, [c1, c2, c3], a);
+  }
+  const oklchMatch = trimmed.match(
+    /^oklch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+(?:deg)?)\s*(?:\/\s*([\d.]+%?))?\)$/
+  );
+  if (oklchMatch) {
+    const l = parseNumOrPercent(oklchMatch[1], 1);
+    const c = parseNumOrPercent(oklchMatch[2], 0.4);
+    const h = parseDegrees(oklchMatch[3]);
+    const a = parseAlpha(oklchMatch[4]);
+    return Color.create("oklch", [l, c, h], a);
+  }
+  const oklabMatch = trimmed.match(
+    /^oklab\(\s*([\d.]+%?)\s+([-\d.]+%?)\s+([-\d.]+%?)\s*(?:\/\s*([\d.]+%?))?\)$/
+  );
+  if (oklabMatch) {
+    const l = parseNumOrPercent(oklabMatch[1], 1);
+    const aComp = parseNumOrPercent(oklabMatch[2], 0.4);
+    const b = parseNumOrPercent(oklabMatch[3], 0.4);
+    const alpha = parseAlpha(oklabMatch[4]);
+    return Color.create("oklab", [l, aComp, b], alpha);
+  }
+  const labMatch = trimmed.match(
+    /^lab\(\s*([\d.]+%?)\s+([-\d.]+)\s+([-\d.]+)\s*(?:\/\s*([\d.]+%?))?\)$/
+  );
+  if (labMatch) {
+    const l = parseNumOrPercent(labMatch[1], 100);
+    const aComp = parseFloat(labMatch[2]);
+    const b = parseFloat(labMatch[3]);
+    const alpha = parseAlpha(labMatch[4]);
+    return Color.create("lab", [l, aComp, b], alpha);
+  }
+  const lchMatch = trimmed.match(
+    /^lch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+(?:deg)?)\s*(?:\/\s*([\d.]+%?))?\)$/
+  );
+  if (lchMatch) {
+    const l = parseNumOrPercent(lchMatch[1], 100);
+    const c = parseNumOrPercent(lchMatch[2], 150);
+    const h = parseDegrees(lchMatch[3]);
+    const a = parseAlpha(lchMatch[4]);
+    return Color.create("lch", [l, c, h], a);
+  }
+  const hwbMatch = trimmed.match(
+    /^hwb\(\s*([\d.]+(?:deg)?)\s+([\d.]+)%\s+([\d.]+)%\s*(?:\/\s*([\d.]+%?))?\)$/
+  );
+  if (hwbMatch) {
+    const h = parseDegrees(hwbMatch[1]);
+    const w = parseFloat(hwbMatch[2]) / 100;
+    const b = parseFloat(hwbMatch[3]) / 100;
+    const a = parseAlpha(hwbMatch[4]);
+    return Color.create("hwb", [h, w, b], a);
   }
   throw new ColorParseError(input);
 }
@@ -33255,6 +33344,7 @@ async function getColorName(input) {
       exactMatch: true,
       name: exactMatch[0].name,
       hex: exactMatch[0].hex,
+      confidence: 1,
       alternatives: exactMatch.length > 1 ? exactMatch.slice(1).map((c) => ({ name: c.name, hex: c.hex })) : void 0
     };
   }
@@ -33276,11 +33366,13 @@ async function getColorName(input) {
       deltaE: Math.round(c.deltaE * 100) / 100
     }));
   }
+  const confidence = Math.max(0, Math.min(1, 1 - difference / 5));
   return {
     input: input.color,
     exactMatch: false,
     name: closest.name,
     hex: closest.hex,
+    confidence: Math.round(confidence * 100) / 100,
     difference: {
       deltaE: Math.round(difference * 100) / 100,
       description: interpretation.description,
@@ -34417,7 +34509,10 @@ var conversionService13 = new ConversionService();
 var calculateDeltaESchema = external_exports3.object({
   color1: external_exports3.string().describe("First color"),
   color2: external_exports3.string().describe("Second color"),
-  method: DeltaEMethodSchema.optional().default("CIEDE2000").describe("Delta-E calculation method")
+  method: DeltaEMethodSchema.optional().default("CIEDE2000").describe("Delta-E calculation method"),
+  kL: external_exports3.number().optional().describe("CIEDE2000 lightness weight (default 1, textiles use 2)"),
+  kC: external_exports3.number().optional().describe("CIEDE2000 chroma weight (default 1)"),
+  kH: external_exports3.number().optional().describe("CIEDE2000 hue weight (default 1)")
 });
 async function calculateDeltaE(input) {
   const color1 = parseColor(input.color1);
@@ -34426,7 +34521,12 @@ async function calculateDeltaE(input) {
   if (!strategy) {
     throw new Error(`Unknown Delta-E method: ${input.method}`);
   }
-  const deltaE = strategy.calculate(color1, color2);
+  const deltaE = strategy.calculate(color1, color2, {
+    application: void 0,
+    kL: input.kL,
+    kC: input.kC,
+    kH: input.kH
+  });
   const interpretation = strategy.interpret(deltaE);
   const srgb1 = conversionService13.convert(color1, "srgb");
   const srgb2 = conversionService13.convert(color2, "srgb");
@@ -34844,6 +34944,36 @@ var PaletteService = class {
     return conversionService17.convert(mixed, color1.space);
   }
   /**
+   * Mixes two colors in a specified interpolation space.
+   * Handles hue-wrap interpolation for cylindrical spaces (oklch, lch, hsl).
+   */
+  mixColorsInSpace(color1, color2, ratio = 0.5, interpolationSpace = "oklch") {
+    const t = Math.max(0, Math.min(1, ratio));
+    const c1 = conversionService17.convert(color1, interpolationSpace);
+    const c2 = conversionService17.convert(color2, interpolationSpace);
+    const isHueSpace = ["oklch", "lch", "hsl"].includes(interpolationSpace);
+    const hueIndex = interpolationSpace === "hsl" ? 0 : 2;
+    const mixed = [];
+    for (let i = 0; i < c1.components.length; i++) {
+      const v1 = c1.components[i];
+      const v2 = c2.components[i];
+      if (isHueSpace && i === hueIndex) {
+        let diff = v2 - v1;
+        if (Math.abs(diff) > 180) {
+          diff = diff > 0 ? diff - 360 : diff + 360;
+        }
+        let h = v1 + diff * t;
+        h = (h % 360 + 360) % 360;
+        mixed.push(h);
+      } else {
+        mixed.push(v1 * (1 - t) + v2 * t);
+      }
+    }
+    const alpha = color1.alpha * (1 - t) + color2.alpha * t;
+    const result = Color.create(interpolationSpace, mixed, alpha);
+    return conversionService17.convert(result, color1.space);
+  }
+  /**
    * Adjusts a color's properties.
    */
   adjustColor(color, adjustments) {
@@ -34880,6 +35010,51 @@ var PaletteService = class {
       colors.push(this.mixColors(startColor, endColor, t));
     }
     return colors;
+  }
+  /**
+   * Generates a gradient through multiple color stops.
+   * Each adjacent pair is interpolated evenly, and steps are distributed
+   * proportionally across segments.
+   */
+  generateMultiStopGradient(colors, totalSteps, interpolationSpace = "oklch") {
+    if (colors.length < 2) {
+      throw new Error("Gradient requires at least 2 colors");
+    }
+    if (totalSteps < colors.length) {
+      throw new Error("Total steps must be at least the number of colors");
+    }
+    if (colors.length === 2) {
+      return this.generateGradientInSpace(colors[0], colors[1], totalSteps, interpolationSpace);
+    }
+    const segments = colors.length - 1;
+    const stepsPerSegment = Math.floor((totalSteps - 1) / segments);
+    const extraSteps = (totalSteps - 1) % segments;
+    const result = [];
+    for (let seg = 0; seg < segments; seg++) {
+      const segSteps = stepsPerSegment + (seg < extraSteps ? 1 : 0);
+      const start = colors[seg];
+      const end = colors[seg + 1];
+      for (let i = 0; i < segSteps; i++) {
+        const t = segSteps === 0 ? 0 : i / segSteps;
+        result.push(this.mixColorsInSpace(start, end, t, interpolationSpace));
+      }
+    }
+    result.push(colors[colors.length - 1]);
+    return result;
+  }
+  /**
+   * Generates a 2-color gradient in a specified interpolation space.
+   */
+  generateGradientInSpace(startColor, endColor, steps, interpolationSpace = "oklch") {
+    if (steps < 2) {
+      throw new Error("Gradient must have at least 2 steps");
+    }
+    const result = [];
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      result.push(this.mixColorsInSpace(startColor, endColor, t, interpolationSpace));
+    }
+    return result;
   }
 };
 
@@ -35119,9 +35294,37 @@ var paletteService4 = new PaletteService();
 var conversionService21 = new ConversionService();
 var generatePaletteSchema = external_exports3.object({
   baseColor: external_exports3.string().describe("Primary brand color"),
-  style: external_exports3.enum(["minimal", "vibrant", "muted", "professional"]).optional().default("professional").describe("Palette style"),
+  style: external_exports3.enum([
+    "minimal",
+    "vibrant",
+    "muted",
+    "professional",
+    "warm",
+    "cool",
+    "pastel",
+    "earth",
+    "jewel",
+    "neon"
+  ]).optional().default("professional").describe("Palette style"),
   includeNeutrals: external_exports3.boolean().optional().default(true).describe("Include neutral colors (grays)")
 });
+function generateSemanticColor(hue, chroma, lightness) {
+  const base = Color.create("oklch", [lightness, chroma, hue], 1);
+  const baseSrgb = conversionService21.convert(base, "srgb");
+  const light = Color.create("oklch", [0.92, chroma * 0.4, hue], 1);
+  const lightSrgb = conversionService21.convert(light, "srgb");
+  const dark = Color.create("oklch", [0.25, chroma * 0.6, hue], 1);
+  const darkSrgb = conversionService21.convert(dark, "srgb");
+  const contrastSvc = new ContrastService();
+  const onBase = contrastSvc.suggestForeground(baseSrgb);
+  const onBaseSrgb = conversionService21.convert(onBase, "srgb");
+  return {
+    base: baseSrgb.toHex(),
+    light: lightSrgb.toHex(),
+    dark: darkSrgb.toHex(),
+    onBase: onBaseSrgb.toHex()
+  };
+}
 async function generatePalette(input) {
   const baseColor = parseColor(input.baseColor);
   let harmonyType;
@@ -35138,13 +35341,54 @@ async function generatePalette(input) {
       harmonyType = "analogous";
       adjustments = { desaturate: 0.2 };
       break;
+    case "warm":
+      harmonyType = "analogous";
+      adjustments = {};
+      break;
+    case "cool":
+      harmonyType = "analogous";
+      adjustments = {};
+      break;
+    case "pastel":
+      harmonyType = "triadic";
+      adjustments = { desaturate: 0.4, lighten: 0.3 };
+      break;
+    case "earth":
+      harmonyType = "analogous";
+      adjustments = { desaturate: 0.5, darken: 0.15 };
+      break;
+    case "jewel":
+      harmonyType = "tetradic";
+      adjustments = { darken: 0.15, saturate: 0.2 };
+      break;
+    case "neon":
+      harmonyType = "split-complementary";
+      adjustments = { saturate: 0.4, lighten: 0.15 };
+      break;
     case "professional":
     default:
       harmonyType = "split-complementary";
       adjustments = { desaturate: 0.1 };
       break;
   }
-  const harmony = paletteService4.generateHarmony(baseColor, harmonyType);
+  let harmony = paletteService4.generateHarmony(baseColor, harmonyType);
+  if (input.style === "warm" || input.style === "cool") {
+    const targetHueCenter = input.style === "warm" ? 30 : 220;
+    const hueRange = 60;
+    const baseOklchForShift = conversionService21.convert(baseColor, "oklch");
+    const [, , baseHForShift] = baseOklchForShift.components;
+    harmony = harmony.map((color) => {
+      const oklch = conversionService21.convert(color, "oklch");
+      const [l, c] = oklch.components;
+      const colorH = oklch.components[2];
+      const hueDelta = (colorH - baseHForShift + 540) % 360 - 180;
+      const mappedHue = (targetHueCenter + hueDelta * (hueRange / 180) + 360) % 360;
+      return conversionService21.convert(
+        Color.create("oklch", [l, c, mappedHue], color.alpha),
+        "srgb"
+      );
+    });
+  }
   const colors = harmony.colors.map((color, index) => {
     let adjusted = color;
     if (Object.keys(adjustments).length > 0) {
@@ -35188,6 +35432,18 @@ async function generatePalette(input) {
     hex: conversionService21.convert(color, "srgb").toHex()
   }));
   const baseSrgb = conversionService21.convert(baseColor, "srgb");
+  const baseOklch2 = conversionService21.convert(baseColor, "oklch");
+  const [baseL, baseC] = baseOklch2.components;
+  const semanticRoles = {
+    error: generateSemanticColor(0, 0.18, 0.45),
+    // Red hue ~0-25
+    success: generateSemanticColor(145, 0.15, 0.45),
+    // Green hue ~145
+    warning: generateSemanticColor(85, 0.16, 0.55),
+    // Amber/yellow hue ~85
+    info: generateSemanticColor(240, 0.12, 0.5)
+    // Blue hue ~240
+  };
   return {
     baseColor: {
       input: input.baseColor,
@@ -35204,7 +35460,8 @@ async function generatePalette(input) {
       description: "Tailwind-style lightness scale for the primary color",
       colors: scaleColors
     },
-    neutrals: neutrals ?? void 0
+    neutrals: neutrals ?? void 0,
+    semantic: semanticRoles
   };
 }
 function getRoleForIndex(index, _total) {
@@ -35219,24 +35476,34 @@ function getRoleForIndex(index, _total) {
 var paletteService5 = new PaletteService();
 var conversionService22 = new ConversionService();
 var generateGradientSchema = external_exports3.object({
-  startColor: external_exports3.string().describe("Starting color of the gradient"),
-  endColor: external_exports3.string().describe("Ending color of the gradient"),
-  steps: external_exports3.number().min(2).max(20).optional().default(5).describe("Number of color stops in the gradient"),
+  startColor: external_exports3.string().optional().describe("Starting color (for 2-color gradient)"),
+  endColor: external_exports3.string().optional().describe("Ending color (for 2-color gradient)"),
+  colors: external_exports3.array(external_exports3.string()).optional().describe("Multiple color stops (for multi-stop gradient)"),
+  steps: external_exports3.number().min(2).max(50).optional().default(5).describe("Number of color stops in the gradient"),
+  interpolationSpace: external_exports3.enum(["oklch", "oklab", "lab", "lch", "srgb", "hsl"]).optional().default("oklch").describe("Color space for interpolation"),
   includeCSS: external_exports3.boolean().optional().default(true).describe("Include CSS gradient string")
 });
 async function generateGradient(input) {
-  const startColor = parseColor(input.startColor);
-  const endColor = parseColor(input.endColor);
-  const gradientColors = paletteService5.generateGradient(
-    startColor,
-    endColor,
-    input.steps
+  let inputColors;
+  let inputLabels;
+  if (input.colors && input.colors.length >= 2) {
+    inputColors = input.colors.map((c) => parseColor(c));
+    inputLabels = input.colors;
+  } else if (input.startColor && input.endColor) {
+    inputColors = [parseColor(input.startColor), parseColor(input.endColor)];
+    inputLabels = [input.startColor, input.endColor];
+  } else {
+    throw new Error("Provide either startColor+endColor or colors array with 2+ entries");
+  }
+  const space = input.interpolationSpace;
+  const gradientColors = paletteService5.generateMultiStopGradient(
+    inputColors,
+    input.steps,
+    space
   );
-  const startSrgb = conversionService22.convert(startColor, "srgb");
-  const endSrgb = conversionService22.convert(endColor, "srgb");
   const stops = gradientColors.map((color, index) => {
     const srgb = conversionService22.convert(color, "srgb");
-    const position = Math.round(index / (input.steps - 1) * 100);
+    const position = Math.round(index / (gradientColors.length - 1) * 100);
     return {
       index,
       position: `${position}%`,
@@ -35248,24 +35515,20 @@ async function generateGradient(input) {
     const cssStops = stops.map((s) => `${s.hex} ${s.position}`).join(", ");
     cssGradient = {
       linear: `linear-gradient(to right, ${cssStops})`,
-      radial: `radial-gradient(circle, ${cssStops})`
+      radial: `radial-gradient(circle, ${cssStops})`,
+      conic: `conic-gradient(from 0deg, ${cssStops})`
     };
   }
   return {
-    startColor: {
-      input: input.startColor,
-      hex: startSrgb.toHex()
-    },
-    endColor: {
-      input: input.endColor,
-      hex: endSrgb.toHex()
-    },
-    steps: input.steps,
-    gradient: {
-      stops
-    },
+    inputColors: inputLabels.map((label, i) => ({
+      input: label,
+      hex: conversionService22.convert(inputColors[i], "srgb").toHex()
+    })),
+    steps: gradientColors.length,
+    interpolationSpace: input.interpolationSpace,
+    gradient: { stops },
     css: cssGradient,
-    note: "Gradient uses Oklch interpolation for perceptually uniform color transitions"
+    note: `Gradient interpolated in ${input.interpolationSpace} color space`
   };
 }
 
@@ -36042,10 +36305,78 @@ var CVDSimulatorRegistry = class _CVDSimulatorRegistry {
   }
 };
 
+// src/strategies/cvd/Daltonizer.ts
+var conversionService28 = new ConversionService();
+var ERROR_MATRICES = {
+  // Protanopia/protanomaly: shift error into blue and green
+  protan: [
+    [0, 0, 0],
+    [0.7, 1, 0],
+    [0.7, 0, 1]
+  ],
+  // Deuteranopia/deuteranomaly: shift error into blue and red
+  deutan: [
+    [1, 0.7, 0],
+    [0, 0, 0],
+    [0, 0.7, 1]
+  ],
+  // Tritanopia/tritanomaly: shift error into red and green
+  tritan: [
+    [1, 0, 0.7],
+    [0, 1, 0.7],
+    [0, 0, 0]
+  ]
+};
+function getErrorCategory(cvdType) {
+  if (cvdType === "protanopia" || cvdType === "protanomaly") return "protan";
+  if (cvdType === "deuteranopia" || cvdType === "deuteranomaly") return "deutan";
+  if (cvdType === "tritanopia" || cvdType === "tritanomaly") return "tritan";
+  return "deutan";
+}
+function daltonize(color, cvdType, options) {
+  const severity = options?.severity ?? 1;
+  const strength = Math.max(0, Math.min(1, options?.strength ?? 1));
+  const srgb = conversionService28.convert(color, "srgb");
+  const [r, g, b] = srgb.components;
+  const registry2 = CVDSimulatorRegistry.createDefault();
+  const simulator = registry2.get(cvdType);
+  if (!simulator) {
+    return { original: color, corrected: color, cvdType, severity };
+  }
+  const simulated = simulator.simulate(srgb, { severity });
+  const [sr, sg, sb] = conversionService28.convert(simulated, "srgb").components;
+  const origLinear = removeGamma([r, g, b]);
+  const simLinear = removeGamma([sr, sg, sb]);
+  const error48 = [
+    origLinear[0] - simLinear[0],
+    origLinear[1] - simLinear[1],
+    origLinear[2] - simLinear[2]
+  ];
+  const category = getErrorCategory(cvdType);
+  const matrix = ERROR_MATRICES[category];
+  const correction = [
+    matrix[0][0] * error48[0] + matrix[0][1] * error48[1] + matrix[0][2] * error48[2],
+    matrix[1][0] * error48[0] + matrix[1][1] * error48[1] + matrix[1][2] * error48[2],
+    matrix[2][0] * error48[0] + matrix[2][1] * error48[1] + matrix[2][2] * error48[2]
+  ];
+  const correctedLinear = [
+    origLinear[0] + correction[0] * strength,
+    origLinear[1] + correction[1] * strength,
+    origLinear[2] + correction[2] * strength
+  ];
+  const correctedGamma = applyGamma([
+    Math.max(0, Math.min(1, correctedLinear[0])),
+    Math.max(0, Math.min(1, correctedLinear[1])),
+    Math.max(0, Math.min(1, correctedLinear[2]))
+  ]);
+  const corrected = Color.create("srgb", correctedGamma, color.alpha);
+  return { original: color, corrected, cvdType, severity };
+}
+
 // src/mcp/tools/generate/generateAccessibleReport.ts
 var contrastService5 = new ContrastService();
 var apcaService3 = new APCAService();
-var conversionService28 = new ConversionService();
+var conversionService29 = new ConversionService();
 var cvdRegistry = CVDSimulatorRegistry.createDefault();
 var deltaERegistry3 = DeltaERegistry.createDefault();
 var generateAccessibleReportSchema = external_exports3.object({
@@ -36058,12 +36389,12 @@ async function generateAccessibleReport(input) {
   const includeAPCA = input.includeAPCA ?? true;
   const includeCVD = input.includeCVD ?? true;
   const bgColor = parseColor(input.backgroundColor);
-  const bgSrgb = conversionService28.convert(bgColor, "srgb");
-  const bgClamped = conversionService28.clampToGamut(bgSrgb);
+  const bgSrgb = conversionService29.convert(bgColor, "srgb");
+  const bgClamped = conversionService29.clampToGamut(bgSrgb);
   const parsedColors = input.colors.map((colorStr) => {
     const parsed = parseColor(colorStr);
-    const srgb = conversionService28.convert(parsed, "srgb");
-    return conversionService28.clampToGamut(srgb);
+    const srgb = conversionService29.convert(parsed, "srgb");
+    return conversionService29.clampToGamut(srgb);
   });
   let wcagAAPassCount = 0;
   let wcagAAAPassCount = 0;
@@ -36114,8 +36445,8 @@ async function generateAccessibleReport(input) {
           continue;
         }
         const simulated = simulator.simulate(color);
-        const simSrgb = conversionService28.convert(simulated, "srgb");
-        const simClamped = conversionService28.clampToGamut(simSrgb);
+        const simSrgb = conversionService29.convert(simulated, "srgb");
+        const simClamped = conversionService29.clampToGamut(simSrgb);
         const deltaE = deltaEStrategy2 ? deltaEStrategy2.calculate(color, simClamped) : 0;
         cvdEntries[cvdType] = {
           simulatedHex: simClamped.toHex(),
@@ -36166,12 +36497,13 @@ async function generateAccessibleReport(input) {
 
 // src/mcp/tools/validate/validateWcagContrast.ts
 var contrastService6 = new ContrastService();
-var conversionService29 = new ConversionService();
+var conversionService30 = new ConversionService();
 var validateWcagContrastSchema = external_exports3.object({
   foreground: external_exports3.string().describe("Foreground (text) color"),
   background: external_exports3.string().describe("Background color"),
   level: WCAGLevelSchema.optional().default("AA").describe("WCAG conformance level to check"),
-  textSize: TextSizeSchema.optional().default("normal").describe("Text size category")
+  textSize: TextSizeSchema.optional().default("normal").describe("Text size category"),
+  componentType: external_exports3.enum(["text", "ui-component", "graphical-object"]).optional().default("text").describe("Element type: text, UI component (buttons/inputs), or graphical object")
 });
 async function validateWcagContrast(input) {
   const foreground = parseColor(input.foreground);
@@ -36187,8 +36519,8 @@ async function validateWcagContrast(input) {
     input.level,
     input.textSize
   );
-  const fgSrgb = conversionService29.convert(foreground, "srgb");
-  const bgSrgb = conversionService29.convert(background, "srgb");
+  const fgSrgb = conversionService30.convert(foreground, "srgb");
+  const bgSrgb = conversionService30.convert(background, "srgb");
   let suggestion;
   if (!passes) {
     const adjusted = contrastService6.adjustForContrast(
@@ -36197,11 +36529,21 @@ async function validateWcagContrast(input) {
       input.level,
       input.textSize
     );
-    const adjustedSrgb = conversionService29.convert(adjusted, "srgb");
+    const adjustedSrgb = conversionService30.convert(adjusted, "srgb");
     const adjustedContrast = contrastService6.calculateContrastRatio(adjusted, background);
     suggestion = {
       hex: adjustedSrgb.toHex(),
       contrast: Math.round(adjustedContrast * 100) / 100
+    };
+  }
+  let nonTextResult;
+  if (input.componentType !== "text") {
+    const nonTextThreshold = 3;
+    const passesNonText = result.ratio >= nonTextThreshold;
+    nonTextResult = {
+      passes: passesNonText,
+      required: nonTextThreshold,
+      message: passesNonText ? `\u2713 Meets WCAG 2.2 non-text contrast (3:1) for ${input.componentType === "ui-component" ? "UI components" : "graphical objects"}` : `\u2717 Fails WCAG 2.2 non-text contrast (3:1) for ${input.componentType === "ui-component" ? "UI components" : "graphical objects"}`
     };
   }
   return {
@@ -36233,13 +36575,14 @@ async function validateWcagContrast(input) {
       "AA-large": result.passes.AA.large,
       "AAA-normal": result.passes.AAA.normal,
       "AAA-large": result.passes.AAA.large
-    }
+    },
+    nonTextContrast: nonTextResult
   };
 }
 
 // src/mcp/tools/validate/validateColorBlindness.ts
 var cvdRegistry2 = CVDSimulatorRegistry.createDefault();
-var conversionService30 = new ConversionService();
+var conversionService31 = new ConversionService();
 var deltaERegistry4 = DeltaERegistry.createDefault();
 var validateColorBlindnessSchema = external_exports3.object({
   colors: external_exports3.array(external_exports3.string()).describe("Array of colors to check"),
@@ -36259,8 +36602,8 @@ async function validateColorBlindness(input) {
     if (!simulator) continue;
     const simulatedColors = colors.map((c) => {
       const simulated = simulator.simulate(c.color, { severity: input.severity });
-      const originalSrgb = conversionService30.convert(c.color, "srgb");
-      const simulatedSrgb = conversionService30.convert(simulated, "srgb");
+      const originalSrgb = conversionService31.convert(c.color, "srgb");
+      const simulatedSrgb = conversionService31.convert(simulated, "srgb");
       const difference = deltaE.calculate(c.color, simulated);
       return {
         input: c.input,
@@ -36285,11 +36628,20 @@ async function validateColorBlindness(input) {
         }
       }
     }
+    const corrections = confusablePairs.length > 0 ? colors.map((c) => {
+      const result = daltonize(c.color, cvdType, { severity: input.severity });
+      const correctedSrgb = conversionService31.convert(result.corrected, "srgb");
+      return {
+        original: c.input,
+        corrected: correctedSrgb.toHex()
+      };
+    }) : void 0;
     results[cvdType] = {
       info: simulator.info,
       colors: simulatedColors,
       confusablePairs: confusablePairs.length > 0 ? confusablePairs : void 0,
-      hasConfusablePairs: confusablePairs.length > 0
+      hasConfusablePairs: confusablePairs.length > 0,
+      corrections
     };
   }
   const hasAnyConfusable = Object.values(results).some(
@@ -36302,7 +36654,7 @@ async function validateColorBlindness(input) {
     overallAssessment: {
       accessible: !hasAnyConfusable,
       message: hasAnyConfusable ? "Some color pairs may be confusable for people with color vision deficiencies" : "Colors appear distinguishable across simulated CVD types",
-      recommendation: hasAnyConfusable ? "Consider using additional visual cues (patterns, labels, icons) alongside color" : void 0
+      recommendation: hasAnyConfusable ? "Consider using the corrected colors or adding visual cues (patterns, labels, icons) alongside color" : void 0
     }
   };
 }
@@ -36315,15 +36667,15 @@ function getPerceptualChangeDescription(deltaE) {
 }
 
 // src/mcp/tools/validate/validateGamut.ts
-var conversionService31 = new ConversionService();
+var conversionService32 = new ConversionService();
 var validateGamutSchema = external_exports3.object({
   color: external_exports3.string().describe("Color to check"),
   targetGamut: ColorSpaceSchema.optional().default("srgb").describe("Target color space gamut to check against")
 });
 async function validateGamut(input) {
   const color = parseColor(input.color);
-  const inGamut = conversionService31.isInGamut(color, input.targetGamut);
-  const converted = conversionService31.convert(color, input.targetGamut);
+  const inGamut = conversionService32.isInGamut(color, input.targetGamut);
+  const converted = conversionService32.convert(color, input.targetGamut);
   const components = converted.components;
   const outOfGamutComponents = [];
   if (["srgb", "linear-srgb", "display-p3"].includes(input.targetGamut)) {
@@ -36337,11 +36689,11 @@ async function validateGamut(input) {
       }
     });
   }
-  const clamped = conversionService31.clampToGamut(converted);
-  const clampedSrgb = conversionService31.convert(clamped, "srgb");
-  const mapped = conversionService31.mapToGamut(color, input.targetGamut);
-  const mappedSrgb = conversionService31.convert(mapped, "srgb");
-  const originalSrgb = conversionService31.convert(color, "srgb");
+  const clamped = conversionService32.clampToGamut(converted);
+  const clampedSrgb = conversionService32.convert(clamped, "srgb");
+  const mapped = conversionService32.mapToGamut(color, input.targetGamut);
+  const mappedSrgb = conversionService32.convert(mapped, "srgb");
+  const originalSrgb = conversionService32.convert(color, "srgb");
   return {
     input: input.color,
     targetGamut: input.targetGamut,
@@ -36376,15 +36728,34 @@ async function validateGamut(input) {
 }
 
 // src/mcp/tools/validate/validatePrintSafe.ts
-var conversionService32 = new ConversionService();
+var conversionService33 = new ConversionService();
 var validatePrintSafeSchema = external_exports3.object({
   color: external_exports3.string().describe("Color to check for print safety")
 });
+function reduceInkCoverage(c, m, y, k, targetTotal) {
+  const minCMY = Math.min(c, m, y);
+  const currentTotal = (c + m + y + k) * 100;
+  if (currentTotal <= targetTotal) {
+    return {
+      c: Math.round(c * 100),
+      m: Math.round(m * 100),
+      y: Math.round(y * 100),
+      k: Math.round(k * 100)
+    };
+  }
+  const replacement = Math.min(minCMY, (currentTotal - targetTotal) / 300);
+  return {
+    c: Math.round((c - replacement) * 100),
+    m: Math.round((m - replacement) * 100),
+    y: Math.round((y - replacement) * 100),
+    k: Math.round((k + replacement) * 100)
+  };
+}
 async function validatePrintSafe(input) {
   const color = parseColor(input.color);
-  const cmyk = conversionService32.convert(color, "cmyk");
+  const cmyk = conversionService33.convert(color, "cmyk");
   const [c, m, y, k] = cmyk.components;
-  const srgb = conversionService32.convert(color, "srgb");
+  const srgb = conversionService33.convert(color, "srgb");
   const issues = [];
   const warnings = [];
   const totalInk = (c + m + y + k) * 100;
@@ -36404,10 +36775,34 @@ async function validatePrintSafe(input) {
   if (c + m + y + k < 0.05) {
     warnings.push("Very light color may appear as white when printed");
   }
-  const hsl = conversionService32.convert(color, "hsl");
+  const hsl = conversionService33.convert(color, "hsl");
   const [_h, s, l] = hsl.components;
   if (s > 0.9 && l > 0.5) {
     warnings.push("Highly saturated bright colors may appear duller in print than on screen");
+  }
+  const isOutOfGamut = !conversionService33.isInGamut(color, "cmyk");
+  let gamutMapped;
+  if (isOutOfGamut || maxChannel > 0.95) {
+    const mapped = conversionService33.mapToGamut(color, "srgb");
+    const mappedCmyk = conversionService33.convert(mapped, "cmyk");
+    const [mc, mm, my, mk] = mappedCmyk.components;
+    const mappedSrgb = conversionService33.convert(mapped, "srgb");
+    gamutMapped = {
+      hex: mappedSrgb.toHex(),
+      cmyk: {
+        c: Math.round(mc * 100),
+        m: Math.round(mm * 100),
+        y: Math.round(my * 100),
+        k: Math.round(mk * 100)
+      },
+      note: "Closest perceptually faithful printable color (hue and lightness preserved)"
+    };
+    const mappedTotalInk = (mc + mm + my + mk) * 100;
+    if (mappedTotalInk > 280) {
+      const inkReduced = reduceInkCoverage(mc, mm, my, mk, 280);
+      gamutMapped.cmyk = inkReduced;
+      gamutMapped.note += `. Ink coverage optimized to ${inkReduced.c + inkReduced.m + inkReduced.y + inkReduced.k}%`;
+    }
   }
   const printSafe = issues.length === 0;
   return {
@@ -36432,12 +36827,13 @@ async function validatePrintSafe(input) {
       "Request a proof print before final production",
       "Discuss with your printer about their ink coverage limits"
     ],
+    gamutMapping: gamutMapped,
     note: "CMYK conversion is approximate. For accurate print colors, use ICC profiles and professional color management."
   };
 }
 
 // src/mcp/tools/validate/validatePaletteHarmony.ts
-var conversionService33 = new ConversionService();
+var conversionService34 = new ConversionService();
 var deltaERegistry5 = DeltaERegistry.createDefault();
 var validatePaletteHarmonySchema = external_exports3.object({
   colors: external_exports3.array(external_exports3.string()).min(2).describe("Array of colors in the palette")
@@ -36446,7 +36842,7 @@ async function validatePaletteHarmony(input) {
   const colors = input.colors.map((c) => parseColor(c));
   const deltaE = deltaERegistry5.getDefault();
   const hues = colors.map((c) => {
-    const oklch = conversionService33.convert(c, "oklch");
+    const oklch = conversionService34.convert(c, "oklch");
     return oklch.components[2];
   });
   const hueAngles = hues.map((h, i) => {
@@ -36468,8 +36864,8 @@ async function validatePaletteHarmony(input) {
   }
   const harmonyScore = calculateHarmonyScore(hues, pairwiseDeltaE);
   const colorInfo = colors.map((c, i) => {
-    const srgb = conversionService33.convert(c, "srgb");
-    const oklch = conversionService33.convert(c, "oklch");
+    const srgb = conversionService34.convert(c, "srgb");
+    const oklch = conversionService34.convert(c, "oklch");
     const [l, chroma, h] = oklch.components;
     return {
       index: i,
@@ -36993,7 +37389,7 @@ server.tool(
 );
 server.tool(
   "generate-gradient",
-  "Generate a smooth color gradient between two colors",
+  "Generate a smooth color gradient between two or more colors with configurable interpolation space",
   generateGradientSchema.shape,
   async (input) => {
     const result = await generateGradient(input);

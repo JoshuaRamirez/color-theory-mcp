@@ -5,10 +5,10 @@ import type { Color } from '../values/Color.js';
  * Each represents a different formula for calculating perceptual color difference.
  */
 export type DeltaEMethod =
-  | 'CIE76'     // Simple Euclidean in Lab
-  | 'CIE94'     // Weighted with chroma/hue adjustments
+  | 'CIE76' // Simple Euclidean in Lab
+  | 'CIE94' // Weighted with chroma/hue adjustments
   | 'CIEDE2000' // Current standard with rotation term
-  | 'CMC'       // CMC l:c (default 2:1)
+  | 'CMC' // CMC l:c (default 2:1)
   | 'Euclidean'; // Simple Euclidean in any space
 
 /**
@@ -26,6 +26,16 @@ export interface DeltaEOptions {
    * Default is 2:1 for perceptibility, 1:1 for acceptability.
    */
   cmcRatio?: { l: number; c: number };
+
+  /**
+   * CIEDE2000 parametric weighting factors.
+   * kL adjusts lightness weight (default 1, textiles use 2).
+   * kC adjusts chroma weight (default 1).
+   * kH adjusts hue weight (default 1).
+   */
+  kL?: number;
+  kC?: number;
+  kH?: number;
 }
 
 /**

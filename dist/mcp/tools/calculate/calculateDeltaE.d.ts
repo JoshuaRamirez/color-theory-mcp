@@ -7,6 +7,9 @@ export declare const calculateDeltaESchema: z.ZodObject<{
         CIE94: "CIE94";
         CIEDE2000: "CIEDE2000";
     }>>>;
+    kL: z.ZodOptional<z.ZodNumber>;
+    kC: z.ZodOptional<z.ZodNumber>;
+    kH: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strip>;
 export type CalculateDeltaEInput = z.infer<typeof calculateDeltaESchema>;
 export declare function calculateDeltaE(input: CalculateDeltaEInput): Promise<{

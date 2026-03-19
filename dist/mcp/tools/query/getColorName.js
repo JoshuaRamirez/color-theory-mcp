@@ -22,6 +22,7 @@ export async function getColorName(input) {
             exactMatch: true,
             name: exactMatch[0].name,
             hex: exactMatch[0].hex,
+            confidence: 1.0,
             alternatives: exactMatch.length > 1
                 ? exactMatch.slice(1).map(c => ({ name: c.name, hex: c.hex }))
                 : undefined,
@@ -52,11 +53,16 @@ export async function getColorName(input) {
             deltaE: Math.round(c.deltaE * 100) / 100,
         }));
     }
+    // Convert Delta-E to 0-1 confidence score
+    // DeltaE 0 = perfect match (confidence 1.0)
+    // DeltaE 5+ = poor match (confidence ~0.0)
+    const confidence = Math.max(0, Math.min(1, 1 - (difference / 5)));
     return {
         input: input.color,
         exactMatch: false,
         name: closest.name,
         hex: closest.hex,
+        confidence: Math.round(confidence * 100) / 100,
         difference: {
             deltaE: Math.round(difference * 100) / 100,
             description: interpretation.description,

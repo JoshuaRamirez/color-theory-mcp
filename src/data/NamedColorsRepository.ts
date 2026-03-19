@@ -88,26 +88,33 @@ export class NamedColorsRepository {
    * Uses CIEDE2000 perceptual distance in Lab space.
    * Lab values are pre-computed at load time for performance.
    */
-  findClosest(color: Color): NamedColor {
+  findClosest(color: Color): { color: NamedColor; deltaE: number } {
     // Convert target to Lab for perceptual comparison
     const targetLab = this.conversionService.convert(color, 'lab');
 
     let closest: NamedColor | undefined;
     let minDeltaE = Infinity;
 
+    // We can't iterate blindly. CIEDE2000 is expensive (sqrt, sin, cos).
+    // Optimization: Euclidean distance in Lab is a lower bound approx.
+    // Or just iterate all since N is small (< 2000).
+
+    // For 1000 colors, iterating all is ~1-2ms.
     for (const [name, entry] of this.colors.entries()) {
-      const entryLabComponents = this.labCache.get(name);
-      if (!entryLabComponents) continue;
+      const entryLabComponents = this.labCache.get(name)!;
+      // Re-create Lab object only if needed? Or modify DeltaE strategy to take raw components?
+      // Optimization: The strategy takes Color objects.
 
       const entryLab = Color.create('lab', entryLabComponents, 1);
       const de = this.deltaE.calculate(targetLab, entryLab);
+
       if (de < minDeltaE) {
         minDeltaE = de;
         closest = entry;
       }
     }
 
-    return closest!;
+    return { color: closest!, deltaE: minDeltaE };
   }
 
   /**

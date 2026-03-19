@@ -9,6 +9,7 @@ export declare function getColorName(input: GetColorNameInput): Promise<{
     exactMatch: boolean;
     name: string;
     hex: string;
+    confidence: number;
     alternatives: {
         name: string;
         hex: string;
@@ -19,6 +20,7 @@ export declare function getColorName(input: GetColorNameInput): Promise<{
     exactMatch: boolean;
     name: string;
     hex: string;
+    confidence: number;
     difference: {
         deltaE: number;
         description: string;

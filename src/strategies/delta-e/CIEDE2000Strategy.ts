@@ -1,4 +1,8 @@
-import type { IDeltaEStrategy, DeltaEInterpretation, DeltaEOptions } from '../../domain/interfaces/IDeltaEStrategy.js';
+import type {
+  IDeltaEStrategy,
+  DeltaEInterpretation,
+  DeltaEOptions,
+} from '../../domain/interfaces/IDeltaEStrategy.js';
 import type { Color } from '../../domain/values/Color.js';
 import { ConversionService } from '../../services/ConversionService.js';
 
@@ -19,7 +23,7 @@ export class CIEDE2000Strategy implements IDeltaEStrategy {
   readonly method = 'CIEDE2000' as const;
   readonly description = 'CIEDE2000 color difference (current CIE standard)';
 
-  calculate(color1: Color, color2: Color, _options?: DeltaEOptions): number {
+  calculate(color1: Color, color2: Color, options?: DeltaEOptions): number {
     // Convert both colors to Lab
     const lab1 = conversionService.convert(color1, 'lab');
     const lab2 = conversionService.convert(color2, 'lab');
@@ -28,9 +32,9 @@ export class CIEDE2000Strategy implements IDeltaEStrategy {
     const [L2, a2, b2] = lab2.components as [number, number, number];
 
     // Parametric weighting factors (all 1 for standard use)
-    const kL = 1;
-    const kC = 1;
-    const kH = 1;
+    const kL = options?.kL ?? 1;
+    const kC = options?.kC ?? 1;
+    const kH = options?.kH ?? 1;
 
     // Step 1: Calculate C'i and h'i
     const C1 = Math.sqrt(a1 * a1 + b1 * b1);
@@ -94,7 +98,7 @@ export class CIEDE2000Strategy implements IDeltaEStrategy {
       0.17 * Math.cos(((hbarPrime - 30) * Math.PI) / 180) +
       0.24 * Math.cos((2 * hbarPrime * Math.PI) / 180) +
       0.32 * Math.cos(((3 * hbarPrime + 6) * Math.PI) / 180) -
-      0.20 * Math.cos(((4 * hbarPrime - 63) * Math.PI) / 180);
+      0.2 * Math.cos(((4 * hbarPrime - 63) * Math.PI) / 180);
 
     // dTheta (rotation for blue region)
     const dTheta = 30 * Math.exp(-Math.pow((hbarPrime - 275) / 25, 2));
@@ -117,12 +121,7 @@ export class CIEDE2000Strategy implements IDeltaEStrategy {
     const term2 = dCPrime / (kC * SC);
     const term3 = dHPrime / (kH * SH);
 
-    const deltaE = Math.sqrt(
-      term1 * term1 +
-        term2 * term2 +
-        term3 * term3 +
-        RT * term2 * term3
-    );
+    const deltaE = Math.sqrt(term1 * term1 + term2 * term2 + term3 * term3 + RT * term2 * term3);
 
     return deltaE;
   }

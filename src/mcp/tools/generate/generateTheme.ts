@@ -44,6 +44,50 @@ export async function generateTheme(input: GenerateThemeInput) {
 
   result.palettes = serializePalettes(theme.palettes);
 
+  // Generate exports
+  const exports: Record<string, string> = {};
+
+  // CSS Variables
+  let css = ':root {\n';
+  if (mode === 'light' || mode === 'both') {
+    for (const [key, value] of Object.entries(theme.light)) {
+      css += `  --md-sys-color-${key}: ${value};\n`;
+    }
+  }
+  if (mode === 'dark' || mode === 'both') {
+    const selector = mode === 'both' ? '\n@media (prefers-color-scheme: dark) {\n  :root' : '';
+    css += selector === '' ? '' : selector + ' {\n';
+    for (const [key, value] of Object.entries(theme.dark)) {
+      css += `  ${selector ? '  ' : ''}--md-sys-color-${key}: ${value};\n`;
+    }
+    css += selector === '' ? '' : '  }\n}\n';
+  }
+  if (mode === 'light') css += '}\n';
+  else if (mode === 'dark') css += '}\n';
+
+  exports.css = css;
+
+  // Tailwind
+  // Flattening to a consistent structure usually involves "light" and "dark" prefixes
+  // or just mapping the roles if usage is consistent.
+  // For a theme generator, simple mapping is best.
+  exports.tailwind = `// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        md: {
+${Object.entries(theme.light)
+  .map(([k]) => `          '${k}': 'var(--md-sys-color-${k})',`)
+  .join('\n')}
+        }
+      }
+    }
+  }
+}`;
+
+  result.exports = exports;
+
   return result;
 }
 

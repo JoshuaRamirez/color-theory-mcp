@@ -48,7 +48,9 @@ export class ColorSpaceMismatchError extends ColorError {
 export class GamutError extends ColorError {
     targetSpace;
     constructor(targetSpace, detail) {
-        super(detail ? `Color is outside ${targetSpace} gamut: ${detail}` : `Color is outside ${targetSpace} gamut`);
+        super(detail
+            ? `Color is outside ${targetSpace} gamut: ${detail}`
+            : `Color is outside ${targetSpace} gamut`);
         this.name = 'GamutError';
         this.targetSpace = targetSpace;
     }

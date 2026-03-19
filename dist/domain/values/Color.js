@@ -91,11 +91,7 @@ export class Color {
             throw new ColorSpaceMismatchError('srgb', this.space);
         }
         const [r, g, b] = this.components;
-        return [
-            Math.round(r * 255),
-            Math.round(g * 255),
-            Math.round(b * 255),
-        ];
+        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
     /**
      * Returns CSS color string representation.
@@ -109,7 +105,7 @@ export class Color {
             return `rgb(${r}, ${g}, ${b})`;
         }
         // CSS Color 4 format
-        const comps = this.components.map(c => c.toFixed(4)).join(' ');
+        const comps = this.components.map((c) => c.toFixed(4)).join(' ');
         if (this.alpha < 1) {
             return `color(${this.space} ${comps} / ${this.alpha.toFixed(3)})`;
         }
@@ -153,7 +149,7 @@ export class Color {
      * Returns a string representation for debugging.
      */
     toString() {
-        const comps = this.components.map(c => c.toFixed(4)).join(', ');
+        const comps = this.components.map((c) => c.toFixed(4)).join(', ');
         return `Color(${this.space}: [${comps}], alpha: ${this.alpha.toFixed(3)})`;
     }
 }

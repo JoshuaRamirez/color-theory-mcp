@@ -10,6 +10,9 @@ export const calculateDeltaESchema = z.object({
     color2: z.string().describe('Second color'),
     method: DeltaEMethodSchema.optional().default('CIEDE2000')
         .describe('Delta-E calculation method'),
+    kL: z.number().optional().describe('CIEDE2000 lightness weight (default 1, textiles use 2)'),
+    kC: z.number().optional().describe('CIEDE2000 chroma weight (default 1)'),
+    kH: z.number().optional().describe('CIEDE2000 hue weight (default 1)'),
 });
 export async function calculateDeltaE(input) {
     const color1 = parseColor(input.color1);
@@ -18,7 +21,12 @@ export async function calculateDeltaE(input) {
     if (!strategy) {
         throw new Error(`Unknown Delta-E method: ${input.method}`);
     }
-    const deltaE = strategy.calculate(color1, color2);
+    const deltaE = strategy.calculate(color1, color2, {
+        application: undefined,
+        kL: input.kL,
+        kC: input.kC,
+        kH: input.kH,
+    });
     const interpretation = strategy.interpret(deltaE);
     // Convert to sRGB for display
     const srgb1 = conversionService.convert(color1, 'srgb');

@@ -10,6 +10,11 @@ export declare const validateWcagContrastSchema: z.ZodObject<{
         normal: "normal";
         large: "large";
     }>>>;
+    componentType: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        text: "text";
+        "ui-component": "ui-component";
+        "graphical-object": "graphical-object";
+    }>>>;
 }, z.core.$strip>;
 export type ValidateWcagContrastInput = z.infer<typeof validateWcagContrastSchema>;
 export declare function validateWcagContrast(input: ValidateWcagContrastInput): Promise<{
@@ -43,5 +48,10 @@ export declare function validateWcagContrast(input: ValidateWcagContrastInput): 
         'AAA-normal': boolean;
         'AAA-large': boolean;
     };
+    nonTextContrast: {
+        passes: boolean;
+        required: number;
+        message: string;
+    } | undefined;
 }>;
 //# sourceMappingURL=validateWcagContrast.d.ts.map

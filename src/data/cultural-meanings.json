@@ -23,6 +23,24 @@
       "business": ["caution", "used sparingly"],
       "wedding": ["varies by country", "sometimes traditional"],
       "mourning": ["not typically used"]
+    },
+    "latinAmerican": {
+      "general": ["passion", "religion", "revolution", "fire"],
+      "business": ["vibrant", "attention"],
+      "wedding": ["passion", "love"],
+      "mourning": ["not typically used"]
+    },
+    "african": {
+      "general": ["bloodshed", "death", "vitality", "aggression"],
+      "business": ["power", "warning"],
+      "wedding": ["traditional in some cultures"],
+      "mourning": ["associated with death (South Africa)"]
+    },
+    "easternEuropean": {
+      "general": ["beauty", "protection against evil", "communism (history)"],
+      "business": ["attention", "power"],
+      "wedding": ["protection", "beauty"],
+      "mourning": ["not typically used"]
     }
   },
   "blue": {
@@ -49,6 +67,24 @@
       "business": ["trust", "stability"],
       "wedding": ["protection from evil eye"],
       "mourning": ["sometimes used in Iran"]
+    },
+    "latinAmerican": {
+      "general": ["trust", "mourning (Mexico)", "sky", "spirituality"],
+      "business": ["trust", "reliability"],
+      "wedding": ["fidelity"],
+      "mourning": ["associated with mourning in Mexico"]
+    },
+    "african": {
+      "general": ["love", "harmony", "togetherness", "peace"],
+      "business": ["trust", "calm"],
+      "wedding": ["love", "fidelity"],
+      "mourning": ["not typically used"]
+    },
+    "easternEuropean": {
+      "general": ["immortality", "royalty", "calm"],
+      "business": ["trust", "corporate"],
+      "wedding": ["fidelity"],
+      "mourning": ["not typically used"]
     }
   },
   "green": {
@@ -74,6 +110,24 @@
       "general": ["Islam", "paradise", "nature", "fertility", "luck"],
       "business": ["positive", "growth", "religious significance"],
       "wedding": ["sometimes used", "positive associations"],
+      "mourning": ["not typically used"]
+    },
+    "latinAmerican": {
+      "general": ["nature", "hope", "patriotism (Mexico, Brazil)"],
+      "business": ["growth", "agriculture"],
+      "wedding": ["hope"],
+      "mourning": ["not typically used"]
+    },
+    "african": {
+      "general": ["growth", "prosperity", "fertility", "nature"],
+      "business": ["agriculture", "success"],
+      "wedding": ["fertility"],
+      "mourning": ["not typically used"]
+    },
+    "easternEuropean": {
+      "general": ["spring", "life", "youth", "forest"],
+      "business": ["eco", "growth"],
+      "wedding": ["fertility", "spring"],
       "mourning": ["not typically used"]
     }
   },
@@ -101,6 +155,24 @@
       "business": ["positive", "success"],
       "wedding": ["sometimes used", "positive"],
       "mourning": ["sometimes associated with death in Egypt"]
+    },
+    "latinAmerican": {
+      "general": ["sun", "mourning", "death", "caution"],
+      "business": ["caution", "low cost"],
+      "wedding": ["avoided in some regions (bad luck)"],
+      "mourning": ["traditional mourning color"]
+    },
+    "african": {
+      "general": ["wealth", "high rank", "fertility", "beauty"],
+      "business": ["premium", "wealth"],
+      "wedding": ["wealth", "fertility"],
+      "mourning": ["reserved for high rank in some cultures"]
+    },
+    "easternEuropean": {
+      "general": ["jealousy", "treason", "gold", "sun"],
+      "business": ["caution"],
+      "wedding": ["avoided (jealousy)"],
+      "mourning": ["not typically used"]
     }
   },
   "white": {
@@ -127,6 +199,24 @@
       "business": ["clean", "professional"],
       "wedding": ["becoming more common", "purity"],
       "mourning": ["used in some regions"]
+    },
+    "latinAmerican": {
+      "general": ["purity", "peace", "modesty"],
+      "business": ["clean", "medical"],
+      "wedding": ["traditional bridal color"],
+      "mourning": ["purity of the soul"]
+    },
+    "african": {
+      "general": ["spirituality", "purity", "peace", "death (West Africa)"],
+      "business": ["medical", "peace"],
+      "wedding": ["purity"],
+      "mourning": ["associated with spirit world"]
+    },
+    "easternEuropean": {
+      "general": ["purity", "light", "winter", "peace"],
+      "business": ["clean"],
+      "wedding": ["traditional"],
+      "mourning": ["traditional in Slavic history"]
     }
   },
   "black": {
@@ -153,6 +243,24 @@
       "business": ["power", "sophistication"],
       "wedding": ["not traditional"],
       "mourning": ["traditional in many areas"]
+    },
+    "latinAmerican": {
+      "general": ["death", "mourning", "masculinity", "mystery"],
+      "business": ["formal", "luxury"],
+      "wedding": ["avoided"],
+      "mourning": ["traditional mourning color"]
+    },
+    "african": {
+      "general": ["maturity", "masculinity", "spirituality"],
+      "business": ["formal"],
+      "wedding": ["not traditional"],
+      "mourning": ["darkness", "loss"]
+    },
+    "easternEuropean": {
+      "general": ["mourning", "mystery", "formality", "soil"],
+      "business": ["formal"],
+      "wedding": ["not traditional"],
+      "mourning": ["standard mourning color"]
     }
   },
   "purple": {

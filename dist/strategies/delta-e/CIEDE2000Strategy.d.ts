@@ -14,7 +14,7 @@ import type { Color } from '../../domain/values/Color.js';
 export declare class CIEDE2000Strategy implements IDeltaEStrategy {
     readonly method: "CIEDE2000";
     readonly description = "CIEDE2000 color difference (current CIE standard)";
-    calculate(color1: Color, color2: Color, _options?: DeltaEOptions): number;
+    calculate(color1: Color, color2: Color, options?: DeltaEOptions): number;
     /**
      * Calculate h' (hue angle in degrees).
      */

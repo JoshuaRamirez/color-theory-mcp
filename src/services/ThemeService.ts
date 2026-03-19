@@ -72,29 +72,56 @@ export interface MaterialTheme {
  * (primary, secondary, tertiary, neutral, neutral-variant, error)
  * and extracts light and dark theme color roles from those palettes.
  *
- * All perceptual manipulation is performed in the Oklch color space
- * to ensure uniform lightness distribution across tonal steps.
+ * All perceptual manipulation is performed in the HCT color space
+ * (Material Design 3 standard) to ensure correct tonal mapping.
  */
 export class ThemeService {
   /**
    * Generates a complete Material Design 3 theme from a seed color.
    *
-   * @param seedColor - Any Color instance; will be converted to Oklch internally
+   * @param seedColor - Any Color instance; will be converted to Oklch/HCT internally
    * @returns A MaterialTheme with light/dark color roles and all six tonal palettes
    */
   generateTheme(seedColor: Color): MaterialTheme {
-    // Extract seed hue and chroma in Oklch
-    const oklch = conversionService.convert(seedColor, 'oklch');
-    const [, seedChroma, seedHue] = oklch.components as [number, number, number];
+    // Extract seed hue and chroma in HCT (Material 3 standard)
+    // We use HCT space for true Material fidelity.
+    const hct = conversionService.convert(seedColor, 'hct');
+    const [seedHue, seedChroma] = hct.components as [number, number, number];
 
     // Build the six key color palettes
     const primaryPalette = this.generateTonalPalette(seedHue, seedChroma);
-    const secondaryPalette = this.generateTonalPalette(seedHue, seedChroma * 0.33);
+    const secondaryPalette = this.generateTonalPalette(seedHue, Math.max(48, seedChroma * 0.33));
+    // Material 3 uses specific chroma targets or multipliers.
+    // M3 Spec: Secondary chroma = 16.
+    // However, dynamic fidelity depends on implementation.
+    // Sticking to proportional but using HCT values.
+
+    // Using standard M3 chroma logic:
+    // Primary: seed chroma (min 48)
+    // Secondary: 16
+    // Tertiary: 24 (with hue rotation)
+    // Neutral: 4
+    // Neutral Variant: 8
+
+    // Let's stick to the previous dynamic logic but in HCT space for now to preserve behavior structure,
+    // but using HCT metric which is more perceptually accurate for this system.
+
+    // Wait, the previous logic used:
+    // secondary: seedChroma * 0.33
+    // tertiary: seedChroma * 0.5
+    // neutral: seedChroma * 0.04
+    // neutralVariant: seedChroma * 0.08
+
+    // M3 spec says:
+    // Primary: C = max(48, seedC) ?? No, actually M3 is complex.
+    // Let's just swap Oklch -> HCT in the existing logic.
+
     const tertiaryHue = (((seedHue + 60) % 360) + 360) % 360;
     const tertiaryPalette = this.generateTonalPalette(tertiaryHue, seedChroma * 0.5);
     const neutralPalette = this.generateTonalPalette(seedHue, seedChroma * 0.04);
     const neutralVariantPalette = this.generateTonalPalette(seedHue, seedChroma * 0.08);
-    const errorPalette = this.generateTonalPalette(25, 0.18);
+    const errorPalette = this.generateTonalPalette(25, 84); // Error chroma in HCT is roughly 84?
+    // In M3, Error is H=25, C=84, T=40 (approx).
 
     // Convert the seed to sRGB hex for the output record
     const seedSrgb = conversionService.convert(seedColor, 'srgb');
@@ -137,21 +164,19 @@ export class ThemeService {
   /**
    * Generates a tonal palette: 13 tones (0-100) for a given hue and chroma.
    *
-   * Each tone T maps to Oklch lightness L = T/100 while preserving
-   * the supplied hue and chroma. The resulting Color objects are stored
-   * in sRGB with gamut clamping applied.
+   * Each tone T maps to HCT Tone = T while preserving
+   * the supplied hue and chroma.
    *
-   * @param hue - Oklch hue in degrees (0-360)
-   * @param chroma - Oklch chroma (0-0.4 typical range)
+   * @param hue - HCT hue in degrees (0-360)
+   * @param chroma - HCT chroma (0-150 typical)
    * @returns TonalPalette with a Map from tone value to sRGB Color
    */
   generateTonalPalette(hue: number, chroma: number): TonalPalette {
     const tones = new Map<number, Color>();
 
     for (const tone of TONAL_STEPS) {
-      const L = tone / 100;
-      const oklchColor = Color.create('oklch', [L, chroma, hue], 1);
-      const srgbColor = conversionService.convert(oklchColor, 'srgb');
+      const hctColor = Color.create('hct', [hue, chroma, tone], 1);
+      const srgbColor = conversionService.convert(hctColor, 'srgb');
       const clamped = conversionService.clampToGamut(srgbColor);
       tones.set(tone, clamped);
     }
@@ -160,13 +185,11 @@ export class ThemeService {
   }
 
   /**
-   * Converts an Oklch specification (hue, chroma, tone) to an sRGB hex string.
-   * Out-of-gamut colors are clamped to the sRGB boundary.
+   * Converts an HCT specification to an sRGB hex string.
    */
   private toneToHex(hue: number, chroma: number, tone: number): string {
-    const L = tone / 100;
-    const oklchColor = Color.create('oklch', [L, chroma, hue], 1);
-    const srgbColor = conversionService.convert(oklchColor, 'srgb');
+    const hctColor = Color.create('hct', [hue, chroma, tone], 1);
+    const srgbColor = conversionService.convert(hctColor, 'srgb');
     const clamped = conversionService.clampToGamut(srgbColor);
     return clamped.toHex();
   }

@@ -21,7 +21,25 @@ export const getColorInfoSchema = z.object({
 export type GetColorInfoInput = z.infer<typeof getColorInfoSchema>;
 
 export async function getColorInfo(input: GetColorInfoInput) {
-  const color = parseColor(input.color);
+  let color: Color;
+  let searchResults: { name: string; hex: string }[] | undefined;
+  let note: string | undefined;
+
+  try {
+    color = parseColor(input.color);
+  } catch (error) {
+    // If parsing fails, try searching named colors
+    const results = namedColors.search(input.color);
+    if (results.length > 0) {
+      // Use the first match
+      const bestMatch = results[0]!;
+      color = bestMatch.color;
+      searchResults = results.slice(0, 5).map((c) => ({ name: c.name, hex: c.hex }));
+      note = `Input "${input.color}" was not a valid color format. Used closest named color "${bestMatch.name}".`;
+    } else {
+      throw error;
+    }
+  }
 
   // Get various representations
   const srgb = conversionService.convert(color, 'srgb');
@@ -31,9 +49,11 @@ export async function getColorInfo(input: GetColorInfoInput) {
   const lch = conversionService.convert(color, 'lch');
   const oklab = conversionService.convert(color, 'oklab');
   const oklch = conversionService.convert(color, 'oklch');
+  const cmyk = conversionService.convert(color, 'cmyk');
 
   // Get closest named color
   const closestNamed = namedColors.findClosest(srgb);
+  const closestXkcd = xkcdColors.findClosest(srgb);
 
   // Calculate luminance
   const luminance = contrastService.calculateLuminance(srgb);
@@ -44,17 +64,14 @@ export async function getColorInfo(input: GetColorInfoInput) {
   // Calculate contrast with white and black
   const white = Color.fromHex('#FFFFFF');
   const black = Color.fromHex('#000000');
-  const contrastWithWhite = contrastService.calculateContrastRatio(srgb, white);
-  const contrastWithBlack = contrastService.calculateContrastRatio(srgb, black);
+  const checkWhite = contrastService.checkContrast(srgb, white);
+  const checkBlack = contrastService.checkContrast(srgb, black);
 
   // APCA contrast with white and black
   const apcaWithWhite = apcaService.calculateAPCA(srgb, white);
   const apcaWithBlack = apcaService.calculateAPCA(srgb, black);
   const apcaSuggested = apcaService.suggestTextColor(srgb);
   const apcaSuggestedSrgb = conversionService.convert(apcaSuggested, 'srgb');
-
-  // Closest XKCD color name
-  const closestXkcd = xkcdColors.findClosest(srgb);
 
   // Estimated color temperature
   const tempResult = temperatureService.colorToTemperature(srgb);
@@ -66,6 +83,7 @@ export async function getColorInfo(input: GetColorInfoInput) {
   const [lchL, lchC, lchH] = lch.components as [number, number, number];
   const [okL, okA, okB] = oklab.components as [number, number, number];
   const [oklchL, oklchC, oklchH] = oklch.components as [number, number, number];
+  const [c, m, y, k] = cmyk.components as [number, number, number, number];
 
   return {
     input: input.color,
@@ -74,6 +92,13 @@ export async function getColorInfo(input: GetColorInfoInput) {
       hexWithAlpha: srgb.toHex(true),
       rgb: { r, g, b },
       rgbString: `rgb(${r}, ${g}, ${b})`,
+      cmyk: {
+        c: Math.round(c * 100),
+        m: Math.round(m * 100),
+        y: Math.round(y * 100),
+        k: Math.round(k * 100),
+        string: `cmyk(${Math.round(c * 100)}%, ${Math.round(m * 100)}%, ${Math.round(y * 100)}%, ${Math.round(k * 100)}%)`,
+      },
       hsl: {
         h: Math.round(h),
         s: Math.round(s * 100),
@@ -112,12 +137,28 @@ export async function getColorInfo(input: GetColorInfoInput) {
       luminance: Math.round(luminance * 10000) / 10000,
       isLight,
       suggestedTextColor: isLight ? '#000000' : '#FFFFFF',
-      contrastWithWhite: Math.round(contrastWithWhite * 100) / 100,
-      contrastWithBlack: Math.round(contrastWithBlack * 100) / 100,
+      contrastWithWhite: {
+        ratio: Math.round(checkWhite.ratio * 100) / 100,
+        AA: checkWhite.passes.AA.normal ? 'pass' : 'fail',
+        AAA: checkWhite.passes.AAA.normal ? 'pass' : 'fail',
+        NonText: checkWhite.passes.AA.ui ? 'pass' : 'fail', // 3:1 check
+      },
+      contrastWithBlack: {
+        ratio: Math.round(checkBlack.ratio * 100) / 100,
+        AA: checkBlack.passes.AA.normal ? 'pass' : 'fail',
+        AAA: checkBlack.passes.AAA.normal ? 'pass' : 'fail',
+        NonText: checkBlack.passes.AA.ui ? 'pass' : 'fail', // 3:1 check
+      },
       apca: {
         suggestedTextColor: apcaSuggestedSrgb.toHex(),
-        contrastWithWhite: Math.round(apcaWithWhite.Lc * 100) / 100,
-        contrastWithBlack: Math.round(apcaWithBlack.Lc * 100) / 100,
+        contrastWithWhite: {
+          Lc: Math.round(apcaWithWhite.Lc * 100) / 100,
+          rating: apcaWithWhite.interpretation,
+        },
+        contrastWithBlack: {
+          Lc: Math.round(apcaWithBlack.Lc * 100) / 100,
+          rating: apcaWithBlack.interpretation,
+        },
       },
       estimatedTemperature: {
         kelvin: tempResult.estimatedKelvin,
@@ -127,14 +168,25 @@ export async function getColorInfo(input: GetColorInfoInput) {
     },
     closestNamedColor: {
       css: {
-        name: closestNamed.name,
-        hex: closestNamed.hex,
+        name: closestNamed.color.name,
+        hex: closestNamed.color.hex,
+        deltaE: Math.round(closestNamed.deltaE * 100) / 100,
+        match:
+          closestNamed.deltaE < 1 ? 'exact' : closestNamed.deltaE < 2 ? 'close' : 'approximate',
       },
       xkcd: {
-        name: closestXkcd.name,
-        hex: closestXkcd.hex,
+        name: closestXkcd.color.name,
+        hex: closestXkcd.color.hex,
+        deltaE: Math.round(closestXkcd.deltaE * 100) / 100,
       },
     },
+    search: searchResults
+      ? {
+          query: input.color,
+          matches: searchResults,
+          note,
+        }
+      : undefined,
     alpha: srgb.alpha,
   };
 }

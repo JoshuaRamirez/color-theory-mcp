@@ -5,6 +5,7 @@ import { CVDSimulatorRegistry } from '../../../strategies/cvd/CVDSimulatorRegist
 import { ConversionService } from '../../../services/ConversionService.js';
 import { DeltaERegistry } from '../../../strategies/delta-e/DeltaERegistry.js';
 import type { CVDType } from '../../../domain/interfaces/ICVDSimulator.js';
+import { daltonize } from '../../../strategies/cvd/Daltonizer.js';
 
 const cvdRegistry = CVDSimulatorRegistry.createDefault();
 const conversionService = new ConversionService();
@@ -12,16 +13,22 @@ const deltaERegistry = DeltaERegistry.createDefault();
 
 export const validateColorBlindnessSchema = z.object({
   colors: z.array(z.string()).describe('Array of colors to check'),
-  cvdType: CVDTypeSchema.optional()
-    .describe('Specific CVD type to simulate (default: all common types)'),
-  severity: z.number().min(0).max(1).optional().default(1.0)
+  cvdType: CVDTypeSchema.optional().describe(
+    'Specific CVD type to simulate (default: all common types)'
+  ),
+  severity: z
+    .number()
+    .min(0)
+    .max(1)
+    .optional()
+    .default(1.0)
     .describe('Severity of deficiency (0-1)'),
 });
 
 export type ValidateColorBlindnessInput = z.infer<typeof validateColorBlindnessSchema>;
 
 export async function validateColorBlindness(input: ValidateColorBlindnessInput) {
-  const colors = input.colors.map(c => ({
+  const colors = input.colors.map((c) => ({
     input: c,
     color: parseColor(c),
   }));
@@ -39,7 +46,7 @@ export async function validateColorBlindness(input: ValidateColorBlindnessInput)
     if (!simulator) continue;
 
     // Simulate each color
-    const simulatedColors = colors.map(c => {
+    const simulatedColors = colors.map((c) => {
       const simulated = simulator.simulate(c.color, { severity: input.severity });
       const originalSrgb = conversionService.convert(c.color, 'srgb');
       const simulatedSrgb = conversionService.convert(simulated, 'srgb');
@@ -74,11 +81,25 @@ export async function validateColorBlindness(input: ValidateColorBlindnessInput)
       }
     }
 
+    // Daltonize confusable pairs for correction suggestions
+    const corrections =
+      confusablePairs.length > 0
+        ? colors.map((c) => {
+            const result = daltonize(c.color, cvdType as CVDType, { severity: input.severity });
+            const correctedSrgb = conversionService.convert(result.corrected, 'srgb');
+            return {
+              original: c.input,
+              corrected: correctedSrgb.toHex(),
+            };
+          })
+        : undefined;
+
     results[cvdType] = {
       info: simulator.info,
       colors: simulatedColors,
       confusablePairs: confusablePairs.length > 0 ? confusablePairs : undefined,
       hasConfusablePairs: confusablePairs.length > 0,
+      corrections: corrections,
     };
   }
 
@@ -97,7 +118,7 @@ export async function validateColorBlindness(input: ValidateColorBlindnessInput)
         ? 'Some color pairs may be confusable for people with color vision deficiencies'
         : 'Colors appear distinguishable across simulated CVD types',
       recommendation: hasAnyConfusable
-        ? 'Consider using additional visual cues (patterns, labels, icons) alongside color'
+        ? 'Consider using the corrected colors or adding visual cues (patterns, labels, icons) alongside color'
         : undefined,
     },
   };

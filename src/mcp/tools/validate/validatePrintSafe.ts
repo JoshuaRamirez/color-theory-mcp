@@ -10,6 +10,36 @@ export const validatePrintSafeSchema = z.object({
 
 export type ValidatePrintSafeInput = z.infer<typeof validatePrintSafeSchema>;
 
+function reduceInkCoverage(
+  c: number,
+  m: number,
+  y: number,
+  k: number,
+  targetTotal: number
+): { c: number; m: number; y: number; k: number } {
+  // GCR (Gray Component Replacement): convert shared CMY into K
+  const minCMY = Math.min(c, m, y);
+  const currentTotal = (c + m + y + k) * 100;
+
+  if (currentTotal <= targetTotal) {
+    return {
+      c: Math.round(c * 100),
+      m: Math.round(m * 100),
+      y: Math.round(y * 100),
+      k: Math.round(k * 100),
+    };
+  }
+
+  // Replace shared CMY with K (GCR)
+  const replacement = Math.min(minCMY, (currentTotal - targetTotal) / 300);
+  return {
+    c: Math.round((c - replacement) * 100),
+    m: Math.round((m - replacement) * 100),
+    y: Math.round((y - replacement) * 100),
+    k: Math.round((k + replacement) * 100),
+  };
+}
+
 export async function validatePrintSafe(input: ValidatePrintSafeInput) {
   const color = parseColor(input.color);
 
@@ -27,9 +57,13 @@ export async function validatePrintSafe(input: ValidatePrintSafeInput) {
   // High total ink coverage (>300% is often problematic)
   const totalInk = (c + m + y + k) * 100;
   if (totalInk > 300) {
-    issues.push(`Total ink coverage (${Math.round(totalInk)}%) exceeds 300% - may cause bleeding or drying issues`);
+    issues.push(
+      `Total ink coverage (${Math.round(totalInk)}%) exceeds 300% - may cause bleeding or drying issues`
+    );
   } else if (totalInk > 280) {
-    warnings.push(`Total ink coverage (${Math.round(totalInk)}%) is high - consider reducing for better print quality`);
+    warnings.push(
+      `Total ink coverage (${Math.round(totalInk)}%) is high - consider reducing for better print quality`
+    );
   }
 
   // Very saturated colors may not reproduce accurately
@@ -55,6 +89,40 @@ export async function validatePrintSafe(input: ValidatePrintSafeInput) {
   const [_h, s, l] = hsl.components as [number, number, number];
   if (s > 0.9 && l > 0.5) {
     warnings.push('Highly saturated bright colors may appear duller in print than on screen');
+  }
+
+  // Check if color is out of CMYK gamut and suggest closest printable version
+  const isOutOfGamut = !conversionService.isInGamut(color, 'cmyk');
+  let gamutMapped:
+    | { hex: string; cmyk: { c: number; m: number; y: number; k: number }; note: string }
+    | undefined;
+
+  if (isOutOfGamut || maxChannel > 0.95) {
+    // Use perceptual gamut mapping to find closest printable color
+    const mapped = conversionService.mapToGamut(color, 'cmyk');
+    const mappedCmyk = conversionService.convert(mapped, 'cmyk');
+    const [mc, mm, my, mk] = mappedCmyk.components as [number, number, number, number];
+    const mappedSrgb = conversionService.convert(mapped, 'srgb');
+
+    gamutMapped = {
+      hex: mappedSrgb.toHex(),
+      cmyk: {
+        c: Math.round(mc * 100),
+        m: Math.round(mm * 100),
+        y: Math.round(my * 100),
+        k: Math.round(mk * 100),
+      },
+      note: 'Closest perceptually faithful printable color (hue and lightness preserved)',
+    };
+
+    // Also check if total ink can be reduced
+    const mappedTotalInk = (mc + mm + my + mk) * 100;
+    if (mappedTotalInk > 280) {
+      // Suggest increasing K to reduce total ink
+      const inkReduced = reduceInkCoverage(mc, mm, my, mk, 280);
+      gamutMapped.cmyk = inkReduced;
+      gamutMapped.note += `. Ink coverage optimized to ${inkReduced.c + inkReduced.m + inkReduced.y + inkReduced.k}%`;
+    }
   }
 
   const printSafe = issues.length === 0;
@@ -83,6 +151,7 @@ export async function validatePrintSafe(input: ValidatePrintSafeInput) {
           'Request a proof print before final production',
           'Discuss with your printer about their ink coverage limits',
         ],
+    gamutMapping: gamutMapped,
     note: 'CMYK conversion is approximate. For accurate print colors, use ICC profiles and professional color management.',
   };
 }

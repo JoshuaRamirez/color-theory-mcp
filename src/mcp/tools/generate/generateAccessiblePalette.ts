@@ -2,16 +2,17 @@ import { z } from 'zod';
 import { parseColor } from '../parseColor.js';
 import { WCAGLevelSchema } from '../schemas.js';
 import { ContrastService, type WCAGLevel } from '../../../services/ContrastService.js';
+import { APCAService } from '../../../services/APCAService.js';
 import { ConversionService } from '../../../services/ConversionService.js';
 
 const contrastService = new ContrastService();
+const apcaService = new APCAService();
 const conversionService = new ConversionService();
 
 export const generateAccessiblePaletteSchema = z.object({
   colors: z.array(z.string()).describe('Array of colors to make accessible'),
   backgroundColor: z.string().describe('Background color to ensure contrast against'),
-  level: WCAGLevelSchema.optional().default('AA')
-    .describe('WCAG conformance level to target'),
+  level: WCAGLevelSchema.optional().default('AA').describe('WCAG conformance level to target'),
 });
 
 export type GenerateAccessiblePaletteInput = z.infer<typeof generateAccessiblePaletteSchema>;
@@ -20,15 +21,18 @@ export async function generateAccessiblePalette(input: GenerateAccessiblePalette
   const background = parseColor(input.backgroundColor);
   const bgSrgb = conversionService.convert(background, 'srgb');
 
-  const results = input.colors.map(colorStr => {
+  const results = input.colors.map((colorStr) => {
     const original = parseColor(colorStr);
     const originalSrgb = conversionService.convert(original, 'srgb');
 
     // Check original contrast
     const originalContrast = contrastService.checkContrast(original, background);
-    const meetsTarget = input.level === 'AAA'
-      ? originalContrast.passes.AAA.normal
-      : originalContrast.passes.AA.normal;
+    const originalApca = apcaService.calculateAPCA(original, background);
+
+    const meetsTarget =
+      input.level === 'AAA'
+        ? originalContrast.passes.AAA.normal
+        : originalContrast.passes.AA.normal;
 
     if (meetsTarget) {
       // Already meets requirements
@@ -37,6 +41,7 @@ export async function generateAccessiblePalette(input: GenerateAccessiblePalette
         original: {
           hex: originalSrgb.toHex(),
           contrast: Math.round(originalContrast.ratio * 100) / 100,
+          apca: Math.round(originalApca.absLc * 10) / 10,
           passes: true,
         },
         adjusted: null,
@@ -53,6 +58,7 @@ export async function generateAccessiblePalette(input: GenerateAccessiblePalette
     );
     const adjustedSrgb = conversionService.convert(adjusted, 'srgb');
     const adjustedContrast = contrastService.checkContrast(adjusted, background);
+    const adjustedApca = apcaService.calculateAPCA(adjusted, background);
 
     // Calculate how much the color changed
     const originalOklch = conversionService.convert(original, 'oklch');
@@ -65,11 +71,13 @@ export async function generateAccessiblePalette(input: GenerateAccessiblePalette
       original: {
         hex: originalSrgb.toHex(),
         contrast: Math.round(originalContrast.ratio * 100) / 100,
+        apca: Math.round(originalApca.absLc * 10) / 10,
         passes: false,
       },
       adjusted: {
         hex: adjustedSrgb.toHex(),
         contrast: Math.round(adjustedContrast.ratio * 100) / 100,
+        apca: Math.round(adjustedApca.absLc * 10) / 10,
         passes: true,
         lightnessChange: Math.round((adjL - origL) * 100),
       },
@@ -77,8 +85,8 @@ export async function generateAccessiblePalette(input: GenerateAccessiblePalette
     };
   });
 
-  const passedOriginal = results.filter(r => r.adjusted === null).length;
-  const adjusted = results.filter(r => r.adjusted !== null).length;
+  const passedOriginal = results.filter((r) => r.adjusted === null).length;
+  const adjusted = results.filter((r) => r.adjusted !== null).length;
 
   return {
     background: {

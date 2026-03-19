@@ -21,6 +21,15 @@ export interface DeltaEOptions {
         l: number;
         c: number;
     };
+    /**
+     * CIEDE2000 parametric weighting factors.
+     * kL adjusts lightness weight (default 1, textiles use 2).
+     * kC adjusts chroma weight (default 1).
+     * kH adjusts hue weight (default 1).
+     */
+    kL?: number;
+    kC?: number;
+    kH?: number;
 }
 /**
  * Interpretation of Delta-E values.
